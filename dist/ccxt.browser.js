@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.76'
+const version = '1.31.77'
 
 Exchange.ccxtVersion = version
 
@@ -16652,19 +16652,20 @@ module.exports = class bitforex extends Exchange {
             'countries': [ 'CN' ],
             'version': 'v1',
             'has': {
-                'fetchBalance': true,
-                'fetchMarkets': true,
-                'createOrder': true,
                 'cancelOrder': true,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchClosedOrders': true,
+                'fetchMarkets': true,
+                'fetchMyTrades': false,
+                'fetchOHLCV': true,
+                'fetchOpenOrders': true,
+                'fetchOrder': true,
+                'fetchOrderBook': true,
+                'fetchOrders': false,
                 'fetchTicker': true,
                 'fetchTickers': false,
-                'fetchMyTrades': false,
                 'fetchTrades': true,
-                'fetchOrder': true,
-                'fetchOrders': false,
-                'fetchOpenOrders': true,
-                'fetchClosedOrders': true,
-                'fetchOHLCV': true,
             },
             'timeframes': {
                 '1m': '1min',
