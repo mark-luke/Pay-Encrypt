@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.35'
+const version = '1.24.36'
 
 Exchange.ccxtVersion = version
 
@@ -77219,6 +77219,10 @@ module.exports = class okex extends Exchange {
         //         ]
         //     }
         //
+        return this.parseBalanceByType (type, response);
+    }
+
+    parseBalanceByType (type, response) {
         if ((type === 'account') || (type === 'spot')) {
             return this.parseAccountBalance (response);
         } else if (type === 'margin') {
