@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.97'
+const version = '1.27.98'
 
 Exchange.ccxtVersion = version
 
@@ -63501,6 +63501,7 @@ module.exports = class huobipro extends Exchange {
                 },
                 'v2Private': {
                     'get': [
+                        'account/ledger',
                         'account/withdraw/quota',
                         'account/deposit/address',
                         'reference/transact-fee-rate',
