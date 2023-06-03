@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.9'
+const version = '1.27.10'
 
 Exchange.ccxtVersion = version
 
@@ -10449,7 +10449,7 @@ module.exports = class bigone extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, ExchangeNotAvailable, InsufficientFunds, OrderNotFound, InvalidOrder, DDoSProtection, InvalidNonce, AuthenticationError, InvalidAddress, RateLimitExceeded, PermissionDenied } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, ExchangeNotAvailable, InsufficientFunds, OrderNotFound, InvalidOrder, DDoSProtection, InvalidNonce, AuthenticationError, InvalidAddress, RateLimitExceeded, PermissionDenied, NotSupported } = require ('./base/errors');
 const { ROUND, TRUNCATE } = require ('./base/functions/number');
 
 //  ---------------------------------------------------------------------------
@@ -10781,6 +10781,14 @@ module.exports = class binance extends Exchange {
                 '-2015': AuthenticationError, // "Invalid API-key, IP, or permissions for action."
             },
         });
+    }
+
+    setSandboxMode (enabled) {
+        const type = this.safeString (this.options, 'defaultType', 'spot');
+        if (type !== 'future') {
+            throw new NotSupported (this.id + ' does not have a sandbox URL for ' + type + " markets, set exchange.options['defaultType'] = 'future' or don't use the sandbox for " + this.id);
+        }
+        return super.setSandboxMode (enabled);
     }
 
     nonce () {
