@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.13'
+const version = '1.21.14'
 
 Exchange.ccxtVersion = version
 
@@ -50986,7 +50986,7 @@ module.exports = class ftx extends Exchange {
         let symbol = undefined;
         if (marketId !== undefined) {
             if (marketId in this.markets_by_id) {
-                market = this.markets_by_id;
+                market = this.markets_by_id[marketId];
                 symbol = market['symbol'];
             } else {
                 const base = this.safeCurrencyCode (this.safeString (trade, 'baseCurrency'));
