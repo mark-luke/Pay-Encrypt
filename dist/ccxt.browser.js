@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.90'
+const version = '1.22.91'
 
 Exchange.ccxtVersion = version
 
@@ -5876,7 +5876,7 @@ function fromWei (amount, decimals = 18) {
     const exponential = Math.floor (amount).toExponential () // wei must be whole numbers
     const [ n, exponent ] = exponential.split ('e')
     const newExponent = parseInt (exponent) - decimals
-    return numberToString (parseFloat (n + 'e' + newExponent))
+    return parseFloat (n + 'e' + newExponent)
 }
 
 function toWei (amount, decimals = 18) {
