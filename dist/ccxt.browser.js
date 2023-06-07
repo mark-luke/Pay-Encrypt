@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1062'
+const version = '1.18.1063'
 
 Exchange.ccxtVersion = version
 
@@ -55311,7 +55311,10 @@ module.exports = class kraken extends Exchange {
         // https://support.kraken.com/hc/en-us/articles/218198197-How-to-pull-all-trade-data-using-the-Kraken-REST-API
         // https://github.com/ccxt/ccxt/issues/5677
         if (since !== undefined) {
-            request['since'] = since * 1000000; // expected to be in nanoseconds
+            // php does not format it properly
+            // therefore we use string concatenation here
+            request['since'] = since * 1e6;
+            request['since'] = since.toString () + '000000'; // expected to be in nanoseconds
         }
         const response = await this.publicGetTrades (this.extend (request, params));
         //
