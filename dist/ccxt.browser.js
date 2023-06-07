@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1277'
+const version = '1.18.1278'
 
 Exchange.ccxtVersion = version
 
@@ -71634,7 +71634,11 @@ module.exports = class okex3 extends Exchange {
         if (feeCost !== undefined) {
             const feeCurrency = undefined;
             fee = {
-                'cost': feeCost,
+                // fee is either a positive number (invitation rebate)
+                // or a negative number (transaction fee deduction)
+                // therefore we need to invert the fee
+                // more about it https://github.com/ccxt/ccxt/issues/5909
+                'cost': -feeCost,
                 'currency': feeCurrency,
             };
         }
