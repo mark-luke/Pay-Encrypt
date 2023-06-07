@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.13'
+const version = '1.23.14'
 
 Exchange.ccxtVersion = version
 
@@ -32482,6 +32482,9 @@ module.exports = class bytetrade extends Exchange {
             const id = this.safeString (market, 'symbol');
             let base = this.safeString (market, 'baseName');
             let quote = this.safeString (market, 'quoteName');
+            const normalBase = base.split ('@')[0];
+            const normalQuote = quote.split ('@')[0];
+            const normalSymbol = normalBase + '/' + normalQuote;
             const baseId = this.safeString (market, 'base');
             const quoteId = this.safeString (market, 'quote');
             if (baseId in this.commonCurrencies) {
@@ -32496,9 +32499,6 @@ module.exports = class bytetrade extends Exchange {
             const price = this.safeValue (limits, 'price', {});
             const precision = this.safeValue (market, 'precision', {});
             const active = this.safeString (market, 'active');
-            const normalBase = base.split ('@')[0];
-            const normalQuote = quote.split ('@')[0];
-            const normalSymbol = normalBase + '/' + normalQuote;
             const entry = {
                 'id': id,
                 'symbol': symbol,
