@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1109'
+const version = '1.18.1110'
 
 Exchange.ccxtVersion = version
 
@@ -17706,7 +17706,7 @@ module.exports = class bitstamp extends Exchange {
             'pair': this.marketId (symbol),
         };
         const response = await this.publicGetOrderBookPair (this.extend (request, params));
-        const timestamp = this.safeIntegerProduct (response, 'timestamp', 1000);
+        const timestamp = this.safeTimestamp (response, 'timestamp', 1000);
         return this.parseOrderBook (response, timestamp);
     }
 
@@ -17716,7 +17716,7 @@ module.exports = class bitstamp extends Exchange {
             'pair': this.marketId (symbol),
         };
         const ticker = await this.publicGetTickerPair (this.extend (request, params));
-        const timestamp = this.safeIntegerProduct (ticker, 'timestamp', 1000);
+        const timestamp = this.safeTimestamp (ticker, 'timestamp', 1000);
         const vwap = this.safeFloat (ticker, 'vwap');
         const baseVolume = this.safeFloat (ticker, 'volume');
         let quoteVolume = undefined;
@@ -57216,7 +57216,7 @@ module.exports = class kucoin extends Exchange {
             },
             'commonCurrencies': {
                 'HOT': 'HOTNOW',
-                'EDGE': 'DADI',
+                'EDGE': 'DADI', // https://github.com/ccxt/ccxt/issues/5756
             },
             'options': {
                 'version': 'v1',
