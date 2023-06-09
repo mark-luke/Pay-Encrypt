@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1083'
+const version = '1.18.1084'
 
 Exchange.ccxtVersion = version
 
@@ -54610,7 +54610,7 @@ module.exports = class kraken extends Exchange {
                 'api': {
                     'public': 'https://api.kraken.com',
                     'private': 'https://api.kraken.com',
-                    'zendesk': 'https://support.kraken.com/hc/en-us/articles/',
+                    'zendesk': 'https://support.kraken.com/hc/en-us/articles',
                 },
                 'www': 'https://www.kraken.com',
                 'doc': 'https://www.kraken.com/features/api',
