@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.76'
+const version = '1.28.77'
 
 Exchange.ccxtVersion = version
 
@@ -15946,14 +15946,19 @@ module.exports = class bitfinex2 extends bitfinex {
             id = undefined;
             status = 'failed';
         }
+        const tag = this.safeString (data, 3);
         return {
             'info': transaction,
             'id': id,
             'txid': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
+            'addressFrom': undefined,
             'address': undefined, // this is actually the tag for XRP transfers (the address is missing)
-            'tag': this.safeString (data, 3), // refix it properly for the tag from description
+            'addressTo': undefined,
+            'tagFrom': undefined,
+            'tag': tag, // refix it properly for the tag from description
+            'tagTo': tag,
             'type': 'withdrawal',
             'amount': amount,
             'currency': code,
