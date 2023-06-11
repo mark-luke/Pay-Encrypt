@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.30'
+const version = '1.20.31'
 
 Exchange.ccxtVersion = version
 
@@ -10860,7 +10860,7 @@ module.exports = class binance extends Exchange {
                         throw new DDoSProtection (this.id + ' temporary banned: ' + body);
                     }
                     const feedback = this.id + ' ' + body;
-                    this.throwExactlyMatchedException (this.exceptions, message, feedback);
+                    this.throwExactlyMatchedException (this.exceptions, error, feedback);
                     throw new ExchangeError (feedback);
                 }
                 if (!success) {
