@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.97'
+const version = '1.34.3'
 
 Exchange.ccxtVersion = version
 
@@ -10394,7 +10394,7 @@ module.exports = class bit2c extends Exchange {
                 },
             },
             'options': {
-                'fetchTradesMethod': 'public_get_exchanges_pair_lasttrades',
+                'fetchTradesMethod': 'public_get_exchanges_pair_trades',
             },
             'exceptions': {
                 'exact': {
@@ -10525,6 +10525,12 @@ module.exports = class bit2c extends Exchange {
         const request = {
             'pair': market['id'],
         };
+        if (since !== undefined) {
+            request['date'] = parseInt (since);
+        }
+        if (limit !== undefined) {
+            request['limit'] = limit; // max 100000
+        }
         const response = await this[method] (this.extend (request, params));
         if (typeof response === 'string') {
             throw new ExchangeError (response);
@@ -25013,7 +25019,7 @@ module.exports = class bitpanda extends Exchange {
         //         "sequence":603047
         //     }
         //
-        // fetchOrder, fetchOpenOrders, fetchClosedOrders trades (private)
+        // fetchMyTrades, fetchOrder, fetchOpenOrders, fetchClosedOrders trades (private)
         //
         //     {
         //         "fee": {
@@ -25584,7 +25590,7 @@ module.exports = class bitpanda extends Exchange {
         const uppercaseType = type.toUpperCase ();
         const request = {
             'instrument_code': market['id'],
-            'type': type.toUpperCase (), // LIMIT, MARKET, STOP
+            'type': uppercaseType, // LIMIT, MARKET, STOP
             'side': side.toUpperCase (), // or SELL
             'amount': this.amountToPrecision (symbol, amount),
             // "price": "1234.5678", // required for LIMIT and STOP orders
@@ -25992,9 +25998,9 @@ module.exports = class bitpanda extends Exchange {
         //     {"error":"MISSING_TO_PARAM"}
         //     {"error":"CANDLESTICKS_TIME_RANGE_TOO_BIG"}
         //
-        const feedback = this.id + ' ' + body;
         const message = this.safeString (response, 'error');
         if (message !== undefined) {
+            const feedback = this.id + ' ' + body;
             this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             throw new ExchangeError (feedback); // unknown message
