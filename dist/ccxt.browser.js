@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.39'
+const version = '1.20.40'
 
 Exchange.ccxtVersion = version
 
@@ -2476,6 +2476,7 @@ module.exports = class anxpro extends Exchange {
                     'Order Engine is offline': ExchangeNotAvailable,
                     'No executed order with that identifer found': OrderNotFound,
                     'Unknown server error, please contact support.': ExchangeError,
+                    'Not available': ExchangeNotAvailable, // { "status": "Not available" }
                 },
             },
             'fees': {
@@ -3543,11 +3544,13 @@ module.exports = class anxpro extends Exchange {
         }
         const result = this.safeString (response, 'result');
         const code = this.safeString (response, 'resultCode');
-        if (((result !== undefined) && (result !== 'success')) || ((code !== undefined) && (code !== 'OK'))) {
+        const status = this.safeString (response, 'status');
+        if (((result !== undefined) && (result !== 'success')) || ((code !== undefined) && (code !== 'OK')) || (status !== undefined)) {
             const message = this.safeString (response, 'error');
             const feedback = this.id + ' ' + body;
             this.throwExactlyMatchedException (this.exceptions['exact'], code, feedback);
             this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
+            this.throwExactlyMatchedException (this.exceptions['exact'], status, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
@@ -19380,6 +19383,7 @@ module.exports = class bitmex extends Exchange {
                     'Signature not valid': AuthenticationError,
                     'overloaded': ExchangeNotAvailable,
                     'Account has insufficient Available Balance': InsufficientFunds,
+                    'Service unavailable': ExchangeNotAvailable, // {"error":{"message":"Service unavailable","name":"HTTPError"}}
                 },
             },
             'precisionMode': TICK_SIZE,
@@ -68520,7 +68524,7 @@ module.exports = class mandala extends Exchange {
             'countries': [ 'MT' ],
             'version': 'v2',
             'rateLimit': 1500,
-            'certified': true,
+            'certified': false,
             // new metainfo interface
             'has': {
                 'cancelAllOrders': true,
