@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.1'
+const version = '1.32.2'
 
 Exchange.ccxtVersion = version
 
@@ -5424,10 +5424,13 @@ const decimalToPrecision = (x, roundingMode
                              , countingMode       = DECIMAL_PLACES
                              , paddingMode        = NO_PADDING) => {
 
-    if (numPrecisionDigits < 0) {
-        if (countingMode === TICK_SIZE) {
-            throw new Error (`TICK_SIZE cant be used with negative numPrecisionDigits`)
+    if (countingMode === TICK_SIZE) {
+        if (numPrecisionDigits <= 0) {
+            throw new Error ('TICK_SIZE cant be used with negative or zero numPrecisionDigits')
         }
+    }
+
+    if (numPrecisionDigits < 0) {
         const toNearest = Math.pow (10, -numPrecisionDigits)
         if (roundingMode === ROUND) {
             return (toNearest * decimalToPrecision (x / toNearest, roundingMode, 0, countingMode, paddingMode)).toString ()
