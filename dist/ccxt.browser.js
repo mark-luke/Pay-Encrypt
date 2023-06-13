@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.78'
+const version = '1.25.79'
 
 Exchange.ccxtVersion = version
 
@@ -8158,6 +8158,7 @@ module.exports = class bequant extends hitbtc {
             'id': 'bequant',
             'name': 'Bequant',
             'countries': [ 'MT' ], // Malta
+            'pro': false,
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/55248342-a75dfe00-525a-11e9-8aa2-05e9dca943c6.jpg',
                 'api': {
@@ -57586,6 +57587,7 @@ module.exports = class hitbtc extends Exchange {
             'countries': [ 'HK' ],
             'rateLimit': 1500,
             'version': '2',
+            'pro': true,
             'has': {
                 'createDepositAddress': true,
                 'fetchDepositAddress': true,
