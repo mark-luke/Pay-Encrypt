@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.60'
+const version = '1.31.61'
 
 Exchange.ccxtVersion = version
 
@@ -6070,17 +6070,19 @@ module.exports = class bcex extends Exchange {
             'countries': [ 'CN', 'CA' ],
             'version': '1',
             'has': {
-                'fetchBalance': true,
-                'fetchMarkets': true,
-                'createOrder': true,
                 'cancelOrder': true,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchClosedOrders': 'emulated',
+                'fetchMarkets': true,
+                'fetchMyTrades': true,
+                'fetchOpenOrders': true,
+                'fetchOrder': true,
+                'fetchOrders': true,
+                'fetchOrderBook': true,
                 'fetchTicker': true,
                 'fetchTickers': false,
                 'fetchTrades': true,
-                'fetchOrder': true,
-                'fetchOrders': true,
-                'fetchClosedOrders': 'emulated',
-                'fetchOpenOrders': true,
                 'fetchTradingLimits': true,
             },
             'urls': {
@@ -6785,21 +6787,27 @@ module.exports = class bibox extends Exchange {
             'countries': [ 'CN', 'US', 'KR' ],
             'version': 'v1',
             'has': {
+                'cancelOrder': true,
                 'CORS': false,
-                'publicAPI': false,
+                'createMarketOrder': false, // or they will return https://github.com/ccxt/ccxt/issues/2338
+                'createOrder': true,
                 'fetchBalance': true,
-                'fetchDeposits': true,
-                'fetchWithdrawals': true,
+                'fetchClosedOrders': true,
                 'fetchCurrencies': true,
+                'fetchDeposits': true,
                 'fetchDepositAddress': true,
                 'fetchFundingFees': true,
-                'fetchTickers': true,
-                'fetchOrder': true,
-                'fetchOpenOrders': true,
-                'fetchClosedOrders': true,
+                'fetchMarkets': true,
                 'fetchMyTrades': true,
                 'fetchOHLCV': true,
-                'createMarketOrder': false, // or they will return https://github.com/ccxt/ccxt/issues/2338
+                'fetchOpenOrders': true,
+                'fetchOrder': true,
+                'fetchOrderBook': true,
+                'fetchTicker': true,
+                'fetchTickers': true,
+                'fetchTrades': true,
+                'fetchWithdrawals': true,
+                'publicAPI': false,
                 'withdraw': true,
             },
             'timeframes': {
