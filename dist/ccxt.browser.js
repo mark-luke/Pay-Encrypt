@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.53'
+const version = '1.31.54'
 
 Exchange.ccxtVersion = version
 
@@ -691,15 +691,22 @@ module.exports = class anxpro extends Exchange {
             'rateLimit': 1500,
             'userAgent': this.userAgents['chrome'],
             'has': {
+                'cancelOrder': true,
                 'CORS': false,
-                'fetchCurrencies': true,
-                'fetchOHLCV': false,
-                'fetchTrades': false,
-                'fetchOpenOrders': true,
-                'fetchDepositAddress': true,
-                'fetchTransactions': true,
-                'fetchMyTrades': true,
                 'createDepositAddress': false,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchCurrencies': true,
+                'fetchDepositAddress': true,
+                'fetchMarkets': true,
+                'fetchMyTrades': true,
+                'fetchOHLCV': false,
+                'fetchOpenOrders': true,
+                'fetchOrderBook': true,
+                'fetchOrders': true,
+                'fetchTicker': true,
+                'fetchTrades': false,
+                'fetchTransactions': true,
                 'withdraw': true,
             },
             'urls': {
