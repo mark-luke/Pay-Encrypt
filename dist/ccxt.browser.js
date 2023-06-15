@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.4'
+const version = '1.24.5'
 
 Exchange.ccxtVersion = version
 
@@ -10361,6 +10361,7 @@ module.exports = class binance extends Exchange {
             const quoteOrderQty = this.safeFloat (params, 'quoteOrderQty');
             if (quoteOrderQty !== undefined) {
                 request['quoteOrderQty'] = this.costToPrecision (symbol, quoteOrderQty);
+                params = this.omit (params, 'quoteOrderQty');
             } else if (price !== undefined) {
                 request['quoteOrderQty'] = this.costToPrecision (symbol, amount * price);
             } else {
