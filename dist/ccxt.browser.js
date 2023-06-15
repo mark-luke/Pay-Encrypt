@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.37'
+const version = '1.28.38'
 
 Exchange.ccxtVersion = version
 
@@ -10511,6 +10511,14 @@ module.exports = class binance extends Exchange {
         }
         await this.loadMarkets ();
         const market = this.market (symbol);
+        const defaultType = this.safeString2 (this.options, 'fetchOrders', 'defaultType', market['type']);
+        const type = this.safeString (params, 'type', defaultType);
+        let method = 'privateGetAllOrders';
+        if (type === 'future') {
+            method = 'fapiPrivateGetAllOrders';
+        } else if (type === 'margin') {
+            method = 'sapiGetMarginAllOrders';
+        }
         const request = {
             'symbol': market['id'],
         };
@@ -10520,10 +10528,11 @@ module.exports = class binance extends Exchange {
         if (limit !== undefined) {
             request['limit'] = limit;
         }
-        const method = market['spot'] ? 'privateGetAllOrders' : 'fapiPrivateGetAllOrders';
-        const response = await this[method] (this.extend (request, params));
+        const query = this.omit (params, 'type');
+        const response = await this[method] (this.extend (request, query));
         //
-        //  Spot:
+        //  spot
+        //
         //     [
         //         {
         //             "symbol": "LTCBTC",
@@ -10545,7 +10554,8 @@ module.exports = class binance extends Exchange {
         //         }
         //     ]
         //
-        //  Futures:
+        //  futures
+        //
         //     [
         //         {
         //             "symbol": "BTCUSDT",
