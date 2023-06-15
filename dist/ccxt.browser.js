@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.62'
+const version = '1.22.63'
 
 Exchange.ccxtVersion = version
 
@@ -10711,6 +10711,8 @@ module.exports = class binance extends Exchange {
         }
         if (since !== undefined) {
             request['startTime'] = since;
+            // max 3 months range https://github.com/ccxt/ccxt/issues/6495
+            request['endTime'] = this.sum (since, 7776000000);
         }
         const response = await this.wapiGetDepositHistory (this.extend (request, params));
         //
@@ -10736,6 +10738,8 @@ module.exports = class binance extends Exchange {
         }
         if (since !== undefined) {
             request['startTime'] = since;
+            // max 3 months range https://github.com/ccxt/ccxt/issues/6495
+            request['endTime'] = this.sum (since, 7776000000);
         }
         const response = await this.wapiGetWithdrawHistory (this.extend (request, params));
         //
