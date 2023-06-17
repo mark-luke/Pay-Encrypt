@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1322'
+const version = '1.18.1323'
 
 Exchange.ccxtVersion = version
 
@@ -8208,7 +8208,7 @@ module.exports = class bibox extends Exchange {
                     throw new ExchangeError (feedback);
                 }
             }
-            throw new ExchangeError (this.id + ': "error" in response: ' + body);
+            throw new ExchangeError (this.id + ' ' + body);
         }
         if (!('result' in response)) {
             throw new ExchangeError (this.id + ' ' + body);
@@ -10794,7 +10794,7 @@ module.exports = class bit2c extends Exchange {
             timestamp = this.safeTimestamp (trade, 'ticks');
             price = this.safeFloat (trade, 'price');
             amount = this.safeFloat (trade, 'firstAmount');
-            const reference_parts = reference.split ('|'); // reference contains: 'pair|orderId|tradeId'
+            const reference_parts = reference.split ('|'); // reference contains 'pair|orderId|tradeId'
             if (market === undefined) {
                 const marketId = this.safeString (trade, 'pair');
                 if (marketId in this.markets_by_id[marketId]) {
