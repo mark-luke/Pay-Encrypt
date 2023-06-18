@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1051'
+const version = '1.18.1052'
 
 Exchange.ccxtVersion = version
 
@@ -6714,10 +6714,10 @@ module.exports = class bibox extends Exchange {
     }
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
         let market = undefined;
         let pair = undefined;
         if (symbol !== undefined) {
-            await this.loadMarkets ();
             market = this.market (symbol);
             pair = market['id'];
         }
