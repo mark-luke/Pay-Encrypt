@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.8'
+const version = '1.20.9'
 
 Exchange.ccxtVersion = version
 
@@ -10861,26 +10861,22 @@ module.exports = class binance extends Exchange {
                         }
                     }
                 }
-                const exceptions = this.exceptions;
                 const message = this.safeString (response, 'msg');
-                if (message in exceptions) {
-                    const ExceptionClass = exceptions[message];
-                    throw new ExceptionClass (this.id + ' ' + message);
+                if (message !== undefined) {
+                    this.throwExactlyMatchedException (this.exceptions, message, this.id + ' ' + message);
                 }
                 // checks against error codes
                 const error = this.safeString (response, 'code');
                 if (error !== undefined) {
-                    if (error in exceptions) {
-                        // a workaround for {"code":-2015,"msg":"Invalid API-key, IP, or permissions for action."}
-                        // despite that their message is very confusing, it is raised by Binance
-                        // on a temporary ban (the API key is valid, but disabled for a while)
-                        if ((error === '-2015') && this.options['hasAlreadyAuthenticatedSuccessfully']) {
-                            throw new DDoSProtection (this.id + ' temporary banned: ' + body);
-                        }
-                        throw new exceptions[error] (this.id + ' ' + body);
-                    } else {
-                        throw new ExchangeError (this.id + ' ' + body);
+                    // a workaround for {"code":-2015,"msg":"Invalid API-key, IP, or permissions for action."}
+                    // despite that their message is very confusing, it is raised by Binance
+                    // on a temporary ban (the API key is valid, but disabled for a while)
+                    if ((error === '-2015') && this.options['hasAlreadyAuthenticatedSuccessfully']) {
+                        throw new DDoSProtection (this.id + ' temporary banned: ' + body);
                     }
+                    const feedback = this.id + ' ' + body;
+                    this.throwExactlyMatchedException (this.exceptions, message, feedback);
+                    throw new ExchangeError (feedback);
                 }
                 if (!success) {
                     throw new ExchangeError (this.id + ' ' + body);
@@ -23637,8 +23633,7 @@ module.exports = class bittrex extends Exchange {
             }
             if (!success) {
                 const message = this.safeString (response, 'message');
-                const feedback = this.id + ' ' + this.json (response);
-                const exceptions = this.exceptions;
+                const feedback = this.id + ' ' + body;
                 if (message === 'APIKEY_INVALID') {
                     if (this.options['hasAlreadyAuthenticatedSuccessfully']) {
                         throw new DDoSProtection (feedback);
@@ -23683,9 +23678,7 @@ module.exports = class bittrex extends Exchange {
                         }
                     }
                 }
-                if (message in exceptions) {
-                    throw new exceptions[message] (feedback);
-                }
+                this.throwExactlyMatchedException (this.exceptions, message, feedback);
                 if (message !== undefined) {
                     if (message.indexOf ('throttled. Try again') >= 0) {
                         throw new DDoSProtection (feedback);
@@ -24899,7 +24892,6 @@ module.exports = class bitz extends Exchange {
         const status = this.safeString (response, 'status');
         if (status !== undefined) {
             const feedback = this.id + ' ' + body;
-            const exceptions = this.exceptions;
             //
             //     {"status":-107,"msg":"","data":"","time":1535968848,"microtime":"0.89092200 1535968848","source":"api"}
             //
@@ -24909,20 +24901,14 @@ module.exports = class bitz extends Exchange {
                 //
                 const code = this.safeInteger (response, 'data');
                 if (code !== undefined) {
-                    if (code in exceptions) {
-                        throw new exceptions[code] (feedback);
-                    } else {
-                        throw new ExchangeError (feedback);
-                    }
+                    this.throwExactlyMatchedException (this.exceptions, code, feedback);
+                    throw new ExchangeError (feedback);
                 } else {
                     return; // no error
                 }
             }
-            if (status in exceptions) {
-                throw new exceptions[status] (feedback);
-            } else {
-                throw new ExchangeError (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions, status, feedback);
+            throw new ExchangeError (feedback);
         }
     }
 };
@@ -27411,12 +27397,9 @@ module.exports = class btcbox extends Exchange {
         if (result === undefined || result === true) {
             return; // either public API (no error codes expected) or success
         }
-        const errorCode = this.safeValue (response, 'code');
-        const feedback = this.id + ' ' + this.json (response);
-        const exceptions = this.exceptions;
-        if (errorCode in exceptions) {
-            throw new exceptions[errorCode] (feedback);
-        }
+        const code = this.safeValue (response, 'code');
+        const feedback = this.id + ' ' + body;
+        this.throwExactlyMatchedException (this.exceptions, code, feedback);
         throw new ExchangeError (feedback); // unknown message
     }
 
@@ -28552,13 +28535,9 @@ module.exports = class btcmarkets extends Exchange {
         if ('success' in response) {
             if (!response['success']) {
                 const error = this.safeString (response, 'errorCode');
-                const message = this.id + ' ' + this.json (response);
-                if (error in this.exceptions) {
-                    const ExceptionClass = this.exceptions[error];
-                    throw new ExceptionClass (message);
-                } else {
-                    throw new ExchangeError (message);
-                }
+                const feedback = this.id + ' ' + body;
+                this.throwExactlyMatchedException (this.exceptions, error, feedback);
+                throw new ExchangeError (feedback);
             }
         }
     }
@@ -30122,13 +30101,9 @@ module.exports = class buda extends Exchange {
             const errorCode = this.safeString (response, 'code');
             const message = this.safeString (response, 'message', body);
             const feedback = this.id + ' ' + message;
-            const exceptions = this.exceptions;
             if (errorCode !== undefined) {
-                if (errorCode in exceptions) {
-                    throw new exceptions[errorCode] (feedback);
-                } else {
-                    throw new ExchangeError (feedback);
-                }
+                this.throwExactlyMatchedException (this.exceptions, errorCode, feedback);
+                throw new ExchangeError (feedback);
             }
         }
     }
@@ -32588,12 +32563,9 @@ module.exports = class bytetrade extends Exchange {
         if ('code' in response) {
             const status = this.safeString (response, 'code');
             if (status === '1') {
-                const msg = this.safeString (response, 'msg');
-                const feedback = this.id + ' ' + this.json (response);
-                const exceptions = this.exceptions;
-                if (msg in exceptions) {
-                    throw new exceptions[msg] (feedback);
-                }
+                const message = this.safeString (response, 'msg');
+                const feedback = this.id + ' ' + body;
+                this.throwExactlyMatchedException (this.exceptions, message, feedback);
                 throw new ExchangeError (feedback);
             }
         }
@@ -34666,10 +34638,7 @@ module.exports = class cobinhood extends Exchange {
                 }
             }
         }
-        const exceptions = this.exceptions;
-        if (errorCode in exceptions) {
-            throw new exceptions[errorCode] (feedback);
-        }
+        this.throwExactlyMatchedException (this.exceptions, errorCode, feedback);
         throw new ExchangeError (feedback);
     }
 
