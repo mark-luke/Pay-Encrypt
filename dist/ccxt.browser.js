@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.2'
+const version = '1.32.3'
 
 Exchange.ccxtVersion = version
 
@@ -86732,7 +86732,7 @@ module.exports = class okex extends Exchange {
         let currency = undefined;
         if (code !== undefined) {
             currency = this.currency (code);
-            request['code'] = currency['code'];
+            request['currency'] = currency['id'];
             method += 'Currency';
         }
         const response = await this[method] (this.extend (request, params));
@@ -86746,7 +86746,7 @@ module.exports = class okex extends Exchange {
         let currency = undefined;
         if (code !== undefined) {
             currency = this.currency (code);
-            request['code'] = currency['code'];
+            request['currency'] = currency['id'];
             method += 'Currency';
         }
         const response = await this[method] (this.extend (request, params));
