@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.1'
+const version = '1.27.2'
 
 Exchange.ccxtVersion = version
 
@@ -12535,10 +12535,10 @@ module.exports = class binanceus extends binance {
             },
             'fees': {
                 'trading': {
-                    'tierBased': false,
+                    'tierBased': true,
                     'percentage': true,
-                    'taker': 0.0, // 0.1% trading fee, zero fees for all trading pairs before November 1
-                    'maker': 0.0, // 0.1% trading fee, zero fees for all trading pairs before November 1
+                    'taker': 0.001, // 0.1% trading fee, zero fees for all trading pairs before November 1
+                    'maker': 0.001, // 0.1% trading fee, zero fees for all trading pairs before November 1
                 },
             },
         });
