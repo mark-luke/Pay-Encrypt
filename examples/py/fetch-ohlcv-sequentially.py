@@ -22,7 +22,7 @@ hold = 30
 
 # -----------------------------------------------------------------------------
 
-exchange = ccxt.gdax({
+exchange = ccxt.kraken({
     'rateLimit': 3000,
     'enableRateLimit': True,
     # 'verbose': True,
