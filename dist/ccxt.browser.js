@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.49'
+const version = '1.23.50'
 
 Exchange.ccxtVersion = version
 
@@ -57367,7 +57367,11 @@ module.exports = class huobipro extends Exchange {
             'symbol': market['id'],
         };
         const response = await this.marketGetDetailMerged (this.extend (request, params));
-        return this.parseTicker (response['tick'], market);
+        const ticker = this.parseTicker (response['tick'], market);
+        const timestamp = this.safeValue (response, 'ts');
+        ticker['timestamp'] = timestamp;
+        ticker['datetime'] = this.iso8601 (timestamp);
+        return ticker;
     }
 
     async fetchTickers (symbols = undefined, params = {}) {
