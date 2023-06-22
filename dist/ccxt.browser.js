@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.39'
+const version = '1.29.40'
 
 Exchange.ccxtVersion = version
 
@@ -348,12 +348,13 @@ module.exports = class _1btcxe extends Exchange {
     async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const market = this.market (symbol);
-        const response = await this.publicGetHistoricalPrices (this.extend ({
+        const request = {
             'currency': market['id'],
             'timeframe': this.timeframes[timeframe],
-        }, params));
+        };
+        const response = await this.publicGetHistoricalPrices (this.extend (request, params));
         const ohlcvs = this.toArray (this.omit (response['historical-prices'], 'request_currency'));
-        return this.parseOHLCVs (ohlcvs, market, timeframe, since, limit);
+        return this.parseOHLCVs (ohlcvs, market);
     }
 
     parseTrade (trade, market = undefined) {
@@ -792,7 +793,7 @@ module.exports = class acx extends Exchange {
             request['timestamp'] = parseInt (since / 1000);
         }
         const response = await this.publicGetK (this.extend (request, params));
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        return this.parseOHLCVs (response, market);
     }
 
     parseOrderStatus (status) {
@@ -111412,9 +111413,8 @@ module.exports = class theocean extends Exchange {
             'baseTokenAddress': market['baseId'],
             'quoteTokenAddress': market['quoteId'],
             'interval': this.timeframes[timeframe],
+            'startTime': parseInt (since),
         };
-        since = parseInt (since);
-        request['startTime'] = since;
         const response = await this.publicGetCandlesticks (this.extend (request, params));
         //
         //   [
@@ -111437,7 +111437,7 @@ module.exports = class theocean extends Exchange {
         //     }
         //   ]
         //
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        return this.parseOHLCVs (response, market);
     }
 
     async fetchBalanceByCode (code, params = {}) {
