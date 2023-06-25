@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.60'
+const version = '1.33.61'
 
 Exchange.ccxtVersion = version
 
@@ -64499,6 +64499,7 @@ module.exports = class ftx extends Exchange {
             'new': 'open',
             'open': 'open',
             'closed': 'closed', // filled or canceled
+            'triggered': 'closed',
         };
         return this.safeString (statuses, status, status);
     }
