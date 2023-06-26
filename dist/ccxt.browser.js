@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.55'
+const version = '1.21.57'
 
 Exchange.ccxtVersion = version
 
@@ -3787,7 +3787,7 @@ module.exports = class Exchange {
 
         // fetch implementation options (JS only)
         this.fetchOptions = {
-            keepalive: true,
+            // keepalive: true, // does not work in Chrome, https://github.com/ccxt/ccxt/issues/6368
         }
 
         this.userAgents = {
