@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1246'
+const version = '1.18.1251'
 
 Exchange.ccxtVersion = version
 
@@ -13642,7 +13642,7 @@ module.exports = class bitfinex2 extends bitfinex {
                 'fetchDepositAddress': false,
                 'fetchClosedOrders': false,
                 'fetchFundingFees': false,
-                'fetchMyTrades': false, // has to be false https://github.com/ccxt/ccxt/issues/4971
+                'fetchMyTrades': true,
                 'fetchOHLCV': true,
                 'fetchOpenOrders': false,
                 'fetchOrder': true,
@@ -14190,8 +14190,6 @@ module.exports = class bitfinex2 extends bitfinex {
     }
 
     async fetchMyTrades (symbol = undefined, since = undefined, limit = undefined, params = {}) {
-        // this.has['fetchMyTrades'] is set to false
-        // https://github.com/ccxt/ccxt/issues/4971
         await this.loadMarkets ();
         let market = undefined;
         const request = {
@@ -14210,25 +14208,6 @@ module.exports = class bitfinex2 extends bitfinex {
             method = 'privatePostAuthRTradesSymbolHist';
         }
         const response = await this[method] (this.extend (request, params));
-        //
-        //     [
-        //         [
-        //             ID,
-        //             PAIR,
-        //             MTS_CREATE,
-        //             ORDER_ID,
-        //             EXEC_AMOUNT,
-        //             EXEC_PRICE,
-        //             ORDER_TYPE,
-        //             ORDER_PRICE,
-        //             MAKER,
-        //             FEE,
-        //             FEE_CURRENCY,
-        //             ...
-        //         ],
-        //         ...
-        //     ]
-        //
         return this.parseTrades (response, market, since, limit);
     }
 
@@ -35048,10 +35027,10 @@ module.exports = class coinfalcon extends Exchange {
         let fee = undefined;
         const feeCost = this.safeFloat (trade, 'fee');
         if (feeCost !== undefined) {
-            const feeCurrencyCode = undefined;
+            const feeCurrencyCode = this.safeString (trade, 'fee_currency_code');
             fee = {
                 'cost': feeCost,
-                'currency': feeCurrencyCode,
+                'currency': this.safeCurrencyCode (feeCurrencyCode),
             };
         }
         return {
@@ -35293,7 +35272,7 @@ module.exports = class coinfalcon extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { NotSupported } = require ('./base/errors');
+const { InsufficientFunds, ExchangeError, NotSupported, InvalidNonce } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -35350,6 +35329,12 @@ module.exports = class coinfloor extends Exchange {
                 'BTC/GBP': { 'id': 'XBT/GBP', 'symbol': 'BTC/GBP', 'base': 'BTC', 'quote': 'GBP', 'baseId': 'XBT', 'quoteId': 'GBP', 'precision': { 'price': 0, 'amount': 4 }},
                 'BTC/EUR': { 'id': 'XBT/EUR', 'symbol': 'BTC/EUR', 'base': 'BTC', 'quote': 'EUR', 'baseId': 'XBT', 'quoteId': 'EUR', 'precision': { 'price': 0, 'amount': 4 }},
                 'ETH/GBP': { 'id': 'ETH/GBP', 'symbol': 'ETH/GBP', 'base': 'ETH', 'quote': 'GBP', 'baseId': 'ETH', 'quoteId': 'GBP', 'precision': { 'price': 0, 'amount': 4 }},
+            },
+            'exceptions': {
+                'exact': {
+                    'You have insufficient funds.': InsufficientFunds,
+                    'Tonce is out of sequence.': InvalidNonce,
+                },
             },
         });
     }
@@ -35752,6 +35737,22 @@ module.exports = class coinfloor extends Exchange {
         //     "type": 0
         //   }
         return this.parseOrders (response, market, since, limit, { 'status': 'open' });
+    }
+
+    handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
+        if (code < 400) {
+            return;
+        }
+        if (response === undefined) {
+            return;
+        }
+        const message = this.safeString (response, 'error_msg');
+        const feedback = this.id + ' ' + body;
+        const exact = this.exceptions['exact'];
+        if (message in exact) {
+            throw new exact[message] (feedback);
+        }
+        throw new ExchangeError (feedback);
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
