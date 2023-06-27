@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.41'
+const version = '1.31.42'
 
 Exchange.ccxtVersion = version
 
@@ -42605,6 +42605,7 @@ module.exports = class coinbasepro extends Exchange {
                     'get': [
                         'currencies',
                         'products',
+                        'products/{id}',
                         'products/{id}/book',
                         'products/{id}/candles',
                         'products/{id}/stats',
@@ -42625,13 +42626,28 @@ module.exports = class coinbasepro extends Exchange {
                         'fills',
                         'funding',
                         'fees',
+                        'margin/profile_information',
+                        'margin/buying_power',
+                        'margin/withdrawal_power',
+                        'margin/withdrawal_power_all',
+                        'margin/exit_plan',
+                        'margin/liquidation_history',
+                        'margin/position_refresh_amounts',
+                        'margin/status',
+                        'oracle',
                         'orders',
                         'orders/{id}',
+                        'orders/client:{client_oid}',
                         'otc/orders',
                         'payment-methods',
                         'position',
-                        'reports/{id}',
+                        'profiles',
+                        'profiles/{id}',
+                        'reports/{report_id}',
+                        'transfers',
+                        'transfers/{transfer_id}',
                         'users/self/trailing-volume',
+                        'users/self/exchange-limits',
                     ],
                     'post': [
                         'conversions',
@@ -42642,13 +42658,16 @@ module.exports = class coinbasepro extends Exchange {
                         'orders',
                         'position/close',
                         'profiles/margin-transfer',
+                        'profiles/transfer',
                         'reports',
                         'withdrawals/coinbase',
+                        'withdrawals/coinbase-account',
                         'withdrawals/crypto',
                         'withdrawals/payment-method',
                     ],
                     'delete': [
                         'orders',
+                        'orders/client:{client_oid}',
                         'orders/{id}',
                     ],
                 },
