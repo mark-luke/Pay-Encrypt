@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1110'
+const version = '1.18.1111'
 
 Exchange.ccxtVersion = version
 
@@ -53050,7 +53050,7 @@ module.exports = class idex extends Exchange {
         //    '0xd6eefd81c7efc9beeb35b924d6db3c93a78bf7eac082ba87e107ad4e94bccdcf',
         //   depositNumber: 1586430 }
         const amount = this.safeFloat (item, 'amount');
-        const timestamp = this.safeInteger (item, 'timestamp') * 1000;
+        const timestamp = this.safeTimestamp (item, 'timestamp');
         const txhash = this.safeString (item, 'transactionHash');
         let id = undefined;
         let type = undefined;
@@ -53202,7 +53202,7 @@ module.exports = class idex extends Exchange {
         //   amount: '210',
         //   status: 'open',
         //   total: '0.1533' }
-        const timestamp = this.safeInteger (order, 'timestamp') * 1000;
+        const timestamp = this.safeTimestamp (order, 'timestamp');
         const side = this.safeString (order, 'type');
         let symbol = undefined;
         let amount = undefined;
@@ -53393,7 +53393,7 @@ module.exports = class idex extends Exchange {
         if (symbol === undefined && market !== undefined) {
             symbol = market['symbol'];
         }
-        const timestamp = this.safeInteger (trade, 'timestamp') * 1000;
+        const timestamp = this.safeTimestamp (trade, 'timestamp');
         const id = this.safeString (trade, 'tid');
         const amount = this.safeFloat (trade, 'amount');
         const price = this.safeFloat (trade, 'price');
