@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.71'
+const version = '1.34.11'
 
 Exchange.ccxtVersion = version
 
@@ -418,7 +418,7 @@ module.exports = class acx extends Exchange {
             }
             result[symbol] = this.parseTicker (response[id], market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -1096,13 +1096,9 @@ module.exports = class aofex extends Exchange {
         const percentage = change / open * 100;
         const baseVolume = this.safeFloat (ticker, 'amount');
         const quoteVolume = this.safeFloat (ticker, 'vol');
-        let vwap = undefined;
-        if (quoteVolume !== undefined) {
-            if (baseVolume !== undefined) {
-                if (baseVolume > 0) {
-                    vwap = parseFloat (this.priceToPrecision (symbol, quoteVolume / baseVolume));
-                }
-            }
+        let vwap = this.vwap (baseVolume, quoteVolume);
+        if (vwap !== undefined) {
+            vwap = parseFloat (this.priceToPrecision (symbol, vwap));
         }
         return {
             'symbol': symbol,
@@ -3714,40 +3710,31 @@ module.exports['byteArrayToWordArray'] = byteArrayToWordArray
 },{"../../static_dependencies/BN/bn":122,"../../static_dependencies/crypto-js/crypto-js":123,"../../static_dependencies/qs/index":158}],11:[function(require,module,exports){
 "use strict";
 
-/*  ------------------------------------------------------------------------ */
+// ----------------------------------------------------------------------------
 
 const { isObject, isNumber, isDictionary, isArray } = require ('./type')
 
-/*  ------------------------------------------------------------------------ */
+// ----------------------------------------------------------------------------
 
 const keys = Object.keys
-
-    , values = x => !isArray (x)  // don't copy arrays if they're already arrays!
-                        ? Object.values (x)
-                        : x
-
-    , index = x => new Set (values (x))
-
+    , values = (x) => ((!isArray (x)) ? Object.values (x) : x) // don't copy arrays if they're already arrays
+    , index = (x) => new Set (values (x))
     , extend = (...args) => Object.assign ({}, ...args) // NB: side-effect free
+    , clone = (x) => (isArray (x) ? Array.from (x) : extend (x)) // clone arrays or objects
 
-    , clone = x => isArray (x)
-                        ? Array.from (x) // clones arrays
-                        : extend (x)     // clones objects
+// ----------------------------------------------------------------------------
 
-/*  ------------------------------------------------------------------------ */
-
-module.exports =
-
-    { keys
+module.exports = {
+    keys
     , values
     , extend
     , clone
     , index
-    , ordered: x => x // a stub to keep assoc keys in order (in JS it does nothing, it's mostly for Python)
-    , unique:  x => Array.from (index (x))
+    , ordered: (x) => x // a stub to keep assoc keys in order (in JS it does nothing, it's mostly for Python)
+    , unique: (x) => Array.from (index (x))
     , arrayConcat: (a, b) => a.concat (b)
 
-    /*  .............................................   */
+    // ------------------------------------------------------------------------
 
     , inArray (needle, haystack) {
 
@@ -3760,12 +3747,13 @@ module.exports =
     }
 
     , isEmpty (object) {
-        if (!object)
-            return true;
+        if (!object) {
+            return true
+        }
         return (Array.isArray (object) ? object : Object.keys (object)).length < 1;
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
 
     , keysort (x, out = {}) {
 
@@ -3775,55 +3763,57 @@ module.exports =
         return out
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
 
     /*
-       Accepts a map/array of objects and a key name to be used as an index:
-       array = [
-          { someKey: 'value1', anotherKey: 'anotherValue1' },
-          { someKey: 'value2', anotherKey: 'anotherValue2' },
-          { someKey: 'value3', anotherKey: 'anotherValue3' },
-       ]
-       key = 'someKey'
+        Accepts a map/array of objects and a key name to be used as an index:
+        array = [
+            { someKey: 'value1', anotherKey: 'anotherValue1' },
+            { someKey: 'value2', anotherKey: 'anotherValue2' },
+            { someKey: 'value3', anotherKey: 'anotherValue3' },
+        ]
+        key = 'someKey'
 
-       Returns a map:
-      {
-          value1: { someKey: 'value1', anotherKey: 'anotherValue1' },
-          value2: { someKey: 'value2', anotherKey: 'anotherValue2' },
-          value3: { someKey: 'value3', anotherKey: 'anotherValue3' },
-      }
+        Returns a map:
+        {
+            value1: { someKey: 'value1', anotherKey: 'anotherValue1' },
+            value2: { someKey: 'value2', anotherKey: 'anotherValue2' },
+            value3: { someKey: 'value3', anotherKey: 'anotherValue3' },
+        }
     */
 
     , indexBy (x, k, out = {}) {
 
-        for (const v of values (x))
-            if (k in v)
+        for (const v of values (x)) {
+            if (k in v) {
                 out[v[k]] = v
+            }
+        }
 
         return out
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
 
     /*
-       Accepts a map/array of objects and a key name to be used as a grouping parameter:
-       array = [
-          { someKey: 'value1', anotherKey: 'anotherValue1' },
-          { someKey: 'value1', anotherKey: 'anotherValue2' },
-          { someKey: 'value3', anotherKey: 'anotherValue3' },
-       ]
-       key = 'someKey'
-
-       Returns a map:
-      {
-          value1: [
+        Accepts a map/array of objects and a key name to be used as a grouping parameter:
+        array = [
             { someKey: 'value1', anotherKey: 'anotherValue1' },
             { someKey: 'value1', anotherKey: 'anotherValue2' },
-          ]
-          value3: [
-            { someKey: 'value3', anotherKey: 'anotherValue3' }
-          ],
-      }
+            { someKey: 'value3', anotherKey: 'anotherValue3' },
+        ]
+        key = 'someKey'
+
+        Returns a map:
+        {
+            value1: [
+                { someKey: 'value1', anotherKey: 'anotherValue1' },
+                { someKey: 'value1', anotherKey: 'anotherValue2' },
+            ]
+            value3: [
+                { someKey: 'value3', anotherKey: 'anotherValue3' }
+            ],
+        }
     */
 
     , groupBy (x, k, out = {}) {
@@ -3838,61 +3828,68 @@ module.exports =
         return out
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
 
     /*
-       Accepts a map/array of objects, a key name and a key value to be used as a filter:
-       array = [
-          { someKey: 'value1', anotherKey: 'anotherValue1' },
-          { someKey: 'value2', anotherKey: 'anotherValue2' },
-          { someKey: 'value3', anotherKey: 'anotherValue3' },
-       ]
-       key = 'someKey'
-       value = 'value1'
+        Accepts a map/array of objects, a key name and a key value to be used as a filter:
+        array = [
+            { someKey: 'value1', anotherKey: 'anotherValue1' },
+            { someKey: 'value2', anotherKey: 'anotherValue2' },
+            { someKey: 'value3', anotherKey: 'anotherValue3' },
+        ]
+        key = 'someKey'
+        value = 'value1'
 
-       Returns an array:
-      [
-          value1: { someKey: 'value1', anotherKey: 'anotherValue1' },
-      ]
+        Returns an array:
+        [
+            value1: { someKey: 'value1', anotherKey: 'anotherValue1' },
+        ]
     */
 
     , filterBy (x, k, value = undefined, out = []) {
 
-        for (const v of values (x))
-            if (v[k] === value)
+        for (const v of values (x)) {
+            if (v[k] === value) {
                 out.push (v)
-
-        return out
-    }
-
-/*  .............................................   */
-
-    , sortBy: (array, // NB: MUTATES ARRAY!
-               key,
-               descending = false,
-               direction  = descending ? -1 : 1) => array.sort ((a, b) =>
-                                                                ((a[key] < b[key]) ? -direction :
-                                                                ((a[key] > b[key]) ?  direction : 0)))
-
-/*  .............................................   */
-
-    , flatten: function flatten (x, out = []) {
-
-        for (const v of x) {
-            if (isArray (v)) flatten (v, out)
-            else out.push (v)
+            }
         }
 
         return out
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
+    // NB: MUTATES ARRAY!
 
-    , pluck: (x, k) => values (x)
-                        .filter (v => k in v)
-                        .map (v => v[k])
+    , sortBy: (array, key, descending = false, direction  = descending ? -1 : 1) => array.sort ((a, b) => {
+        if (a[key] < b[key]) {
+            return -direction
+        } else if (a[key] > b[key]) {
+            return direction
+        } else {
+            return 0
+        }
+    })
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
+
+    , flatten: function flatten (x, out = []) {
+
+        for (const v of x) {
+            if (isArray (v)) {
+                flatten (v, out)
+            } else {
+                out.push (v)
+            }
+        }
+
+        return out
+    }
+
+    // ------------------------------------------------------------------------
+
+    , pluck: (x, k) => values (x).filter ((v) => k in v).map ((v) => v[k])
+
+    // ------------------------------------------------------------------------
 
     , omit (x, ...args) {
 
@@ -3901,15 +3898,13 @@ module.exports =
             const out = clone (x)
 
             for (const k of args) {
-
                 if (isArray (k)) { // omit (x, ['a', 'b'])
-
                     for (const kk of k) {
                         delete out[kk]
                     }
+                } else {
+                    delete out[k] // omit (x, 'a', 'b')
                 }
-
-                else delete out[k] // omit (x, 'a', 'b')
             }
 
             return out
@@ -3918,24 +3913,22 @@ module.exports =
         return x
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
 
     , sum (...xs) {
 
         const ns = xs.filter (isNumber) // leave only numbers
 
-        return (ns.length > 0)
-                    ? ns.reduce ((a, b) => a + b, 0)
-                    : undefined
+        return (ns.length > 0) ? ns.reduce ((a, b) => a + b, 0) : undefined
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
 
     , deepExtend: function deepExtend (...xs) {
         let out = undefined
         for (const x of xs) {
             if (isDictionary (x)) {
-                if (!isObject (out)) {
+                if (!isDictionary (out)) {
                     out = {}
                 }
                 for (const k in x) {
@@ -3948,7 +3941,7 @@ module.exports =
         return out
     }
 
-/*  ------------------------------------------------------------------------ */
+// ----------------------------------------------------------------------------
 
 }
 
@@ -4056,6 +4049,10 @@ const implodeParams = (string, params) => {
     return string
 }
 
+function vwap (baseVolume, quoteVolume) {
+    return ((baseVolume !== undefined) && (quoteVolume !== undefined) && (baseVolume > 0)) ? (quoteVolume / baseVolume) : undefined
+}
+
 /*  ------------------------------------------------------------------------ */
 
 module.exports = {
@@ -4081,7 +4078,9 @@ module.exports = {
     ROUND_DOWN,
 
     implodeParams,
-    extractParams
+    extractParams,
+
+    vwap,
 }
 
 /*  ------------------------------------------------------------------------ */
@@ -4758,9 +4757,10 @@ const isNumber          = Number.isFinite
     , isInteger         = Number.isInteger
     , isArray           = Array.isArray
     , hasProps          = o => ((o !== undefined) && (o !== null))
-    , isString          = s =>                 (typeof s === 'string')
+    , isString          = s =>                  (typeof s === 'string')
     , isObject          = o => ((o !== null) && (typeof o === 'object'))
-    , isDictionary      = o => (isObject (o) && !isArray (o))
+    , isRegExp          = o => (o instanceof RegExp)
+    , isDictionary      = o => (isObject (o) && !isArray (o) && !isRegExp (o))
     , isStringCoercible = x => ((hasProps (x) && x.toString) || isNumber (x))
 
 /*  .............................................   */
@@ -5817,7 +5817,8 @@ module.exports = class bibox extends Exchange {
         };
         const response = await this.publicGetMdata (this.extend (request, params));
         const tickers = this.parseTickers (response['result'], symbols);
-        return this.indexBy (tickers, 'symbol');
+        const result = this.indexBy (tickers, 'symbol');
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     parseTrade (trade, market = undefined) {
@@ -5860,7 +5861,7 @@ module.exports = class bibox extends Exchange {
         }
         if (feeCost !== undefined) {
             fee = {
-                'cost': feeCost,
+                'cost': -feeCost,
                 'currency': feeCurrency,
                 'rate': feeRate,
             };
@@ -6954,7 +6955,7 @@ module.exports = class bigone extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTime (params = {}) {
@@ -10393,7 +10394,7 @@ module.exports = class bit2c extends Exchange {
                 },
             },
             'options': {
-                'fetchTradesMethod': 'public_get_exchanges_pair_lasttrades',
+                'fetchTradesMethod': 'public_get_exchanges_pair_trades',
             },
             'exceptions': {
                 'exact': {
@@ -10524,6 +10525,12 @@ module.exports = class bit2c extends Exchange {
         const request = {
             'pair': market['id'],
         };
+        if (since !== undefined) {
+            request['date'] = parseInt (since);
+        }
+        if (limit !== undefined) {
+            request['limit'] = limit; // max 100000
+        }
         const response = await this[method] (this.extend (request, params));
         if (typeof response === 'string') {
             throw new ExchangeError (response);
@@ -11606,6 +11613,9 @@ module.exports = class bitbay extends Exchange {
                 'UNDER_MAINTENANCE': OnMaintenance,
                 'REQUEST_TIMESTAMP_TOO_OLD': InvalidNonce,
                 'PERMISSIONS_NOT_SUFFICIENT': PermissionDenied,
+            },
+            'commonCurrencies': {
+                'GGC': 'Global Game Coin',
             },
         });
     }
@@ -13326,7 +13336,7 @@ module.exports = class bitfinex extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -14425,7 +14435,7 @@ module.exports = class bitfinex2 extends bitfinex {
                 result[symbol] = this.parseTicker (ticker, market);
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -17349,10 +17359,7 @@ module.exports = class bitget extends Exchange {
         }
         const baseVolume = this.safeFloat2 (ticker, 'amount', 'volume_24h');
         const quoteVolume = this.safeFloat (ticker, 'vol');
-        let vwap = undefined;
-        if ((baseVolume !== undefined) && (quoteVolume !== undefined)) {
-            vwap = quoteVolume / baseVolume;
-        }
+        const vwap = this.vwap (baseVolume, quoteVolume);
         let change = undefined;
         let percentage = undefined;
         let average = undefined;
@@ -19352,10 +19359,7 @@ module.exports = class bithumb extends Exchange {
         }
         const baseVolume = this.safeFloat (ticker, 'units_traded_24H');
         const quoteVolume = this.safeFloat (ticker, 'acc_trade_value_24H');
-        let vwap = undefined;
-        if (quoteVolume !== undefined && baseVolume !== undefined) {
-            vwap = quoteVolume / baseVolume;
-        }
+        const vwap = this.vwap (baseVolume, quoteVolume);
         return {
             'symbol': symbol,
             'timestamp': timestamp,
@@ -19424,7 +19428,7 @@ module.exports = class bithumb extends Exchange {
                 result[symbol] = this.parseTicker (ticker, market);
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -20362,7 +20366,7 @@ module.exports = class bitmart extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchCurrencies (params = {}) {
@@ -23545,7 +23549,7 @@ module.exports = class bitmex extends Exchange {
                 result[symbol] = ticker;
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     parseTicker (ticker, market = undefined) {
@@ -24354,7 +24358,7 @@ module.exports = class bitpanda extends Exchange {
             },
             'fees': {
                 'trading': {
-                    'tierBased': false,
+                    'tierBased': true,
                     'percentage': true,
                     'taker': 0.15 / 100,
                     'maker': 0.10 / 100,
@@ -24762,10 +24766,7 @@ module.exports = class bitpanda extends Exchange {
         }
         const baseVolume = this.safeFloat (ticker, 'base_volume');
         const quoteVolume = this.safeFloat (ticker, 'quote_volume');
-        let vwap = undefined;
-        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume !== 0)) {
-            vwap = quoteVolume / baseVolume;
-        }
+        const vwap = this.vwap (baseVolume, quoteVolume);
         return {
             'symbol': symbol,
             'timestamp': timestamp,
@@ -24820,7 +24821,7 @@ module.exports = class bitpanda extends Exchange {
 
     async fetchTickers (symbols = undefined, params = {}) {
         await this.loadMarkets ();
-        const tickers = await this.publicGetMarketTicker (params);
+        const response = await this.publicGetMarketTicker (params);
         //
         //     [
         //         {
@@ -24842,12 +24843,12 @@ module.exports = class bitpanda extends Exchange {
         //     ]
         //
         const result = {};
-        for (let i = 0; i < tickers.length; i++) {
-            const ticker = this.parseTicker (tickers[i]);
+        for (let i = 0; i < response.length; i++) {
+            const ticker = this.parseTicker (response[i]);
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -24954,8 +24955,7 @@ module.exports = class bitpanda extends Exchange {
         const durationInSeconds = this.parseTimeframe (timeframe);
         const duration = durationInSeconds * 1000;
         const timestamp = this.parse8601 (this.safeString (ohlcv, 'time'));
-        const modulo = this.integerModulo (timestamp, duration);
-        const alignedTimestamp = timestamp - modulo;
+        const alignedTimestamp = duration * parseInt (timestamp / duration);
         const options = this.safeValue (this.options, 'fetchOHLCV', {});
         const volumeField = this.safeString (options, 'volume', 'total_amount');
         return [
@@ -25019,7 +25019,7 @@ module.exports = class bitpanda extends Exchange {
         //         "sequence":603047
         //     }
         //
-        // fetchOrder, fetchOpenOrders, fetchClosedOrders trades (private)
+        // fetchMyTrades, fetchOrder, fetchOpenOrders, fetchClosedOrders trades (private)
         //
         //     {
         //         "fee": {
@@ -25590,7 +25590,7 @@ module.exports = class bitpanda extends Exchange {
         const uppercaseType = type.toUpperCase ();
         const request = {
             'instrument_code': market['id'],
-            'type': type.toUpperCase (), // LIMIT, MARKET, STOP
+            'type': uppercaseType, // LIMIT, MARKET, STOP
             'side': side.toUpperCase (), // or SELL
             'amount': this.amountToPrecision (symbol, amount),
             // "price": "1234.5678", // required for LIMIT and STOP orders
@@ -25998,9 +25998,9 @@ module.exports = class bitpanda extends Exchange {
         //     {"error":"MISSING_TO_PARAM"}
         //     {"error":"CANDLESTICKS_TIME_RANGE_TOO_BIG"}
         //
-        const feedback = this.id + ' ' + body;
         const message = this.safeString (response, 'error');
         if (message !== undefined) {
+            const feedback = this.id + ' ' + body;
             this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             throw new ExchangeError (feedback); // unknown message
@@ -30293,10 +30293,7 @@ module.exports = class bitvavo extends Exchange {
         const last = this.safeFloat (ticker, 'last');
         const baseVolume = this.safeFloat (ticker, 'volume');
         const quoteVolume = this.safeFloat (ticker, 'volumeQuote');
-        let vwap = undefined;
-        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume > 0)) {
-            vwap = quoteVolume / baseVolume;
-        }
+        const vwap = this.vwap (baseVolume, quoteVolume);
         let change = undefined;
         let percentage = undefined;
         let average = undefined;
@@ -31906,7 +31903,7 @@ module.exports = class bitz extends Exchange {
                 });
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTime (params = {}) {
@@ -34050,7 +34047,7 @@ module.exports = class braziliex extends Exchange {
             const symbol = market['symbol'];
             result[symbol] = this.parseTicker (response[marketId], market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -36904,7 +36901,7 @@ module.exports = class btcturk extends Exchange {
             }
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -38268,7 +38265,7 @@ module.exports = class bw extends Exchange {
                 result[symbol] = ticker;
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -39316,6 +39313,7 @@ module.exports = class bybit extends Exchange {
                 },
                 'broad': {
                     'unknown orderInfo': OrderNotFound, // {"ret_code":-1,"ret_msg":"unknown orderInfo","ext_code":"","ext_info":"","result":null,"time_now":"1584030414.005545","rate_limit_status":99,"rate_limit_reset_ms":1584030414003,"rate_limit":100}
+                    'invalid api_key': AuthenticationError, // {"ret_code":10003,"ret_msg":"invalid api_key","ext_code":"","ext_info":"","result":null,"time_now":"1599547085.415797"}
                 },
             },
             'precisionMode': TICK_SIZE,
@@ -39573,10 +39571,7 @@ module.exports = class bybit extends Exchange {
         }
         const baseVolume = this.safeFloat (ticker, 'turnover_24h');
         const quoteVolume = this.safeFloat (ticker, 'volume_24h');
-        let vwap = undefined;
-        if (quoteVolume !== undefined && baseVolume !== undefined) {
-            vwap = quoteVolume / baseVolume;
-        }
+        const vwap = this.vwap (baseVolume, quoteVolume);
         return {
             'symbol': symbol,
             'timestamp': timestamp,
@@ -40154,7 +40149,7 @@ module.exports = class bybit extends Exchange {
                 }
             }
         }
-        const status = this.parseOrderStatus (this.safeString (order, 'order_status'));
+        const status = this.parseOrderStatus (this.safeString2 (order, 'order_status', 'stop_order_status'));
         const side = this.safeStringLower (order, 'side');
         let feeCost = this.safeFloat (order, 'cum_exec_fee');
         let fee = undefined;
@@ -41171,10 +41166,7 @@ module.exports = class bybit extends Exchange {
                 'recv_window': this.options['recvWindow'],
                 'timestamp': timestamp,
             });
-            let auth = this.rawencode (this.keysort (query));
-            // fix https://github.com/ccxt/ccxt/issues/7377
-            // bybit encodes whole floats as integers without .0
-            auth = auth.replace ('.0&', '&');
+            const auth = this.rawencode (this.keysort (query));
             const signature = this.hmac (this.encode (auth), this.encode (this.secret));
             if (method === 'POST') {
                 body = this.json (this.extend (query, {
@@ -43151,7 +43143,7 @@ module.exports = class cex extends Exchange {
             const market = this.markets[symbol];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -47403,7 +47395,7 @@ module.exports = class coinex extends Exchange {
             ticker['symbol'] = symbol;
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = 20, params = {}) {
@@ -48245,7 +48237,7 @@ module.exports = class coinfalcon extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -49326,7 +49318,7 @@ module.exports = class coingi extends Exchange {
             }
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -50757,7 +50749,7 @@ module.exports = class coinone extends Exchange {
                 result[symbol]['timestamp'] = timestamp;
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -51955,7 +51947,7 @@ module.exports = class coss extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -52544,6 +52536,7 @@ module.exports = class crex24 extends Exchange {
                     'API Key': AuthenticationError, // "API Key '9edc48de-d5b0-4248-8e7e-f59ffcd1c7f1' doesn't exist."
                     'Insufficient funds': InsufficientFunds, // "Insufficient funds: new order requires 10 ETH which is more than the available balance."
                     'has been delisted.': BadSymbol, // {"errorDescription":"Instrument '$PAC-BTC' has been delisted."}
+                    'Mandatory parameter': BadRequest, // {"errorDescription":"Mandatory parameter 'feeCurrency' is missing."}
                 },
             },
         });
@@ -53643,6 +53636,7 @@ module.exports = class crex24 extends Exchange {
             // true - balance will be decreased by amount, whereas [amount - fee] will be transferred to the specified address
             // false - amount will be deposited to the specified address, whereas the balance will be decreased by [amount + fee]
             // 'includeFee': false, // the default value is false
+            'feeCurrency': currency['id'], // https://github.com/ccxt/ccxt/issues/7544
         };
         if (tag !== undefined) {
             request['paymentId'] = tag;
@@ -56972,7 +56966,7 @@ module.exports = class digifinex extends Exchange {
             }
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -58327,7 +58321,7 @@ module.exports = class dsx extends Exchange {
             }
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -59413,10 +59407,7 @@ module.exports = class eterbase extends Exchange {
         const last = this.safeFloat (ticker, 'price');
         const baseVolume = this.safeFloat (ticker, 'volumeBase');
         const quoteVolume = this.safeFloat (ticker, 'volume');
-        let vwap = undefined;
-        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && baseVolume) {
-            vwap = quoteVolume / baseVolume;
-        }
+        const vwap = this.vwap (baseVolume, quoteVolume);
         const percentage = this.safeFloat (ticker, 'change');
         const result = {
             'symbol': symbol,
@@ -61081,7 +61072,7 @@ module.exports = class exmo extends Exchange {
             const ticker = response[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -62071,7 +62062,7 @@ module.exports = class exx extends Exchange {
             };
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -63663,7 +63654,7 @@ module.exports = class foxbit extends Exchange {
 
 const Exchange = require ('./base/Exchange');
 const { TICK_SIZE } = require ('./base/functions/number');
-const { ExchangeError, InvalidOrder, BadRequest, InsufficientFunds, OrderNotFound } = require ('./base/errors');
+const { ExchangeError, InvalidOrder, BadRequest, InsufficientFunds, OrderNotFound, AuthenticationError } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -63853,6 +63844,7 @@ module.exports = class ftx extends Exchange {
             },
             'exceptions': {
                 'exact': {
+                    'Not logged in': AuthenticationError, // {"error":"Not logged in","success":false}
                     'Not enough balances': InsufficientFunds, // {"error":"Not enough balances","success":false}
                     'InvalidPrice': InvalidOrder, // {"error":"Invalid price","success":false}
                     'Size too small': InvalidOrder, // {"error":"Size too small","success":false}
@@ -64572,13 +64564,39 @@ module.exports = class ftx extends Exchange {
         //         "reduceOnly": false
         //     }
         //
+        // canceled order with a closed status
+        //
+        //     {
+        //         "avgFillPrice":null,
+        //         "clientId":null,
+        //         "createdAt":"2020-09-01T13:45:57.119695+00:00",
+        //         "filledSize":0.0,
+        //         "future":null,
+        //         "id":8553541288,
+        //         "ioc":false,
+        //         "liquidation":false,
+        //         "market":"XRP/USDT",
+        //         "postOnly":false,
+        //         "price":0.5,
+        //         "reduceOnly":false,
+        //         "remainingSize":0.0,
+        //         "side":"sell",
+        //         "size":46.0,
+        //         "status":"closed",
+        //         "type":"limit"
+        //     }
+        //
         const id = this.safeString (order, 'id');
         const timestamp = this.parse8601 (this.safeString (order, 'createdAt'));
+        let status = this.parseOrderStatus (this.safeString (order, 'status'));
         const amount = this.safeFloat (order, 'size');
         const filled = this.safeFloat (order, 'filledSize');
         let remaining = this.safeFloat (order, 'remainingSize');
         if ((remaining === 0.0) && (amount !== undefined) && (filled !== undefined)) {
             remaining = Math.max (amount - filled, 0);
+            if (remaining > 0) {
+                status = 'canceled';
+            }
         }
         let symbol = undefined;
         const marketId = this.safeString (order, 'market');
@@ -64595,7 +64613,6 @@ module.exports = class ftx extends Exchange {
         if ((symbol === undefined) && (market !== undefined)) {
             symbol = market['symbol'];
         }
-        const status = this.parseOrderStatus (this.safeString (order, 'status'));
         const side = this.safeString (order, 'side');
         const type = this.safeString (order, 'type');
         const average = this.safeFloat (order, 'avgFillPrice');
@@ -65065,13 +65082,17 @@ module.exports = class ftx extends Exchange {
         //     }
         //
         const code = this.safeCurrencyCode (this.safeString (transaction, 'coin'));
-        const id = this.safeInteger (transaction, 'id');
+        const id = this.safeString (transaction, 'id');
         const amount = this.safeFloat (transaction, 'size');
         const status = this.parseTransactionStatus (this.safeString (transaction, 'status'));
         const timestamp = this.parse8601 (this.safeString (transaction, 'time'));
         const txid = this.safeString (transaction, 'txid');
-        const address = this.safeString (transaction, 'address');
-        const tag = this.safeString (transaction, 'tag');
+        let tag = undefined;
+        let address = this.safeValue (transaction, 'address');
+        if (typeof address !== 'string') {
+            tag = this.safeString (address, 'tag');
+            address = this.safeString (address, 'address');
+        }
         const fee = this.safeFloat (transaction, 'fee');
         const type = ('destinationName' in transaction) ? 'withdrawal' : 'deposit';
         return {
@@ -65691,7 +65712,7 @@ module.exports = class gateio extends Exchange {
             }
             result[symbol] = this.parseTicker (response[id], market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -66699,10 +66720,7 @@ module.exports = class gemini extends Exchange {
         }
         const baseVolume = this.safeFloat (volume, baseId);
         const quoteVolume = this.safeFloat (volume, quoteId);
-        let vwap = undefined;
-        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume !== 0)) {
-            vwap = quoteVolume / baseVolume;
-        }
+        const vwap = this.vwap (baseVolume, quoteVolume);
         return {
             'symbol': symbol,
             'timestamp': timestamp,
@@ -68804,10 +68822,7 @@ module.exports = class hbtc extends Exchange {
         }
         const quoteVolume = this.safeFloat (ticker, 'quoteVolume');
         const baseVolume = this.safeFloat (ticker, 'volume');
-        let vwap = undefined;
-        if (baseVolume !== undefined && quoteVolume !== undefined && baseVolume > 0) {
-            vwap = quoteVolume / baseVolume;
-        }
+        const vwap = this.vwap (baseVolume, quoteVolume);
         return {
             'symbol': symbol,
             'timestamp': timestamp,
@@ -69398,17 +69413,19 @@ module.exports = class hitbtc extends Exchange {
         //
         //     [
         //         {
-        //             "id":"DDF",
-        //             "fullName":"DDF",
+        //             "id":"XPNT",
+        //             "fullName":"pToken",
         //             "crypto":true,
-        //             "payinEnabled":false,
+        //             "payinEnabled":true,
         //             "payinPaymentId":false,
-        //             "payinConfirmations":20,
+        //             "payinConfirmations":9,
         //             "payoutEnabled":true,
         //             "payoutIsPaymentId":false,
         //             "transferEnabled":true,
         //             "delisted":false,
-        //             "payoutFee":"646.000000000000"
+        //             "payoutFee":"26.510000000000",
+        //             "precisionPayout":18,
+        //             "precisionTransfer":8
         //         }
         //     ]
         //
@@ -69419,7 +69436,8 @@ module.exports = class hitbtc extends Exchange {
             // todo: will need to rethink the fees
             // to add support for multiple withdrawal/deposit methods and
             // differentiated fees for each particular method
-            const precision = 8; // default precision, todo: fix "magic constants"
+            const decimals = this.safeInteger (currency, 'precisionTransfer', 8);
+            const precision = 1 / Math.pow (10, decimals);
             const code = this.safeCurrencyCode (id);
             const payin = this.safeValue (currency, 'payinEnabled');
             const payout = this.safeValue (currency, 'payoutEnabled');
@@ -69449,12 +69467,12 @@ module.exports = class hitbtc extends Exchange {
                 'precision': precision,
                 'limits': {
                     'amount': {
-                        'min': Math.pow (10, -precision),
-                        'max': Math.pow (10, precision),
+                        'min': 1 / Math.pow (10, decimals),
+                        'max': Math.pow (10, decimals),
                     },
                     'price': {
-                        'min': Math.pow (10, -precision),
-                        'max': Math.pow (10, precision),
+                        'min': 1 / Math.pow (10, decimals),
+                        'max': Math.pow (10, decimals),
                     },
                     'cost': {
                         'min': undefined,
@@ -69587,14 +69605,7 @@ module.exports = class hitbtc extends Exchange {
                 percentage = change / open * 100;
             }
         }
-        let vwap = undefined;
-        if (quoteVolume !== undefined) {
-            if (baseVolume !== undefined) {
-                if (baseVolume > 0) {
-                    vwap = quoteVolume / baseVolume;
-                }
-            }
-        }
+        const vwap = this.vwap (baseVolume, quoteVolume);
         return {
             'symbol': symbol,
             'timestamp': timestamp,
@@ -69636,7 +69647,7 @@ module.exports = class hitbtc extends Exchange {
                 }
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -72018,10 +72029,7 @@ module.exports = class huobipro extends Exchange {
         }
         const baseVolume = this.safeFloat (ticker, 'amount');
         const quoteVolume = this.safeFloat (ticker, 'vol');
-        let vwap = undefined;
-        if (baseVolume !== undefined && quoteVolume !== undefined && baseVolume > 0) {
-            vwap = quoteVolume / baseVolume;
-        }
+        const vwap = this.vwap (baseVolume, quoteVolume);
         return {
             'symbol': symbol,
             'timestamp': timestamp,
@@ -73328,7 +73336,7 @@ module.exports = class ice3x extends Exchange {
                 result[symbol] = this.parseTicker (ticker, market);
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -76988,11 +76996,9 @@ module.exports = class kraken extends Exchange {
             const market = this.markets_by_id[id];
             const symbol = market['symbol'];
             const ticker = tickers[id];
-            if (this.inArray (symbol, symbols)) {
-                result[symbol] = this.parseTicker (ticker, market);
-            }
+            result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -78635,6 +78641,9 @@ module.exports = class kucoin extends Exchange {
                 symbol = market['symbol'];
             }
         }
+        const baseVolume = this.safeFloat (ticker, 'vol');
+        const quoteVolume = this.safeFloat (ticker, 'volValue');
+        const vwap = this.vwap (baseVolume, quoteVolume);
         const timestamp = this.safeInteger2 (ticker, 'time', 'datetime');
         return {
             'symbol': symbol,
@@ -78646,7 +78655,7 @@ module.exports = class kucoin extends Exchange {
             'bidVolume': undefined,
             'ask': this.safeFloat (ticker, 'sell'),
             'askVolume': undefined,
-            'vwap': undefined,
+            'vwap': vwap,
             'open': this.safeFloat (ticker, 'open'),
             'close': last,
             'last': last,
@@ -78654,8 +78663,8 @@ module.exports = class kucoin extends Exchange {
             'change': this.safeFloat (ticker, 'changePrice'),
             'percentage': percentage,
             'average': this.safeFloat (ticker, 'averagePrice'),
-            'baseVolume': this.safeFloat (ticker, 'vol'),
-            'quoteVolume': this.safeFloat (ticker, 'volValue'),
+            'baseVolume': baseVolume,
+            'quoteVolume': quoteVolume,
             'info': ticker,
         };
     }
@@ -78693,7 +78702,7 @@ module.exports = class kucoin extends Exchange {
                 result[symbol] = ticker;
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -80348,7 +80357,7 @@ module.exports = class lakebtc extends Exchange {
             }
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -80941,11 +80950,9 @@ module.exports = class latoken extends Exchange {
         for (let i = 0; i < response.length; i++) {
             const ticker = this.parseTicker (response[i]);
             const symbol = ticker['symbol'];
-            if (symbols === undefined || this.inArray (symbol, symbols)) {
-                result[symbol] = ticker;
-            }
+            result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     parseTrade (trade, market = undefined) {
@@ -81674,7 +81681,7 @@ module.exports = class lbank extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = 60, params = {}) {
@@ -82674,7 +82681,7 @@ module.exports = class liquid extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -83630,7 +83637,7 @@ module.exports = class livecoin extends Exchange {
             const ticker = tickers[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -84515,7 +84522,7 @@ module.exports = class luno extends Exchange {
             const ticker = tickers[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -86434,7 +86441,7 @@ module.exports = class oceanex extends Exchange {
             const symbol = market['symbol'];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     parseTicker (data, market = undefined) {
@@ -87008,6 +87015,10 @@ module.exports = class okex extends Exchange {
                 '12h': '43200',
                 '1d': '86400',
                 '1w': '604800',
+                '1M': '2678400',
+                '3M': '8035200',
+                '6M': '16070400',
+                '1y': '31536000',
             },
             'hostname': 'okex.com',
             'urls': {
@@ -87315,6 +87326,7 @@ module.exports = class okex extends Exchange {
                     '30037': ExchangeNotAvailable, // { "code": 30037, "message": "endpoint is offline or unavailable" }
                     // '30038': AuthenticationError, // { "code": 30038, "message": "user does not exist" }
                     '30038': OnMaintenance, // {"client_oid":"","code":"30038","error_code":"30038","error_message":"Matching engine is being upgraded. Please try in about 1 minute.","message":"Matching engine is being upgraded. Please try in about 1 minute.","order_id":"-1","result":false}
+                    '30044': RequestTimeout, // { "code":30044, "message":"Endpoint request timeout" }
                     // futures
                     '32001': AccountSuspended, // { "code": 32001, "message": "futures account suspended" }
                     '32002': PermissionDenied, // { "code": 32002, "message": "futures account does not exist" }
@@ -87596,6 +87608,9 @@ module.exports = class okex extends Exchange {
             },
             'precisionMode': TICK_SIZE,
             'options': {
+                'fetchOHLCV': {
+                    'type': 'Candles', // Candles or HistoryCandles
+                },
                 'createMarketBuyOrderRequiresPrice': true,
                 'fetchMarkets': [ 'spot', 'futures', 'swap', 'option' ],
                 'defaultType': 'spot', // 'account', 'spot', 'margin', 'futures', 'swap', 'option'
@@ -88312,14 +88327,17 @@ module.exports = class okex extends Exchange {
     async fetchOHLCV (symbol, timeframe = '1m', since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const market = this.market (symbol);
-        let method = undefined;
         const duration = this.parseTimeframe (timeframe);
         const request = {
             'instrument_id': market['id'],
             'granularity': this.timeframes[timeframe],
         };
-        if (market['option'] || market['spot']) {
-            method = market['type'] + 'GetInstrumentsInstrumentIdCandles';
+        const options = this.safeValue (this.options, 'fetchOHLCV', {});
+        const defaultType = this.safeString (options, 'type', 'Candles'); // Candles or HistoryCandles
+        const type = this.safeString (params, 'type', defaultType);
+        params = this.omit (params, 'type');
+        const method = market['type'] + 'GetInstrumentsInstrumentId' + type;
+        if (type === 'Candles') {
             if (since !== undefined) {
                 if (limit !== undefined) {
                     request['end'] = this.iso8601 (this.sum (since, limit * duration * 1000));
@@ -88332,8 +88350,10 @@ module.exports = class okex extends Exchange {
                     request['end'] = this.iso8601 (now);
                 }
             }
-        } else {
-            method = market['type'] + 'GetInstrumentsInstrumentIdHistoryCandles';
+        } else if (type === 'HistoryCandles') {
+            if (market['option']) {
+                throw new NotSupported (this.id + ' fetchOHLCV does not have ' + type + ' for ' + market['type'] + ' markets');
+            }
             if (since !== undefined) {
                 if (limit === undefined) {
                     limit = 300; // default
@@ -91478,9 +91498,7 @@ module.exports = class phemex extends Exchange {
         const baseVolume = this.fromEv (this.safeFloat2 (ticker, 'volumeEv', 'volume'), market);
         let vwap = undefined;
         if ((market !== undefined) && (market['spot'])) {
-            if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume > 0)) {
-                vwap = quoteVolume / baseVolume;
-            }
+            vwap = this.vwap (baseVolume, quoteVolume);
         }
         let change = undefined;
         let percentage = undefined;
@@ -93223,7 +93241,7 @@ module.exports = class poloniex extends Exchange {
             const ticker = response[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchCurrencies (params = {}) {
@@ -94821,10 +94839,7 @@ module.exports = class probit extends Exchange {
         }
         const baseVolume = this.safeFloat (ticker, 'base_volume');
         const quoteVolume = this.safeFloat (ticker, 'quote_volume');
-        let vwap = undefined;
-        if ((baseVolume !== undefined) && (quoteVolume !== undefined)) {
-            vwap = baseVolume / quoteVolume;
-        }
+        const vwap = this.vwap (baseVolume, quoteVolume);
         return {
             'symbol': symbol,
             'timestamp': timestamp,
@@ -95059,8 +95074,7 @@ module.exports = class probit extends Exchange {
             return this.iso8601 (previousSunday * 1000);
         } else {
             timestamp = parseInt (timestamp / 1000);
-            const difference = this.integerModulo (timestamp, duration);
-            timestamp -= difference;
+            timestamp = duration * parseInt (timestamp / duration);
             if (after) {
                 timestamp = this.sum (timestamp, duration);
             }
@@ -95581,7 +95595,7 @@ module.exports = class probit extends Exchange {
                 this.checkRequiredCredentials ();
                 const expires = this.safeInteger (this.options, 'expires');
                 if ((expires === undefined) || (expires < now)) {
-                    throw new AuthenticationError (this.id + ' accessToken expired, call signIn() method');
+                    throw new AuthenticationError (this.id + ' access token expired, call signIn() method');
                 }
                 const accessToken = this.safeString (this.options, 'accessToken');
                 headers = {
@@ -96074,10 +96088,7 @@ module.exports = class qtrade extends Exchange {
         }
         const baseVolume = this.safeFloat (ticker, 'day_volume_market');
         const quoteVolume = this.safeFloat (ticker, 'day_volume_base');
-        let vwap = undefined;
-        if ((baseVolume !== undefined) && (quoteVolume !== undefined) && (baseVolume > 0)) {
-            vwap = quoteVolume / baseVolume;
-        }
+        const vwap = this.vwap (baseVolume, quoteVolume);
         return {
             'symbol': symbol,
             'timestamp': timestamp,
@@ -97478,7 +97489,7 @@ module.exports = class rightbtc extends Exchange {
             const symbol = market['symbol'];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -98176,7 +98187,7 @@ module.exports = class southxchange extends Exchange {
             const ticker = tickers[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -120277,7 +120288,7 @@ module.exports = class therock extends Exchange {
             const ticker = tickers[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -121485,7 +121496,7 @@ module.exports = class tidebit extends Exchange {
                 result[symbol] = this.parseTicker (ticker, market);
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -122183,7 +122194,7 @@ module.exports = class tidex extends Exchange {
             }
             result[symbol] = this.parseTicker (response[id], market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -124549,7 +124560,7 @@ module.exports = class upbit extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -128190,7 +128201,7 @@ module.exports = class xbtce extends Exchange {
             const ticker = tickers[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -128804,7 +128815,7 @@ module.exports = class xena extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -130487,7 +130498,7 @@ module.exports = class yobit extends Exchange {
             }
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -131833,7 +131844,7 @@ module.exports = class zb extends Exchange {
             const market = anotherMarketsById[ids[i]];
             result[market['symbol']] = this.parseTicker (response[ids[i]], market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
