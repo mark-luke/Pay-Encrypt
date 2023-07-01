@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.12'
+const version = '1.31.14'
 
 Exchange.ccxtVersion = version
 
@@ -22184,6 +22184,7 @@ module.exports = class bitpanda extends Exchange {
             'has': {
                 'cancelAllOrders': true,
                 'cancelOrder': true,
+                'cancelOrders': true,
                 'createDepositAddress': true,
                 'createOrder': true,
                 'fetchBalance': true,
@@ -23438,6 +23439,20 @@ module.exports = class bitpanda extends Exchange {
             const market = this.market (symbol);
             request['instrument_code'] = market['id'];
         }
+        const response = await this.privateDeleteAccountOrders (this.extend (request, params));
+        //
+        //     [
+        //         "a10e9bd1-8f72-4cfe-9f1b-7f1c8a9bd8ee"
+        //     ]
+        //
+        return response;
+    }
+
+    async cancelOrders (ids, symbol = undefined, params = {}) {
+        await this.loadMarkets ();
+        const request = {
+            'ids': ids.join (','),
+        };
         const response = await this.privateDeleteAccountOrders (this.extend (request, params));
         //
         //     [
@@ -28794,7 +28809,7 @@ module.exports = class bitz extends Exchange {
             },
             'hostname': 'apiv2.bitz.com',
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/35862606-4f554f14-0b5d-11e8-957d-35058c504b6f.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87443304-fec5e000-c5fd-11ea-98f8-ba8e67f7eaff.jpg',
                 'api': {
                     'market': 'https://{hostname}',
                     'trade': 'https://{hostname}',
@@ -48438,7 +48453,7 @@ module.exports = class coss extends Exchange {
             'version': 'v1',
             'certified': false,
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/50328158-22e53c00-0503-11e9-825c-c5cfd79bfa74.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87443313-008fa380-c5fe-11ea-8400-34d4749c7da5.jpg',
                 'api': {
                     'trade': 'https://trade.coss.io/c/api/v1',
                     'engine': 'https://engine.coss.io/api/v1',
@@ -53533,7 +53548,7 @@ module.exports = class digifinex extends Exchange {
                 '1w': '1W',
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/62184319-304e8880-b366-11e9-99fe-8011d6929195.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87443315-01283a00-c5fe-11ea-8628-c2a0feaf07ac.jpg',
                 'api': 'https://openapi.digifinex.com',
                 'www': 'https://www.digifinex.com',
                 'doc': [
@@ -59993,7 +60008,7 @@ module.exports = class flowbtc extends Exchange {
                 'CORS': false,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/28162465-cd815d4c-67cf-11e7-8e57-438bea0523a2.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87443317-01c0d080-c5fe-11ea-95c2-9ebe1a8fafd9.jpg',
                 'api': 'https://publicapi.flowbtc.com.br',
                 'www': 'https://www.flowbtc.com.br',
                 'doc': 'https://www.flowbtc.com.br/api.html',
@@ -60273,7 +60288,7 @@ module.exports = class foxbit extends Exchange {
             'rateLimit': 1000,
             'version': 'v1',
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27991413-11b40d42-647f-11e7-91ee-78ced874dd09.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87443320-01c0d080-c5fe-11ea-92e2-4ef56d32b026.jpg',
                 'api': {
                     'public': 'https://api.blinktrade.com/api',
                     'private': 'https://api.blinktrade.com/tapi',
