@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.90'
+const version = '1.33.91'
 
 Exchange.ccxtVersion = version
 
@@ -95573,7 +95573,7 @@ module.exports = class probit extends Exchange {
                 this.checkRequiredCredentials ();
                 const expires = this.safeInteger (this.options, 'expires');
                 if ((expires === undefined) || (expires < now)) {
-                    throw new AuthenticationError (this.id + ' accessToken expired, call signIn() method');
+                    throw new AuthenticationError (this.id + ' access token expired, call signIn() method');
                 }
                 const accessToken = this.safeString (this.options, 'accessToken');
                 headers = {
