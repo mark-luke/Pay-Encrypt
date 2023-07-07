@@ -14,7 +14,7 @@ let printUsage = function () {
     printSupportedExchanges ()
 }
 
-let printTicker = async (id, symbol, depth) => {
+let printTicker = async (id, symbol) => {
 
     // check if the exchange is supported by ccxt
     let exchangeFound = ccxt.exchanges.indexOf (id) > -1
