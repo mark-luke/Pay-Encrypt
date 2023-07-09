@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.6'
+const version = '1.35.7'
 
 Exchange.ccxtVersion = version
 
@@ -101417,20 +101417,7 @@ module.exports = class ripio extends Exchange {
         //
         const timestamp = this.parse8601 (this.safeString (ticker, 'created_at'));
         const marketId = this.safeString (ticker, 'pair');
-        let symbol = undefined;
-        if (marketId !== undefined) {
-            if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[marketId];
-            } else if (marketId !== undefined) {
-                const [ baseId, quoteId ] = marketId.split ('_');
-                const base = this.safeCurrencyCode (baseId);
-                const quote = this.safeCurrencyCode (quoteId);
-                symbol = base + '/' + quote;
-            }
-        }
-        if ((symbol === undefined) && (market !== undefined)) {
-            symbol = market['symbol'];
-        }
+        const symbol = this.safeSymbol (marketId, market);
         const last = this.safeFloat (ticker, 'last_price');
         const average = this.safeFloat (ticker, 'avg');
         return {
