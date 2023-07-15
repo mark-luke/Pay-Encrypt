@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.81'
+const version = '1.22.82'
 
 Exchange.ccxtVersion = version
 
@@ -15962,6 +15962,9 @@ module.exports = class bitforex extends Exchange {
                         'FSN': 2,
                     },
                 },
+            },
+            'commonCurrencies': {
+                'UOS': 'UOS Network',
             },
             'exceptions': {
                 '4004': OrderNotFound,
