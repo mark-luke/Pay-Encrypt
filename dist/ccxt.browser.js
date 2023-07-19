@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.48'
+const version = '1.26.49'
 
 Exchange.ccxtVersion = version
 
@@ -76160,14 +76160,6 @@ module.exports = class okex extends Exchange {
             'price': this.safeFloat (market, 'tick_size'),
         };
         const minAmount = this.safeFloat2 (market, 'min_size', 'base_min_size');
-        let minPrice = this.safeFloat (market, 'tick_size');
-        if (precision['price'] !== undefined) {
-            minPrice = Math.pow (10, -precision['price']);
-        }
-        let minCost = undefined;
-        if (minAmount !== undefined && minPrice !== undefined) {
-            minCost = minAmount * minPrice;
-        }
         const active = true;
         const fees = this.safeValue2 (this.fees, marketType, 'trading', {});
         return this.extend (fees, {
@@ -76191,11 +76183,11 @@ module.exports = class okex extends Exchange {
                     'max': undefined,
                 },
                 'price': {
-                    'min': minPrice,
+                    'min': precision['price'],
                     'max': undefined,
                 },
                 'cost': {
-                    'min': minCost,
+                    'min': precision['price'],
                     'max': undefined,
                 },
             },
