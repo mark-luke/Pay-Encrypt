@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.42'
+const version = '1.24.43'
 
 Exchange.ccxtVersion = version
 
@@ -43868,7 +43868,8 @@ module.exports = class coinmate extends Exchange {
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         const response = await this.privatePostOpenOrders (this.extend ({}, params));
-        return this.parseOrders (response['data'], undefined, since, limit);
+        const extension = { 'status': 'open' };
+        return this.parseOrders (response['data'], undefined, since, limit, extension);
     }
 
     async fetchOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -75802,6 +75803,7 @@ module.exports = class okex extends Exchange {
             'countries': [ 'CN', 'US' ],
             'version': 'v3',
             'rateLimit': 1000, // up to 3000 requests per 5 minutes ≈ 600 requests per minute ≈ 10 requests per second ≈ 100 ms
+            'pro': true,
             'has': {
                 'CORS': false,
                 'fetchOHLCV': true,
