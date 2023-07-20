@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.58'
+const version = '1.21.59'
 
 Exchange.ccxtVersion = version
 
@@ -73574,12 +73574,12 @@ module.exports = class okex3 extends Exchange {
             'amount': this.numberToString (amount),
             'fee': fee, // String. Network transaction fee ≥ 0. Withdrawals to OKCoin or OKEx are fee-free, please set as 0. Withdrawal to external digital asset address requires network transaction fee.
         };
-        if (this.password) {
-            request['trade_pwd'] = this.password;
-        } else if ('password' in params) {
+        if ('password' in params) {
             request['trade_pwd'] = params['password'];
         } else if ('trade_pwd' in params) {
             request['trade_pwd'] = params['trade_pwd'];
+        } else if (this.password) {
+            request['trade_pwd'] = this.password;
         }
         const query = this.omit (params, [ 'fee', 'password', 'trade_pwd' ]);
         if (!('trade_pwd' in request)) {
