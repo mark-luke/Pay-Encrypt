@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.82'
+const version = '1.23.83'
 
 Exchange.ccxtVersion = version
 
@@ -18819,6 +18819,10 @@ module.exports = class bitmax extends Exchange {
                     '600503': InvalidOrder, // {"code":600503,"message":"Notional is too small."}
                 },
                 'broad': {},
+            },
+            'commonCurrencies': {
+                'BTCBEAR': 'BEAR',
+                'BTCBULL': 'BULL',
             },
         });
     }
