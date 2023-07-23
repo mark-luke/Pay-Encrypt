@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.46'
+const version = '1.25.47'
 
 Exchange.ccxtVersion = version
 
@@ -24843,6 +24843,7 @@ module.exports = class bittrex extends Exchange {
         const isCeilingOrder = isCeilingLimit || isCeilingMarket;
         if (isCeilingOrder) {
             request['ceiling'] = this.priceToPrecision (symbol, price);
+            // bittrex only accepts IMMEDIATE_OR_CANCEL or FILL_OR_KILL for ceiling orders
             request['timeInForce'] = 'IMMEDIATE_OR_CANCEL';
         } else {
             request['quantity'] = this.amountToPrecision (symbol, amount);
@@ -24850,6 +24851,7 @@ module.exports = class bittrex extends Exchange {
                 request['limit'] = this.priceToPrecision (symbol, price);
                 request['timeInForce'] = 'GOOD_TIL_CANCELLED';
             } else {
+                // bittrex does not allow GOOD_TIL_CANCELLED for market orders
                 request['timeInForce'] = 'IMMEDIATE_OR_CANCEL';
             }
         }
@@ -48229,6 +48231,12 @@ module.exports = class deribit extends Exchange {
         return this.safeInteger (response, 'result');
     }
 
+    codeFromOptions (methodName) {
+        const defaultCode = this.safeValue (this.options, 'code', 'BTC');
+        const options = this.safeValue (this.options, methodName, {});
+        return this.safeValue (options, 'code', defaultCode);
+    }
+
     async fetchStatus (params = {}) {
         const request = {
             // 'expected_result': false, // true will trigger an error for testing purposes
@@ -48367,9 +48375,7 @@ module.exports = class deribit extends Exchange {
 
     async fetchBalance (params = {}) {
         await this.loadMarkets ();
-        const defaultCode = this.safeValue (this.options, 'code', 'BTC');
-        const options = this.safeValue (this.options, 'fetchBalance', {});
-        const code = this.safeValue (options, 'code', defaultCode);
+        const code = this.codeFromOptions ('fetchBalance');
         const currency = this.currency (code);
         const request = {
             'currency': currency['id'],
@@ -48617,9 +48623,7 @@ module.exports = class deribit extends Exchange {
 
     async fetchTickers (symbols = undefined, params = {}) {
         await this.loadMarkets ();
-        const defaultCode = this.safeValue (this.options, 'code', 'BTC');
-        const options = this.safeValue (this.options, 'fetchTickers', {});
-        const code = this.safeValue (options, 'code', defaultCode);
+        const code = this.codeFromOptions ('fetchTickers');
         const currency = this.currency (code);
         const request = {
             'currency': currency['id'],
@@ -49228,9 +49232,7 @@ module.exports = class deribit extends Exchange {
         let market = undefined;
         let method = undefined;
         if (symbol === undefined) {
-            const defaultCode = this.safeValue (this.options, 'code', 'BTC');
-            const options = this.safeValue (this.options, 'fetchOpenOrders', {});
-            const code = this.safeValue (options, 'code', defaultCode);
+            const code = this.codeFromOptions ('fetchOpenOrders');
             const currency = this.currency (code);
             request['currency'] = currency['id'];
             method = 'privateGetGetOpenOrdersByCurrency';
@@ -49250,9 +49252,7 @@ module.exports = class deribit extends Exchange {
         let market = undefined;
         let method = undefined;
         if (symbol === undefined) {
-            const defaultCode = this.safeValue (this.options, 'code', 'BTC');
-            const options = this.safeValue (this.options, 'fetchClosedOrders', {});
-            const code = this.safeValue (options, 'code', defaultCode);
+            const code = this.codeFromOptions ('fetchClosedOrders');
             const currency = this.currency (code);
             request['currency'] = currency['id'];
             method = 'privateGetGetOrderHistoryByCurrency';
@@ -49318,9 +49318,7 @@ module.exports = class deribit extends Exchange {
         let market = undefined;
         let method = undefined;
         if (symbol === undefined) {
-            const defaultCode = this.safeValue (this.options, 'code', 'BTC');
-            const options = this.safeValue (this.options, 'fetchMyTrades', {});
-            const code = this.safeValue (options, 'code', defaultCode);
+            const code = this.codeFromOptions ('fetchMyTrades');
             const currency = this.currency (code);
             request['currency'] = currency['id'];
             if (since === undefined) {
