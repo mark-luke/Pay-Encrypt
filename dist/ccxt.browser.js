@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.79'
+const version = '1.20.81'
 
 Exchange.ccxtVersion = version
 
@@ -9578,6 +9578,9 @@ module.exports = class binance extends Exchange {
                         'ticker/bookTicker',
                         'income',
                     ],
+                    'put': [ 'listenKey' ],
+                    'post': [ 'listenKey' ],
+                    'delete': [ 'listenKey' ],
                 },
                 'fapiPrivate': {
                     'get': [
@@ -11023,7 +11026,7 @@ module.exports = class binance extends Exchange {
         if (api === 'wapi') {
             url += '.html';
         }
-        const userDataStream = (path === 'userDataStream');
+        const userDataStream = ((path === 'userDataStream') || (path === 'listenKey'));
         if (path === 'historicalTrades') {
             headers = {
                 'X-MBX-APIKEY': this.apiKey,
@@ -50493,6 +50496,7 @@ module.exports = class ftx extends Exchange {
                         'orders/{order_id}',
                         'orders/by_client_id/{client_order_id}',
                         'conditional_orders', // ?market={market}
+                        'conditional_orders/history', // ?market={market}
                         'fills', // ?market={market}
                         'funding_payments',
                         'lt/balances',
