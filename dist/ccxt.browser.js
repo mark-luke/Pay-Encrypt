@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1077'
+const version = '1.18.1078'
 
 Exchange.ccxtVersion = version
 
@@ -46034,6 +46034,7 @@ module.exports = class gateio extends Exchange {
                 '21': 'You don\'t have enough fund',
             },
             'options': {
+                'fetchTradesMethod': 'public_get_tradehistory_id', // 'public_get_tradehistory_id_tid'
                 'limits': {
                     'cost': {
                         'min': {
@@ -46327,7 +46328,8 @@ module.exports = class gateio extends Exchange {
         const request = {
             'id': market['id'],
         };
-        const response = await this.publicGetTradeHistoryId (this.extend (request, params));
+        const method = this.safeString (this.options, 'fetchTradesMethod', 'public_get_tradehistory_id');
+        const response = await this[method] (this.extend (request, params));
         return this.parseTrades (response['data'], market, since, limit);
     }
 
