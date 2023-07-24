@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.14'
+const version = '1.32.15'
 
 Exchange.ccxtVersion = version
 
@@ -42866,19 +42866,26 @@ module.exports = class coinbasepro extends Exchange {
             'pro': true,
             'has': {
                 'cancelAllOrders': true,
+                'cancelOrder': true,
                 'CORS': true,
+                'createDepositAddress': true,
+                'createOrder': true,
                 'deposit': true,
                 'fetchAccounts': true,
+                'fetchBalance': true,
                 'fetchClosedOrders': true,
                 'fetchDepositAddress': true,
-                'createDepositAddress': true,
+                'fetchMarkets': true,
                 'fetchMyTrades': true,
                 'fetchOHLCV': true,
                 'fetchOpenOrders': true,
                 'fetchOrder': true,
-                'fetchOrderTrades': true,
+                'fetchOrderBook': true,
                 'fetchOrders': true,
+                'fetchOrderTrades': true,
                 'fetchTime': true,
+                'fetchTicker': true,
+                'fetchTrades': true,
                 'fetchTransactions': true,
                 'withdraw': true,
             },
@@ -43871,9 +43878,15 @@ module.exports = class coincheck extends Exchange {
             'countries': [ 'JP', 'ID' ],
             'rateLimit': 1500,
             'has': {
+                'cancelOrder': true,
                 'CORS': false,
-                'fetchOpenOrders': true,
+                'createOrder': true,
+                'fetchBalance': true,
                 'fetchMyTrades': true,
+                'fetchOrderBook': true,
+                'fetchOpenOrders': true,
+                'fetchTicker': true,
+                'fetchTrades': true,
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/51840849/87182088-1d6d6380-c2ec-11ea-9c64-8ab9f9b289f5.jpg',
