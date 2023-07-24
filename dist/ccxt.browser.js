@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1245'
+const version = '1.18.1246'
 
 Exchange.ccxtVersion = version
 
@@ -47026,7 +47026,7 @@ module.exports = class fcoin extends Exchange {
             'side': side,
             'type': orderType,
         };
-        if (type === 'limit') {
+        if ((type === 'limit') || (type === 'ioc') || (type === 'fok')) {
             request['price'] = this.priceToPrecision (symbol, price);
         }
         const response = await this.privatePostOrders (this.extend (request, params));
