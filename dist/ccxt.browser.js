@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.63'
+const version = '1.23.64'
 
 Exchange.ccxtVersion = version
 
@@ -7112,6 +7112,7 @@ module.exports = class bibox extends Exchange {
                 'private': {
                     'post': [
                         'cquery',
+                        'ctrade',
                         'user',
                         'orderpending',
                         'transfer',
