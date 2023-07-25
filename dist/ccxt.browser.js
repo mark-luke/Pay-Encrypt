@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.88'
+const version = '1.28.89'
 
 Exchange.ccxtVersion = version
 
@@ -51212,7 +51212,7 @@ module.exports = class dsx extends Exchange {
                 'fetchOrders': true,
                 'fetchOpenOrders': true,
                 'fetchClosedOrders': false,
-                'fetchOrderBooks': false,
+                'fetchOrderBooks': true,
                 'createDepositAddress': true,
                 'fetchDepositAddress': true,
                 'fetchTransactions': true,
