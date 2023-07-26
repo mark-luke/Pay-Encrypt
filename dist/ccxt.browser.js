@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.66'
+const version = '1.28.67'
 
 Exchange.ccxtVersion = version
 
@@ -52405,6 +52405,7 @@ module.exports = class exmo extends Exchange {
                     '50054': InsufficientFunds,
                     '50304': OrderNotFound, // "Order was not found '123456789'" (fetching order trades for an order that does not have trades yet)
                     '50173': OrderNotFound, // "Order with id X was not found." (cancelling non-existent, closed and cancelled order)
+                    '50277': InvalidOrder,
                     '50319': InvalidOrder, // Price by order is less than permissible minimum for this pair
                     '50321': InvalidOrder, // Price by order is more than permissible maximum for this pair
                 },
