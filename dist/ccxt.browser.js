@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.54'
+const version = '1.34.55'
 
 Exchange.ccxtVersion = version
 
@@ -127886,6 +127886,9 @@ module.exports = class upbit extends Exchange {
                 'tradingFeesByQuoteCurrency': {
                     'KRW': 0.0005,
                 },
+            },
+            'commonCurrencies': {
+                'TON': 'Tokamak Network',
             },
         });
     }
