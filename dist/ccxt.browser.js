@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.8'
+const version = '1.31.9'
 
 Exchange.ccxtVersion = version
 
@@ -23369,8 +23369,25 @@ module.exports = class bitpanda extends Exchange {
             // "is_post_only": false, // limit orders only, optional
             // "trigger_price": "1234.5678" // required for stop orders
         };
-        if (uppercaseType === 'LIMIT' || type === 'STOP') {
+        let priceIsRequired = false;
+        if (uppercaseType === 'LIMIT' || uppercaseType === 'STOP') {
+            priceIsRequired = true;
+        }
+        if (uppercaseType === 'STOP') {
+            const triggerPrice = this.safeFloat (params, 'trigger_price');
+            if (triggerPrice === undefined) {
+                throw new ArgumentsRequired (this.id + ' createOrder requires a trigger_price param for ' + type + ' orders');
+            }
+            request['trigger_price'] = this.priceToPrecision (symbol, triggerPrice);
+            params = this.omit (params, 'trigger_price');
+        }
+        if (priceIsRequired) {
             request['price'] = this.priceToPrecision (symbol, price);
+        }
+        const clientOrderId = this.safeString2 (params, 'clientOrderId', 'client_id');
+        if (clientOrderId !== undefined) {
+            request['client_id'] = clientOrderId;
+            params = this.omit (params, [ 'clientOrderId', 'client_id' ]);
         }
         const response = await this.privatePostAccountOrders (this.extend (request, params));
         //
