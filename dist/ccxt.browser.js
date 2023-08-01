@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.91'
+const version = '1.22.92'
 
 Exchange.ccxtVersion = version
 
@@ -4416,8 +4416,8 @@ module.exports = class Exchange {
 
     async fetchStatus (params = {}) {
         if (this.has['fetchTime']) {
-            const time = await this.fetchTime(params)
-            return this.status = this.extend(this.status, {
+            const time = await this.fetchTime (params)
+            this.status = this.extend (this.status, {
                 'updated': time,
             })
         }
