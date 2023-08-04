@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.10'
+const version = '1.31.11'
 
 Exchange.ccxtVersion = version
 
@@ -22182,6 +22182,7 @@ module.exports = class bitpanda extends Exchange {
             'version': 'v1',
             // new metainfo interface
             'has': {
+                'cancelOrder': true,
                 'createDepositAddress': true,
                 'createOrder': true,
                 'fetchBalance': true,
@@ -22309,6 +22310,8 @@ module.exports = class bitpanda extends Exchange {
             },
             'exceptions': {
                 'exact': {
+                    'INVALID_CLIENT_UUID': InvalidOrder,
+                    'ORDER_NOT_FOUND': OrderNotFound,
                     'ONLY_ONE_ERC20_ADDRESS_ALLOWED': InvalidAddress,
                     'DEPOSIT_ADDRESS_NOT_USED': InvalidAddress,
                     'INVALID_CREDENTIALS': AuthenticationError,
@@ -23406,6 +23409,25 @@ module.exports = class bitpanda extends Exchange {
         //     }
         //
         return this.parseOrder (response, market);
+    }
+
+    async cancelOrder (id, symbol = undefined, params = {}) {
+        await this.loadMarkets ();
+        const clientOrderId = this.safeString2 (params, 'clientOrderId', 'client_id');
+        params = this.omit (params, [ 'clientOrderId', 'client_id' ]);
+        let method = 'privateDeleteAccountOrdersOrderId';
+        const request = {};
+        if (clientOrderId !== undefined) {
+            method = 'privateDeleteAccountOrdersClientClientId';
+            request['client_id'] = clientOrderId;
+        } else {
+            request['order_id'] = id;
+        }
+        const response = await this[method] (this.extend (request, params));
+        //
+        // responds with an empty body
+        //
+        return response;
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
