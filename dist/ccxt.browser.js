@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1355'
+const version = '1.18.1356'
 
 Exchange.ccxtVersion = version
 
@@ -5168,7 +5168,9 @@ const errorHierarchy = {
             'NotSupported': {},
         },
         'NetworkError': {
-            'DDoSProtection': {},
+            'DDoSProtection': {
+                'RateLimitExceeded': {},
+            },
             'ExchangeNotAvailable': {
                 'OnMaintenance': {},
             },
@@ -30813,7 +30815,7 @@ module.exports = class bytetrade extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, NullResponse, InvalidOrder, NotSupported, InsufficientFunds, InvalidNonce, OrderNotFound } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, NullResponse, InvalidOrder, NotSupported, InsufficientFunds, InvalidNonce, OrderNotFound, RateLimitExceeded } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -30935,6 +30937,7 @@ module.exports = class cex extends Exchange {
                     'Nonce must be incremented': InvalidNonce,
                     'Invalid Order': InvalidOrder,
                     'Order not found': OrderNotFound,
+                    'Rate limit exceeded': RateLimitExceeded,
                 },
             },
             'options': {
