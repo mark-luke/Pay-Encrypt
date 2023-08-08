@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.67'
+const version = '1.21.68'
 
 Exchange.ccxtVersion = version
 
@@ -49278,7 +49278,7 @@ module.exports = class exx extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { BadSymbol, ExchangeError, ExchangeNotAvailable, ArgumentsRequired, InsufficientFunds, InvalidOrder, DDoSProtection, InvalidNonce, AuthenticationError, NotSupported } = require ('./base/errors');
+const { BadSymbol, ExchangeError, ExchangeNotAvailable, ArgumentsRequired, InsufficientFunds, InvalidOrder, RateLimitExceeded, InvalidNonce, AuthenticationError, NotSupported } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -49418,7 +49418,7 @@ module.exports = class fcoin extends Exchange {
                 '400': NotSupported, // Bad Request
                 '401': AuthenticationError,
                 '405': NotSupported,
-                '429': DDoSProtection, // Too Many Requests, exceed api request limit
+                '429': RateLimitExceeded, // Too Many Requests, exceed api request limit
                 '1002': ExchangeNotAvailable, // System busy
                 '1016': InsufficientFunds,
                 '2136': AuthenticationError, // The API key is expired
