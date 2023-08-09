@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.66'
+const version = '1.27.67'
 
 Exchange.ccxtVersion = version
 
@@ -43451,7 +43451,7 @@ module.exports = class coinmate extends Exchange {
         let filled = undefined;
         let cost = undefined;
         if ((amount !== undefined) && (remaining !== undefined)) {
-            filled = Math.min (amount - remaining, 0);
+            filled = Math.max (amount - remaining, 0);
             if (remaining === 0) {
                 status = 'closed';
             }
