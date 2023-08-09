@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.63'
+const version = '1.29.64'
 
 Exchange.ccxtVersion = version
 
@@ -57050,15 +57050,15 @@ module.exports = class exmo extends Exchange {
             }
             lastTradeTimestamp = trades[numTransactions - 1]['timestamp'];
         }
+        let status = this.safeString (order, 'status'); // in case we need to redefine it for canceled orders
         let remaining = undefined;
         if (amount !== undefined) {
             remaining = amount - filled;
-        }
-        let status = this.safeString (order, 'status'); // in case we need to redefine it for canceled orders
-        if (filled >= amount) {
-            status = 'closed';
-        } else {
-            status = 'open';
+            if (filled >= amount) {
+                status = 'closed';
+            } else {
+                status = 'open';
+            }
         }
         if (market === undefined) {
             market = this.getMarketFromTrades (trades);
