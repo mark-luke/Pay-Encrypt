@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.47'
+const version = '1.26.48'
 
 Exchange.ccxtVersion = version
 
@@ -12277,6 +12277,11 @@ module.exports = class binance extends Exchange {
             let query = undefined;
             if ((api === 'sapi') && (path === 'asset/dust')) {
                 query = this.urlencodeWithArrayRepeat (this.extend ({
+                    'timestamp': this.nonce (),
+                    'recvWindow': this.options['recvWindow'],
+                }, params));
+            } else if (path === 'batchOrders') {
+                query = this.rawencode (this.extend ({
                     'timestamp': this.nonce (),
                     'recvWindow': this.options['recvWindow'],
                 }, params));
