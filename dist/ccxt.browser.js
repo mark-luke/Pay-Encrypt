@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.51'
+const version = '1.33.52'
 
 Exchange.ccxtVersion = version
 
@@ -66351,7 +66351,7 @@ module.exports = class gemini extends Exchange {
         return await this[method] (params);
     }
 
-    async fetchMarketsFromWeb (symbols = undefined, params = {}) {
+    async fetchMarketsFromWeb (params = {}) {
         const response = await this.webGetRestApi (params);
         const sections = response.split ('<h1 id="symbols-and-minimums">Symbols and minimums</h1>');
         const numSections = sections.length;
@@ -66416,10 +66416,10 @@ module.exports = class gemini extends Exchange {
                 if (!(symbol in indexedSymbols)) {
                     continue;
                 }
-                const id = baseId + quoteId;
+                const marketId = baseId + quoteId;
                 const active = undefined;
                 result.push ({
-                    'id': id,
+                    'id': marketId,
                     'info': row,
                     'symbol': symbol,
                     'base': base,
