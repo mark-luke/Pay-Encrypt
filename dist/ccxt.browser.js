@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.92'
+const version = '1.25.93'
 
 Exchange.ccxtVersion = version
 
@@ -67787,7 +67787,7 @@ module.exports = class kucoin extends Exchange {
             'datetime': this.iso8601 (timestamp),
             'fee': undefined,
             'status': 'open',
-            'clientOid': clientOid,
+            'clientOrderId': clientOid,
             'info': data,
         };
         if (!this.safeValue (params, 'quoteAmount')) {
