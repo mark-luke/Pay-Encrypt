@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.61'
+const version = '1.30.62'
 
 Exchange.ccxtVersion = version
 
@@ -10312,6 +10312,8 @@ module.exports = class binance extends Exchange {
                 quantityIsRequired = true;
             }
             stopPriceIsRequired = true;
+        } else if (uppercaseType === 'TRAILING_STOP_MARKET') {
+            quantityIsRequired = true;
         }
         if (quantityIsRequired) {
             request['quantity'] = this.amountToPrecision (symbol, amount);
