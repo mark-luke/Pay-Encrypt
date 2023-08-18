@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.97'
+const version = '1.25.98'
 
 Exchange.ccxtVersion = version
 
@@ -3473,6 +3473,7 @@ module.exports = class aofex extends Exchange {
                 'fetchOpenOrders': true,
                 'fetchClosedOrders': true,
                 'fetchClosedOrder': true,
+                'fetchOrderTrades': true,
                 'fetchTradingFee': true,
             },
             'timeframes': {
@@ -4324,6 +4325,11 @@ module.exports = class aofex extends Exchange {
         const order = this.safeValue (result, 'entrust', {});
         order['trades'] = trades;
         return this.parseOrder (order);
+    }
+
+    async fetchOrderTrades (id, symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        const response = await this.fetchClosedOrder (id, symbol, params);
+        return this.safeValue (response, 'trades', []);
     }
 
     async fetchOrdersWithMethod (method, symbol = undefined, since = undefined, limit = undefined, params = {}) {
