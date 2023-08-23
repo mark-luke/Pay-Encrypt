@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.89'
+const version = '1.31.90'
 
 Exchange.ccxtVersion = version
 
@@ -29360,17 +29360,25 @@ module.exports = class bitz extends Exchange {
             'version': 'v2',
             'userAgent': this.userAgents['chrome'],
             'has': {
-                'fetchTickers': true,
+                'cancelOrder': true,
+                'cancelOrders': true,
+                'createOrder': true,
+                'createMarketOrder': false,
+                'fetchBalance': true,
+                'fetchDeposits': true,
+                'fetchClosedOrders': true,
+                'fetchMarkets': true,
                 'fetchOHLCV': true,
                 'fetchOpenOrders': true,
-                'fetchClosedOrders': true,
-                'fetchOrders': true,
                 'fetchOrder': true,
-                'createMarketOrder': false,
-                'fetchDeposits': true,
+                'fetchOrderBook': true,
+                'fetchOrders': true,
+                'fetchTicker': true,
+                'fetchTickers': true,
                 'fetchTime': true,
-                'fetchWithdrawals': true,
+                'fetchTrades': true,
                 'fetchTransactions': false,
+                'fetchWithdrawals': true,
             },
             'timeframes': {
                 '1m': '1min',
