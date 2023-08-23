@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.84'
+const version = '1.25.86'
 
 Exchange.ccxtVersion = version
 
@@ -60524,6 +60524,7 @@ module.exports = class huobipro extends Exchange {
             'exceptions': {
                 'exact': {
                     // err-code
+                    'bad-request': BadRequest,
                     'api-not-support-temp-addr': PermissionDenied, // {"status":"error","err-code":"api-not-support-temp-addr","err-msg":"API withdrawal does not support temporary addresses","data":null}
                     'timeout': RequestTimeout, // {"ts":1571653730865,"status":"error","err-code":"timeout","err-msg":"Request Timeout"}
                     'gateway-internal-error': ExchangeNotAvailable, // {"status":"error","err-code":"gateway-internal-error","err-msg":"Failed to load data. Try again later.","data":null}
@@ -66038,6 +66039,13 @@ module.exports = class kraken extends Exchange {
         };
     }
 
+    parseBidAsk (bidask, priceKey = 0, amountKey = 1) {
+        const price = this.safeFloat (bidask, priceKey);
+        const amount = this.safeFloat (bidask, amountKey);
+        const timestamp = this.safeInteger (bidask, 2);
+        return [ price, amount, timestamp ];
+    }
+
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const market = this.market (symbol);
@@ -66051,7 +66059,27 @@ module.exports = class kraken extends Exchange {
             request['count'] = limit; // 100
         }
         const response = await this.publicGetDepth (this.extend (request, params));
-        const orderbook = response['result'][market['id']];
+        //
+        //     {
+        //         "error":[],
+        //         "result":{
+        //             "XETHXXBT":{
+        //                 "asks":[
+        //                     ["0.023480","4.000",1586321307],
+        //                     ["0.023490","50.095",1586321306],
+        //                     ["0.023500","28.535",1586321302],
+        //                 ],
+        //                 "bids":[
+        //                     ["0.023470","59.580",1586321307],
+        //                     ["0.023460","20.000",1586321301],
+        //                     ["0.023440","67.832",1586321306],
+        //                 ]
+        //             }
+        //         }
+        //     }
+        //
+        const result = this.safeValue (response, 'result', {});
+        const orderbook = this.safeValue (result, market['id']);
         return this.parseOrderBook (orderbook);
     }
 
