@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.83'
+const version = '1.29.84'
 
 Exchange.ccxtVersion = version
 
@@ -20219,7 +20219,7 @@ module.exports = class bitmax extends Exchange {
         if ((symbol === undefined) && (market !== undefined)) {
             symbol = market['symbol'];
         }
-        let timestamp = this.safeInteger (order, 'timestamp');
+        let timestamp = this.safeInteger2 (order, 'timestamp', 'sendingTime');
         let lastTradeTimestamp = this.safeInteger (order, 'lastExecTime');
         const price = this.safeFloat (order, 'price');
         const amount = this.safeFloat (order, 'orderQty');
