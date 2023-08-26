@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.18'
+const version = '1.21.19'
 
 Exchange.ccxtVersion = version
 
@@ -101712,7 +101712,7 @@ module.exports = class timex extends Exchange {
             const expireIn = this.safeValue (params, 'expireIn', defaultExpireIn);
             if (expireTime !== undefined) {
                 request['expireTime'] = expireTime;
-            } else if (expireIn === undefined) {
+            } else if (expireIn !== undefined) {
                 request['expireIn'] = expireIn;
             } else {
                 throw new InvalidOrder (this.id + ' createOrder method requires a expireTime or expireIn param for a ' + type + ' order, you can also set the expireIn exchange-wide option');
