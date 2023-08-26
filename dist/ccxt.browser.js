@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.51'
+const version = '1.34.52'
 
 Exchange.ccxtVersion = version
 
@@ -15984,6 +15984,7 @@ module.exports = class bitforex extends Exchange {
                 },
             },
             'commonCurrencies': {
+                'CREDIT': 'TerraCredit',
                 'UOS': 'UOS Network',
             },
             'exceptions': {
@@ -42820,6 +42821,7 @@ module.exports = class bytetrade extends Exchange {
             'commonCurrencies': {
                 '44': 'ByteHub',
                 '48': 'Blocktonic',
+                '133': 'TerraCredit',
             },
             'exceptions': {
                 'vertify error': AuthenticationError, // typo on the exchange side, 'vertify'
@@ -51043,6 +51045,7 @@ module.exports = class coinmarketcap extends Exchange {
             'ACChain': 'ACChain',
             'AdCoin': 'AdCoin',
             'BatCoin': 'BatCoin',
+            'BigONE Token': 'BigONE Token', // conflict with Harmony (ONE)
             'Bitgem': 'Bitgem',
             'BlazeCoin': 'BlazeCoin',
             'BlockCAT': 'BlockCAT',
@@ -51074,6 +51077,7 @@ module.exports = class coinmarketcap extends Exchange {
             'KingN Coin': 'KingN Coin', // conflict with KNC (Kyber Network)
             'LiteBitcoin': 'LiteBitcoin', // conflict with LBTC (LightningBitcoin)
             'Maggie': 'Maggie',
+            'Menlo One': 'Menlo One', // conflict with Harmony (ONE)
             'Monarch': 'Monarch', // conflict with MyToken (MT)
             'MTC Mesh Network': 'MTC Mesh Network', // conflict with MTC Docademic doc.com Token https://github.com/ccxt/ccxt/issues/6081 https://github.com/ccxt/ccxt/issues/3025
             'IOTA': 'IOTA', // a special case, most exchanges list it as IOTA, therefore we change just the Coinmarketcap instead of changing them all
@@ -51087,9 +51091,8 @@ module.exports = class coinmarketcap extends Exchange {
             // https://github.com/ccxt/ccxt/issues/6081
             // https://github.com/ccxt/ccxt/issues/3365
             // https://github.com/ccxt/ccxt/issues/2873
+            'TerraCredit': 'TerraCredit', // conflict with CREDIT (PROXI)
             'Themis': 'Themis', // conflict with GET (Guaranteed Entrance Token, GET Protocol)
-            'Menlo One': 'Menlo One', // conflict with Harmony (ONE)
-            'BigONE Token': 'BigONE Token', // conflict with Harmony (ONE)
         };
         return this.safeValue (currencies, name, base);
     }
@@ -54011,9 +54014,10 @@ module.exports = class crex24 extends Exchange {
                 },
             },
             'commonCurrencies': {
-                'YOYO': 'YOYOW',
-                'BULL': 'BuySell',
                 'BCC': 'BCH',
+                'BULL': 'BuySell',
+                'CREDIT': 'TerraCredit',
+                'YOYO': 'YOYOW',
             },
             // exchange-specific options
             'options': {
@@ -134033,6 +134037,7 @@ module.exports = class yobit extends Exchange {
                 'COV': 'Coven Coin',
                 'COVX': 'COV',
                 'CPC': 'Capricoin',
+                'CREDIT': 'Creditbit',
                 'CS': 'CryptoSpots',
                 'DCT': 'Discount',
                 'DFT': 'DraftCoin',
