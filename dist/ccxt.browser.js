@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.29'
+const version = '1.31.30'
 
 Exchange.ccxtVersion = version
 
@@ -124700,6 +124700,7 @@ module.exports = class yobit extends Exchange {
                     'Insufficient funds': InsufficientFunds,
                     'invalid key': AuthenticationError,
                     'invalid nonce': InvalidNonce, // {"success":0,"error":"invalid nonce (has already been used)"}'
+                    'Total order amount is less than minimal amount': InvalidOrder,
                 },
             },
         });
