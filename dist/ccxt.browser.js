@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.90'
+const version = '1.33.97'
 
 Exchange.ccxtVersion = version
 
@@ -418,7 +418,7 @@ module.exports = class acx extends Exchange {
             }
             result[symbol] = this.parseTicker (response[id], market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -3710,40 +3710,31 @@ module.exports['byteArrayToWordArray'] = byteArrayToWordArray
 },{"../../static_dependencies/BN/bn":122,"../../static_dependencies/crypto-js/crypto-js":123,"../../static_dependencies/qs/index":158}],11:[function(require,module,exports){
 "use strict";
 
-/*  ------------------------------------------------------------------------ */
+// ----------------------------------------------------------------------------
 
 const { isObject, isNumber, isDictionary, isArray } = require ('./type')
 
-/*  ------------------------------------------------------------------------ */
+// ----------------------------------------------------------------------------
 
 const keys = Object.keys
-
-    , values = x => !isArray (x)  // don't copy arrays if they're already arrays!
-                        ? Object.values (x)
-                        : x
-
-    , index = x => new Set (values (x))
-
+    , values = (x) => ((!isArray (x)) ? Object.values (x) : x) // don't copy arrays if they're already arrays
+    , index = (x) => new Set (values (x))
     , extend = (...args) => Object.assign ({}, ...args) // NB: side-effect free
+    , clone = (x) => (isArray (x) ? Array.from (x) : extend (x)) // clone arrays or objects
 
-    , clone = x => isArray (x)
-                        ? Array.from (x) // clones arrays
-                        : extend (x)     // clones objects
+// ----------------------------------------------------------------------------
 
-/*  ------------------------------------------------------------------------ */
-
-module.exports =
-
-    { keys
+module.exports = {
+    keys
     , values
     , extend
     , clone
     , index
-    , ordered: x => x // a stub to keep assoc keys in order (in JS it does nothing, it's mostly for Python)
-    , unique:  x => Array.from (index (x))
+    , ordered: (x) => x // a stub to keep assoc keys in order (in JS it does nothing, it's mostly for Python)
+    , unique: (x) => Array.from (index (x))
     , arrayConcat: (a, b) => a.concat (b)
 
-    /*  .............................................   */
+    // ------------------------------------------------------------------------
 
     , inArray (needle, haystack) {
 
@@ -3756,12 +3747,13 @@ module.exports =
     }
 
     , isEmpty (object) {
-        if (!object)
-            return true;
+        if (!object) {
+            return true
+        }
         return (Array.isArray (object) ? object : Object.keys (object)).length < 1;
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
 
     , keysort (x, out = {}) {
 
@@ -3771,55 +3763,57 @@ module.exports =
         return out
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
 
     /*
-       Accepts a map/array of objects and a key name to be used as an index:
-       array = [
-          { someKey: 'value1', anotherKey: 'anotherValue1' },
-          { someKey: 'value2', anotherKey: 'anotherValue2' },
-          { someKey: 'value3', anotherKey: 'anotherValue3' },
-       ]
-       key = 'someKey'
+        Accepts a map/array of objects and a key name to be used as an index:
+        array = [
+            { someKey: 'value1', anotherKey: 'anotherValue1' },
+            { someKey: 'value2', anotherKey: 'anotherValue2' },
+            { someKey: 'value3', anotherKey: 'anotherValue3' },
+        ]
+        key = 'someKey'
 
-       Returns a map:
-      {
-          value1: { someKey: 'value1', anotherKey: 'anotherValue1' },
-          value2: { someKey: 'value2', anotherKey: 'anotherValue2' },
-          value3: { someKey: 'value3', anotherKey: 'anotherValue3' },
-      }
+        Returns a map:
+        {
+            value1: { someKey: 'value1', anotherKey: 'anotherValue1' },
+            value2: { someKey: 'value2', anotherKey: 'anotherValue2' },
+            value3: { someKey: 'value3', anotherKey: 'anotherValue3' },
+        }
     */
 
     , indexBy (x, k, out = {}) {
 
-        for (const v of values (x))
-            if (k in v)
+        for (const v of values (x)) {
+            if (k in v) {
                 out[v[k]] = v
+            }
+        }
 
         return out
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
 
     /*
-       Accepts a map/array of objects and a key name to be used as a grouping parameter:
-       array = [
-          { someKey: 'value1', anotherKey: 'anotherValue1' },
-          { someKey: 'value1', anotherKey: 'anotherValue2' },
-          { someKey: 'value3', anotherKey: 'anotherValue3' },
-       ]
-       key = 'someKey'
-
-       Returns a map:
-      {
-          value1: [
+        Accepts a map/array of objects and a key name to be used as a grouping parameter:
+        array = [
             { someKey: 'value1', anotherKey: 'anotherValue1' },
             { someKey: 'value1', anotherKey: 'anotherValue2' },
-          ]
-          value3: [
-            { someKey: 'value3', anotherKey: 'anotherValue3' }
-          ],
-      }
+            { someKey: 'value3', anotherKey: 'anotherValue3' },
+        ]
+        key = 'someKey'
+
+        Returns a map:
+        {
+            value1: [
+                { someKey: 'value1', anotherKey: 'anotherValue1' },
+                { someKey: 'value1', anotherKey: 'anotherValue2' },
+            ]
+            value3: [
+                { someKey: 'value3', anotherKey: 'anotherValue3' }
+            ],
+        }
     */
 
     , groupBy (x, k, out = {}) {
@@ -3834,61 +3828,68 @@ module.exports =
         return out
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
 
     /*
-       Accepts a map/array of objects, a key name and a key value to be used as a filter:
-       array = [
-          { someKey: 'value1', anotherKey: 'anotherValue1' },
-          { someKey: 'value2', anotherKey: 'anotherValue2' },
-          { someKey: 'value3', anotherKey: 'anotherValue3' },
-       ]
-       key = 'someKey'
-       value = 'value1'
+        Accepts a map/array of objects, a key name and a key value to be used as a filter:
+        array = [
+            { someKey: 'value1', anotherKey: 'anotherValue1' },
+            { someKey: 'value2', anotherKey: 'anotherValue2' },
+            { someKey: 'value3', anotherKey: 'anotherValue3' },
+        ]
+        key = 'someKey'
+        value = 'value1'
 
-       Returns an array:
-      [
-          value1: { someKey: 'value1', anotherKey: 'anotherValue1' },
-      ]
+        Returns an array:
+        [
+            value1: { someKey: 'value1', anotherKey: 'anotherValue1' },
+        ]
     */
 
     , filterBy (x, k, value = undefined, out = []) {
 
-        for (const v of values (x))
-            if (v[k] === value)
+        for (const v of values (x)) {
+            if (v[k] === value) {
                 out.push (v)
-
-        return out
-    }
-
-/*  .............................................   */
-
-    , sortBy: (array, // NB: MUTATES ARRAY!
-               key,
-               descending = false,
-               direction  = descending ? -1 : 1) => array.sort ((a, b) =>
-                                                                ((a[key] < b[key]) ? -direction :
-                                                                ((a[key] > b[key]) ?  direction : 0)))
-
-/*  .............................................   */
-
-    , flatten: function flatten (x, out = []) {
-
-        for (const v of x) {
-            if (isArray (v)) flatten (v, out)
-            else out.push (v)
+            }
         }
 
         return out
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
+    // NB: MUTATES ARRAY!
 
-    , pluck: (x, k) => values (x)
-                        .filter (v => k in v)
-                        .map (v => v[k])
+    , sortBy: (array, key, descending = false, direction  = descending ? -1 : 1) => array.sort ((a, b) => {
+        if (a[key] < b[key]) {
+            return -direction
+        } else if (a[key] > b[key]) {
+            return direction
+        } else {
+            return 0
+        }
+    })
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
+
+    , flatten: function flatten (x, out = []) {
+
+        for (const v of x) {
+            if (isArray (v)) {
+                flatten (v, out)
+            } else {
+                out.push (v)
+            }
+        }
+
+        return out
+    }
+
+    // ------------------------------------------------------------------------
+
+    , pluck: (x, k) => values (x).filter ((v) => k in v).map ((v) => v[k])
+
+    // ------------------------------------------------------------------------
 
     , omit (x, ...args) {
 
@@ -3897,15 +3898,13 @@ module.exports =
             const out = clone (x)
 
             for (const k of args) {
-
                 if (isArray (k)) { // omit (x, ['a', 'b'])
-
                     for (const kk of k) {
                         delete out[kk]
                     }
+                } else {
+                    delete out[k] // omit (x, 'a', 'b')
                 }
-
-                else delete out[k] // omit (x, 'a', 'b')
             }
 
             return out
@@ -3914,24 +3913,22 @@ module.exports =
         return x
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
 
     , sum (...xs) {
 
         const ns = xs.filter (isNumber) // leave only numbers
 
-        return (ns.length > 0)
-                    ? ns.reduce ((a, b) => a + b, 0)
-                    : undefined
+        return (ns.length > 0) ? ns.reduce ((a, b) => a + b, 0) : undefined
     }
 
-/*  .............................................   */
+    // ------------------------------------------------------------------------
 
     , deepExtend: function deepExtend (...xs) {
         let out = undefined
         for (const x of xs) {
             if (isDictionary (x)) {
-                if (!isObject (out)) {
+                if (!isDictionary (out)) {
                     out = {}
                 }
                 for (const k in x) {
@@ -3944,7 +3941,7 @@ module.exports =
         return out
     }
 
-/*  ------------------------------------------------------------------------ */
+// ----------------------------------------------------------------------------
 
 }
 
@@ -4760,9 +4757,10 @@ const isNumber          = Number.isFinite
     , isInteger         = Number.isInteger
     , isArray           = Array.isArray
     , hasProps          = o => ((o !== undefined) && (o !== null))
-    , isString          = s =>                 (typeof s === 'string')
+    , isString          = s =>                  (typeof s === 'string')
     , isObject          = o => ((o !== null) && (typeof o === 'object'))
-    , isDictionary      = o => (isObject (o) && !isArray (o))
+    , isRegExp          = o => (o instanceof RegExp)
+    , isDictionary      = o => (isObject (o) && !isArray (o) && !isRegExp (o))
     , isStringCoercible = x => ((hasProps (x) && x.toString) || isNumber (x))
 
 /*  .............................................   */
@@ -5819,7 +5817,8 @@ module.exports = class bibox extends Exchange {
         };
         const response = await this.publicGetMdata (this.extend (request, params));
         const tickers = this.parseTickers (response['result'], symbols);
-        return this.indexBy (tickers, 'symbol');
+        const result = this.indexBy (tickers, 'symbol');
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     parseTrade (trade, market = undefined) {
@@ -6956,7 +6955,7 @@ module.exports = class bigone extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTime (params = {}) {
@@ -13331,7 +13330,7 @@ module.exports = class bitfinex extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -14430,7 +14429,7 @@ module.exports = class bitfinex2 extends bitfinex {
                 result[symbol] = this.parseTicker (ticker, market);
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -19423,7 +19422,7 @@ module.exports = class bithumb extends Exchange {
                 result[symbol] = this.parseTicker (ticker, market);
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -20361,7 +20360,7 @@ module.exports = class bitmart extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchCurrencies (params = {}) {
@@ -23544,7 +23543,7 @@ module.exports = class bitmex extends Exchange {
                 result[symbol] = ticker;
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     parseTicker (ticker, market = undefined) {
@@ -24353,7 +24352,7 @@ module.exports = class bitpanda extends Exchange {
             },
             'fees': {
                 'trading': {
-                    'tierBased': false,
+                    'tierBased': true,
                     'percentage': true,
                     'taker': 0.15 / 100,
                     'maker': 0.10 / 100,
@@ -24816,7 +24815,7 @@ module.exports = class bitpanda extends Exchange {
 
     async fetchTickers (symbols = undefined, params = {}) {
         await this.loadMarkets ();
-        const tickers = await this.publicGetMarketTicker (params);
+        const response = await this.publicGetMarketTicker (params);
         //
         //     [
         //         {
@@ -24838,12 +24837,12 @@ module.exports = class bitpanda extends Exchange {
         //     ]
         //
         const result = {};
-        for (let i = 0; i < tickers.length; i++) {
-            const ticker = this.parseTicker (tickers[i]);
+        for (let i = 0; i < response.length; i++) {
+            const ticker = this.parseTicker (response[i]);
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -31898,7 +31897,7 @@ module.exports = class bitz extends Exchange {
                 });
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTime (params = {}) {
@@ -34042,7 +34041,7 @@ module.exports = class braziliex extends Exchange {
             const symbol = market['symbol'];
             result[symbol] = this.parseTicker (response[marketId], market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -36896,7 +36895,7 @@ module.exports = class btcturk extends Exchange {
             }
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -38260,7 +38259,7 @@ module.exports = class bw extends Exchange {
                 result[symbol] = ticker;
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -40143,7 +40142,7 @@ module.exports = class bybit extends Exchange {
                 }
             }
         }
-        const status = this.parseOrderStatus (this.safeString (order, 'order_status'));
+        const status = this.parseOrderStatus (this.safeString2 (order, 'order_status', 'stop_order_status'));
         const side = this.safeStringLower (order, 'side');
         let feeCost = this.safeFloat (order, 'cum_exec_fee');
         let fee = undefined;
@@ -43137,7 +43136,7 @@ module.exports = class cex extends Exchange {
             const market = this.markets[symbol];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -47389,7 +47388,7 @@ module.exports = class coinex extends Exchange {
             ticker['symbol'] = symbol;
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = 20, params = {}) {
@@ -48231,7 +48230,7 @@ module.exports = class coinfalcon extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -49312,7 +49311,7 @@ module.exports = class coingi extends Exchange {
             }
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -50743,7 +50742,7 @@ module.exports = class coinone extends Exchange {
                 result[symbol]['timestamp'] = timestamp;
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -51941,7 +51940,7 @@ module.exports = class coss extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -56960,7 +56959,7 @@ module.exports = class digifinex extends Exchange {
             }
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -58315,7 +58314,7 @@ module.exports = class dsx extends Exchange {
             }
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -61066,7 +61065,7 @@ module.exports = class exmo extends Exchange {
             const ticker = response[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -62056,7 +62055,7 @@ module.exports = class exx extends Exchange {
             };
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -63648,7 +63647,7 @@ module.exports = class foxbit extends Exchange {
 
 const Exchange = require ('./base/Exchange');
 const { TICK_SIZE } = require ('./base/functions/number');
-const { ExchangeError, InvalidOrder, BadRequest, InsufficientFunds, OrderNotFound } = require ('./base/errors');
+const { ExchangeError, InvalidOrder, BadRequest, InsufficientFunds, OrderNotFound, AuthenticationError } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -63838,6 +63837,7 @@ module.exports = class ftx extends Exchange {
             },
             'exceptions': {
                 'exact': {
+                    'Not logged in': AuthenticationError, // {"error":"Not logged in","success":false}
                     'Not enough balances': InsufficientFunds, // {"error":"Not enough balances","success":false}
                     'InvalidPrice': InvalidOrder, // {"error":"Invalid price","success":false}
                     'Size too small': InvalidOrder, // {"error":"Size too small","success":false}
@@ -65701,7 +65701,7 @@ module.exports = class gateio extends Exchange {
             }
             result[symbol] = this.parseTicker (response[id], market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -69633,7 +69633,7 @@ module.exports = class hitbtc extends Exchange {
                 }
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -73322,7 +73322,7 @@ module.exports = class ice3x extends Exchange {
                 result[symbol] = this.parseTicker (ticker, market);
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -76982,11 +76982,9 @@ module.exports = class kraken extends Exchange {
             const market = this.markets_by_id[id];
             const symbol = market['symbol'];
             const ticker = tickers[id];
-            if (this.inArray (symbol, symbols)) {
-                result[symbol] = this.parseTicker (ticker, market);
-            }
+            result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -78690,7 +78688,7 @@ module.exports = class kucoin extends Exchange {
                 result[symbol] = ticker;
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -80345,7 +80343,7 @@ module.exports = class lakebtc extends Exchange {
             }
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -80938,11 +80936,9 @@ module.exports = class latoken extends Exchange {
         for (let i = 0; i < response.length; i++) {
             const ticker = this.parseTicker (response[i]);
             const symbol = ticker['symbol'];
-            if (symbols === undefined || this.inArray (symbol, symbols)) {
-                result[symbol] = ticker;
-            }
+            result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     parseTrade (trade, market = undefined) {
@@ -81671,7 +81667,7 @@ module.exports = class lbank extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = 60, params = {}) {
@@ -82671,7 +82667,7 @@ module.exports = class liquid extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -83627,7 +83623,7 @@ module.exports = class livecoin extends Exchange {
             const ticker = tickers[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -84512,7 +84508,7 @@ module.exports = class luno extends Exchange {
             const ticker = tickers[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -86431,7 +86427,7 @@ module.exports = class oceanex extends Exchange {
             const symbol = market['symbol'];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     parseTicker (data, market = undefined) {
@@ -93219,7 +93215,7 @@ module.exports = class poloniex extends Exchange {
             const ticker = response[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchCurrencies (params = {}) {
@@ -95573,7 +95569,7 @@ module.exports = class probit extends Exchange {
                 this.checkRequiredCredentials ();
                 const expires = this.safeInteger (this.options, 'expires');
                 if ((expires === undefined) || (expires < now)) {
-                    throw new AuthenticationError (this.id + ' accessToken expired, call signIn() method');
+                    throw new AuthenticationError (this.id + ' access token expired, call signIn() method');
                 }
                 const accessToken = this.safeString (this.options, 'accessToken');
                 headers = {
@@ -97467,7 +97463,7 @@ module.exports = class rightbtc extends Exchange {
             const symbol = market['symbol'];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -98165,7 +98161,7 @@ module.exports = class southxchange extends Exchange {
             const ticker = tickers[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -120266,7 +120262,7 @@ module.exports = class therock extends Exchange {
             const ticker = tickers[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -121474,7 +121470,7 @@ module.exports = class tidebit extends Exchange {
                 result[symbol] = this.parseTicker (ticker, market);
             }
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -122172,7 +122168,7 @@ module.exports = class tidex extends Exchange {
             }
             result[symbol] = this.parseTicker (response[id], market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -124538,7 +124534,7 @@ module.exports = class upbit extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -128179,7 +128175,7 @@ module.exports = class xbtce extends Exchange {
             const ticker = tickers[id];
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -128793,7 +128789,7 @@ module.exports = class xena extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -130476,7 +130472,7 @@ module.exports = class yobit extends Exchange {
             }
             result[symbol] = this.parseTicker (ticker, market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
@@ -131822,7 +131818,7 @@ module.exports = class zb extends Exchange {
             const market = anotherMarketsById[ids[i]];
             result[market['symbol']] = this.parseTicker (response[ids[i]], market);
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTicker (symbol, params = {}) {
