@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.14'
+const version = '1.30.15'
 
 Exchange.ccxtVersion = version
 
@@ -21671,11 +21671,11 @@ module.exports = class bitmex extends Exchange {
         }
         let amount = this.safeInteger (transaction, 'amount');
         if (amount !== undefined) {
-            amount = Math.abs (amount) * 1e-8;
+            amount = Math.abs (amount) / 10000000;
         }
         let feeCost = this.safeInteger (transaction, 'fee');
         if (feeCost !== undefined) {
-            feeCost = feeCost * 1e-8;
+            feeCost = feeCost / 10000000;
         }
         const fee = {
             'cost': feeCost,
