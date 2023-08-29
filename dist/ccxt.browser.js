@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.7'
+const version = '1.31.8'
 
 Exchange.ccxtVersion = version
 
@@ -18017,6 +18017,7 @@ module.exports = class bitmart extends Exchange {
                 'fetchOHLCV': true,
                 'fetchBalance': true,
                 'createOrder': true,
+                'createMarketOrder': false,
                 'cancelOrder': true,
                 'cancelAllOrders': true,
                 'fetchOrders': false,
@@ -18723,7 +18724,7 @@ module.exports = class bitmart extends Exchange {
         //     }
         //
         const id = this.safeString (order, 'entrust_id');
-        const timestamp = this.milliseconds ();
+        const timestamp = this.safeInteger (order, 'timestamp', this.milliseconds ());
         const status = this.parseOrderStatus (this.safeString (order, 'status'));
         let symbol = undefined;
         const marketId = this.safeString (order, 'symbol');
@@ -18748,12 +18749,12 @@ module.exports = class bitmart extends Exchange {
         if (amount !== undefined) {
             if (remaining !== undefined) {
                 if (filled === undefined) {
-                    filled = amount - remaining;
+                    filled = Math.max (0, amount - remaining);
                 }
             }
             if (filled !== undefined) {
                 if (remaining === undefined) {
-                    remaining = amount - filled;
+                    remaining = Math.max (0, amount - filled);
                 }
                 if (cost === undefined) {
                     if (price !== undefined) {
@@ -18776,7 +18777,7 @@ module.exports = class bitmart extends Exchange {
             'side': side,
             'price': price,
             'amount': amount,
-            'cost': undefined,
+            'cost': cost,
             'average': undefined,
             'filled': filled,
             'remaining': remaining,
@@ -22167,7 +22168,7 @@ module.exports = class bitmex extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { AuthenticationError, ExchangeError, PermissionDenied, BadRequest, ArgumentsRequired, OrderNotFound, InsufficientFunds, ExchangeNotAvailable, DDoSProtection, InvalidAddress } = require ('./base/errors');
+const { AuthenticationError, ExchangeError, PermissionDenied, BadRequest, ArgumentsRequired, OrderNotFound, InsufficientFunds, ExchangeNotAvailable, DDoSProtection, InvalidAddress, InvalidOrder } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -22182,6 +22183,7 @@ module.exports = class bitpanda extends Exchange {
             // new metainfo interface
             'has': {
                 'createDepositAddress': true,
+                'createOrder': true,
                 'fetchBalance': true,
                 'fetchCurrencies': true,
                 'fetchDeposits': true,
@@ -22342,7 +22344,7 @@ module.exports = class bitpanda extends Exchange {
                     'INVALID_QUERY': BadRequest,
                     'INVALID_CURSOR': BadRequest,
                     'INVALID_ACCOUNT_ID': BadRequest,
-                    'INVALID_SIDE': BadRequest,
+                    'INVALID_SIDE': InvalidOrder,
                     'INVALID_ACCOUNT_HISTORY_FROM_TIME': BadRequest,
                     'INVALID_ACCOUNT_HISTORY_MAX_PAGE_SIZE': BadRequest,
                     'INVALID_ACCOUNT_HISTORY_TIME_PERIOD': BadRequest,
@@ -22355,21 +22357,21 @@ module.exports = class bitpanda extends Exchange {
                     'INVALID_TIME_RANGE': BadRequest,
                     'INVALID_TRADE_ID': BadRequest,
                     'INVALID_UI_ACCOUNT_SETTINGS': BadRequest,
-                    'NEGATIVE_AMOUNT': BadRequest,
-                    'NEGATIVE_PRICE': BadRequest,
-                    'MIN_SIZE_NOT_SATISFIED': BadRequest,
-                    'BAD_AMOUNT_PRECISION': BadRequest,
-                    'BAD_PRICE_PRECISION': BadRequest,
-                    'BAD_TRIGGER_PRICE_PRECISION': BadRequest,
+                    'NEGATIVE_AMOUNT': InvalidOrder,
+                    'NEGATIVE_PRICE': InvalidOrder,
+                    'MIN_SIZE_NOT_SATISFIED': InvalidOrder,
+                    'BAD_AMOUNT_PRECISION': InvalidOrder,
+                    'BAD_PRICE_PRECISION': InvalidOrder,
+                    'BAD_TRIGGER_PRICE_PRECISION': InvalidOrder,
                     'MAX_OPEN_ORDERS_EXCEEDED': BadRequest,
-                    'MISSING_PRICE': ArgumentsRequired,
-                    'MISSING_ORDER_TYPE': ArgumentsRequired,
-                    'MISSING_SIDE': ArgumentsRequired,
+                    'MISSING_PRICE': InvalidOrder,
+                    'MISSING_ORDER_TYPE': InvalidOrder,
+                    'MISSING_SIDE': InvalidOrder,
                     'MISSING_CANDLESTICKS_PERIOD_PARAM': ArgumentsRequired,
                     'MISSING_CANDLESTICKS_UNIT_PARAM': ArgumentsRequired,
                     'MISSING_FROM_PARAM': ArgumentsRequired,
                     'MISSING_INSTRUMENT_CODE': ArgumentsRequired,
-                    'MISSING_ORDER_ID': ArgumentsRequired,
+                    'MISSING_ORDER_ID': InvalidOrder,
                     'MISSING_TO_PARAM': ArgumentsRequired,
                     'MISSING_TRADE_ID': ArgumentsRequired,
                     'INVALID_ORDER_ID': OrderNotFound,
@@ -23260,6 +23262,133 @@ module.exports = class bitpanda extends Exchange {
             'datetime': this.iso8601 (timestamp),
             'fee': fee,
         };
+    }
+
+    parseOrder (order, market = undefined) {
+        //
+        // createOrder
+        //
+        //     {
+        //         "order_id": "d5492c24-2995-4c18-993a-5b8bf8fffc0d",
+        //         "client_id": "d75fb03b-b599-49e9-b926-3f0b6d103206",
+        //         "account_id": "a4c699f6-338d-4a26-941f-8f9853bfc4b9",
+        //         "instrument_code": "BTC_EUR",
+        //         "time": "2019-08-01T08:00:44.026Z",
+        //         "side": "BUY",
+        //         "price": "5000",
+        //         "amount": "1",
+        //         "filled_amount": "0.5",
+        //         "type": "LIMIT",
+        //         "time_in_force": "GOOD_TILL_CANCELLED"
+        //     }
+        //
+        // cancelOrder
+        //
+        //     ...
+        //
+        // fetchOrders
+        //
+        //     ...
+        //
+        const id = this.safeString (order, 'order_id');
+        const clientOrderId = this.safeString (order, 'client_id');
+        const timestamp = this.parse8601 (this.safeString (order, 'time'));
+        let status = undefined;
+        let symbol = undefined;
+        const marketId = this.safeString (order, 'instrument_code');
+        if (marketId !== undefined) {
+            if (marketId in this.markets_by_id) {
+                market = this.markets_by_id[marketId];
+            } else {
+                const [ baseId, quoteId ] = marketId.split ('_');
+                const base = this.safeCurrencyCode (baseId);
+                const quote = this.safeCurrencyCode (quoteId);
+                symbol = base + '/' + quote;
+            }
+        }
+        if ((symbol === undefined) && (market !== undefined)) {
+            symbol = market['symbol'];
+        }
+        const price = this.safeFloat (order, 'price');
+        const amount = this.safeFloat (order, 'amount');
+        let cost = undefined;
+        const filled = this.safeFloat (order, 'filled_amount');
+        let remaining = undefined;
+        if (filled !== undefined) {
+            if (amount !== undefined) {
+                remaining = Math.max (0, amount - filled);
+                if (remaining > 0) {
+                    status = 'open';
+                } else {
+                    status = 'closed';
+                }
+            }
+            if (cost === undefined) {
+                if (price !== undefined) {
+                    cost = price * filled;
+                }
+            }
+        }
+        const side = this.safeStringLower (order, 'side');
+        const type = this.safeStringLower (order, 'type');
+        return {
+            'id': id,
+            'clientOrderId': clientOrderId,
+            'info': order,
+            'timestamp': timestamp,
+            'datetime': this.iso8601 (timestamp),
+            'lastTradeTimestamp': undefined,
+            'symbol': symbol,
+            'type': type,
+            'side': side,
+            'price': price,
+            'amount': amount,
+            'cost': cost,
+            'average': undefined,
+            'filled': filled,
+            'remaining': remaining,
+            'status': status,
+            'fee': undefined,
+            'trades': undefined,
+        };
+    }
+
+    async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const uppercaseType = type.toUpperCase ();
+        const request = {
+            'instrument_code': market['id'],
+            'type': type.toUpperCase (), // LIMIT, MARKET, STOP
+            'side': side.toUpperCase (), // or SELL
+            'amount': this.amountToPrecision (symbol, amount),
+            // "price": "1234.5678", // required for LIMIT and STOP orders
+            // "client_id": "d75fb03b-b599-49e9-b926-3f0b6d103206", // optional
+            // "time_in_force": "GOOD_TILL_CANCELLED", // limit orders only, GOOD_TILL_CANCELLED, GOOD_TILL_TIME, IMMEDIATE_OR_CANCELLED and FILL_OR_KILL
+            // "expire_after": "2020-07-02T19:40:13Z", // required for GOOD_TILL_TIME
+            // "is_post_only": false, // limit orders only, optional
+            // "trigger_price": "1234.5678" // required for stop orders
+        };
+        if (uppercaseType === 'LIMIT' || type === 'STOP') {
+            request['price'] = this.priceToPrecision (symbol, price);
+        }
+        const response = await this.privatePostAccountOrders (this.extend (request, params));
+        //
+        //     {
+        //         "order_id": "d5492c24-2995-4c18-993a-5b8bf8fffc0d",
+        //         "client_id": "d75fb03b-b599-49e9-b926-3f0b6d103206",
+        //         "account_id": "a4c699f6-338d-4a26-941f-8f9853bfc4b9",
+        //         "instrument_code": "BTC_EUR",
+        //         "time": "2019-08-01T08:00:44.026Z",
+        //         "side": "BUY",
+        //         "price": "5000",
+        //         "amount": "1",
+        //         "filled_amount": "0.5",
+        //         "type": "LIMIT",
+        //         "time_in_force": "GOOD_TILL_CANCELLED"
+        //     }
+        //
+        return this.parseOrder (response, market);
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
