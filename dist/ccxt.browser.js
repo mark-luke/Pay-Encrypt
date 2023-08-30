@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.30'
+const version = '1.30.31'
 
 Exchange.ccxtVersion = version
 
@@ -88269,8 +88269,8 @@ module.exports = class poloniex extends Exchange {
                 let feeRate = this.safeString (parts, 2);
                 if (feeRate !== undefined) {
                     feeRate = feeRate.replace ('(', '');
-                    feeRate = feeRate.replace (')', '');
-                    feeRate = feeRate.replace ('%', '');
+                    const feeRateParts = feeRate.split ('%');
+                    feeRate = this.safeString (feeRateParts, 0);
                     feeRate = parseFloat (feeRate) / 100;
                 }
                 fee = {
