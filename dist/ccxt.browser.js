@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.96'
+const version = '1.20.97'
 
 Exchange.ccxtVersion = version
 
@@ -4488,21 +4488,6 @@ module.exports = class Exchange {
             'datetime': this.iso8601 (timestamp),
             'nonce': undefined,
         }
-    }
-
-    getCurrencyUsedOnOpenOrders (currency) {
-        return Object.values (this.orders).filter (order => (order['status'] === 'open')).reduce ((total, order) => {
-            const symbol = order['symbol']
-            const market = this.markets[symbol]
-            const remaining = order['remaining']
-            if (currency === market['base'] && order['side'] === 'sell') {
-                return total + remaining
-            } else if (currency === market['quote'] && order['side'] === 'buy') {
-                return total + (order['price'] * remaining)
-            } else {
-                return total
-            }
-        }, 0)
     }
 
     parseBalance (balance) {
