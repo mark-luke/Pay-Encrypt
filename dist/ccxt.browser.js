@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.52'
+const version = '1.24.53'
 
 Exchange.ccxtVersion = version
 
@@ -43503,7 +43503,7 @@ module.exports = class coinmarketcap extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, InvalidOrder, OrderNotFound } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, InvalidOrder, OrderNotFound, RateLimitExceeded } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -43608,7 +43608,9 @@ module.exports = class coinmate extends Exchange {
                     'No order with given ID': OrderNotFound,
                 },
                 'broad': {
+                    'Incorrect order ID': InvalidOrder,
                     'Minimum Order Size ': InvalidOrder,
+                    'TOO MANY REQUESTS': RateLimitExceeded,
                 },
             },
         });
@@ -44138,8 +44140,9 @@ module.exports = class coinmate extends Exchange {
         if (symbol) {
             market = this.market (symbol);
         }
-        const res = await this.privatePostOrderById (this.extend (request, params));
-        return this.parseOrder (res['data'], market);
+        const response = await this.privatePostOrderById (this.extend (request, params));
+        const data = this.safeValue (response, 'data');
+        return this.parseOrder (data, market);
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
@@ -44179,19 +44182,28 @@ module.exports = class coinmate extends Exchange {
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
     }
 
-    async request (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
-        const response = await this.fetch2 (path, api, method, params, headers, body);
-        if ('error' in response) {
-            // {"error":true,"errorMessage":"Minimum Order Size 0.01 ETH","data":null}
-            if (response['error']) {
-                const message = this.safeString (response, 'errorMessage');
-                const feedback = this.id + ' ' + message;
-                this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
-                this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
-                throw new ExchangeError (this.id + ' ' + this.json (response));
+    handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
+        if (response !== undefined) {
+            if ('error' in response) {
+                // {"error":true,"errorMessage":"Minimum Order Size 0.01 ETH","data":null}
+                if (response['error']) {
+                    const message = this.safeString (response, 'errorMessage');
+                    const feedback = this.id + ' ' + message;
+                    this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
+                    this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
+                    throw new ExchangeError (this.id + ' ' + this.json (response));
+                }
             }
         }
-        return response;
+        if (code > 400) {
+            if (body) {
+                const feedback = this.id + ' ' + body;
+                this.throwExactlyMatchedException (this.exceptions['exact'], body, feedback);
+                this.throwBroadlyMatchedException (this.exceptions['broad'], body, feedback);
+                throw new ExchangeError (feedback); // unknown message
+            }
+            throw new ExchangeError (this.id + ' ' + body);
+        }
     }
 };
 
