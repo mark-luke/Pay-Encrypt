@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.37'
+const version = '1.20.38'
 
 Exchange.ccxtVersion = version
 
@@ -33999,7 +33999,7 @@ module.exports = class cex extends Exchange {
         if (Array.isArray (response)) {
             return response; // public endpoints may return []-arrays
         }
-        if (!response) {
+        if (response === undefined) {
             throw new NullResponse (this.id + ' returned ' + this.json (response));
         }
         if (response === true || response === 'true') {
