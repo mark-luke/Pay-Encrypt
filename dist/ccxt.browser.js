@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1063'
+const version = '1.18.1080'
 
 Exchange.ccxtVersion = version
 
@@ -2476,7 +2476,6 @@ module.exports = class Exchange {
                 'eta': undefined,
                 'url': undefined,
             },
-            'skipJsonOnStatusCodes': [], // array of http status codes which override requirement for JSON response
             'exceptions': undefined,
             'httpExceptions': {
                 '422': ExchangeError,
@@ -2841,41 +2840,13 @@ module.exports = class Exchange {
     }
 
     parseJson (jsonString) {
-        return JSON.parse (jsonString)
-    }
-
-    parseRestResponse (response, responseBody, url, method) {
         try {
-
-            return (responseBody.length > 0) ? this.parseJson (responseBody) : {} // empty object for empty body
-
-        } catch (e) {
-
-            if (this.verbose)
-                console.log ('parseJson:\n', this.id, method, url, response.status, 'error', e, "response body:\n'" + responseBody + "'\n")
-
-            let title = undefined
-            const match = responseBody.match (/<title>([^<]+)/i)
-            if (match)
-                title = match[1].trim ();
-
-            const maintenance = responseBody.match (/offline|busy|retry|wait|unavailable|maintain|maintenance|maintenancing/i)
-            const ddosProtection = responseBody.match (/cloudflare|incapsula|overload|ddos/i)
-
-            if (e instanceof SyntaxError) {
-
-                let ExceptionClass = ExchangeNotAvailable
-                let details = 'not accessible from this location at the moment'
-                if (maintenance)
-                    details = 'offline, on maintenance, or unreachable from this location at the moment'
-                // http error codes proxied by cloudflare are not really DDoSProtection errors (mostly)
-                if ((response.status < 500) && (ddosProtection)) {
-                    ExceptionClass = DDoSProtection
-                }
-                throw new ExceptionClass ([ this.id, method, url, response.status, title, details ].join (' '))
+            if (this.isJsonEncodedObject (jsonString)) {
+                return JSON.parse (jsonString)
             }
-
-            throw e
+        } catch (e) {
+            // SyntaxError
+            return undefined
         }
     }
 
@@ -2894,30 +2865,39 @@ module.exports = class Exchange {
         // override me
     }
 
-    defaultErrorHandler (code, reason, responseBody, url, method) {
-        if ((code >= 200) && (code <= 299))
-            return
+    defaultErrorHandler (code, reason, url, method, headers, body, response) {
+        let details = body
+        const codeAsString = code.toString ()
         let ErrorClass = undefined
-        let details = responseBody
-        const match = responseBody.match (/<title>([^<]+)/i)
-        if (match)
-            details = match[1].trim ();
-        ErrorClass = this.httpExceptions[code.toString ()] || ExchangeError
-        if (ErrorClass === ExchangeNotAvailable) {
-            if (responseBody.match (/cloudflare|incapsula|overload|ddos/i)) {
+        if (codeAsString in this.httpExceptions) {
+            ErrorClass = this.httpExceptions[codeAsString]
+        } else if (code < 200 || code > 299) {
+            ErrorClass = ExchangeError
+        }
+        if (response === undefined) {
+            const maintenance = body.match (/offline|busy|retry|wait|unavailable|maintain|maintenance|maintenancing/i)
+            const ddosProtection = body.match (/cloudflare|incapsula|overload|ddos/i)
+            if (maintenance) {
+                ErrorClass = ExchangeNotAvailable
+                details += ' offline, on maintenance, or unreachable from this location at the moment'
+            }
+            if (ddosProtection) {
                 ErrorClass = DDoSProtection
-            } else {
-                details += ' (possible reasons: ' + [
-                    'invalid API keys',
-                    'bad or old nonce',
-                    'exchange is down or offline',
-                    'on maintenance',
-                    'DDoS protection',
-                    'rate-limiting',
-                ].join (', ') + ')'
             }
         }
-        throw new ErrorClass ([ this.id, method, url, code, reason, details ].join (' '))
+        if (ErrorClass === ExchangeNotAvailable) {
+            details += ' (possible reasons: ' + [
+                'invalid API keys',
+                'bad or old nonce',
+                'exchange is down or offline',
+                'on maintenance',
+                'DDoS protection',
+                'rate-limiting',
+            ].join (', ') + ')'
+        }
+        if (ErrorClass !== undefined) {
+            throw new ErrorClass ([ this.id, method, url, code, reason, details ].join (' '))
+        }
     }
 
     isJsonEncodedObject (object) {
@@ -2939,8 +2919,7 @@ module.exports = class Exchange {
 
         return response.text ().then ((responseBody) => {
 
-            const shouldParseJson = this.isJsonEncodedObject (responseBody) && !this.skipJsonOnStatusCodes.includes (response.status)
-            const json = shouldParseJson ? this.parseRestResponse (response, responseBody, url, method) : undefined
+            const json = this.parseJson (responseBody)
 
             const responseHeaders = this.getResponseHeaders (response)
 
@@ -2960,7 +2939,7 @@ module.exports = class Exchange {
                 console.log ("handleRestResponse:\n", this.id, method, url, response.status, response.statusText, "\nResponse:\n", responseHeaders, "\n", responseBody, "\n")
 
             this.handleErrors (response.status, response.statusText, url, method, responseHeaders, responseBody, json)
-            this.defaultErrorHandler (response.status, response.statusText, responseBody, url, method)
+            this.defaultErrorHandler (response.status, response.statusText, url, method, responseHeaders, responseBody, json)
 
             return json || responseBody
         })
@@ -4487,12 +4466,14 @@ module.exports =
 },{"./type":20}],14:[function(require,module,exports){
 'use strict';
 
+const { ROUND_UP, ROUND_DOWN } = require ('./number')
+
 //-------------------------------------------------------------------------
 // converts timeframe to seconds
 const parseTimeframe = (timeframe) => {
 
-    let amount = timeframe.slice (0, -1)
-    let unit = timeframe.slice (-1)
+    const amount = timeframe.slice (0, -1)
+    const unit = timeframe.slice (-1)
     let scale = 60 // 1m by default
 
     if (unit === 'y') {
@@ -4510,19 +4491,26 @@ const parseTimeframe = (timeframe) => {
     return amount * scale
 }
 
+const roundTimeframe = (timeframe, timestamp, direction = ROUND_DOWN) => {
+    const ms = parseTimeframe (timeframe) * 1000
+    // Get offset based on timeframe in milliseconds
+    const offset = timestamp % ms
+    return timestamp - offset + ((direction === ROUND_UP) ? ms : 0);
+}
+
 // given a sorted arrays of trades (recent last) and a timeframe builds an array of OHLCV candles
 const buildOHLCVC = (trades, timeframe = '1m', since = -Infinity, limit = Infinity) => {
-    let ms = parseTimeframe (timeframe) * 1000;
-    let ohlcvs = [];
+    const ms = parseTimeframe (timeframe) * 1000;
+    const ohlcvs = [];
     const [ timestamp, /* open */, high, low, close, volume, count ] = [ 0, 1, 2, 3, 4, 5, 6 ];
-    let oldest = Math.min (trades.length - 1, limit);
+    const oldest = Math.min (trades.length - 1, limit);
 
     for (let i = 0; i <= oldest; i++) {
-        let trade = trades[i];
+        const trade = trades[i];
         if (trade.timestamp < since)
             continue;
-        let openingTime = Math.floor (trade.timestamp / ms) * ms; // shift to the edge of m/h/d (but not M)
-        let candle = ohlcvs.length - 1;
+        const openingTime = Math.floor (trade.timestamp / ms) * ms; // shift to the edge of m/h/d (but not M)
+        const candle = ohlcvs.length - 1;
 
         if (candle === -1 || openingTime >= ohlcvs[candle][timestamp] + ms) {
             // moved to a new timeframe -> create a new candle from opening trade
@@ -4553,27 +4541,32 @@ module.exports = {
 
     aggregate (bidasks) {
 
-        let result = {}
+        const result = {}
 
-        for (const [price, volume] of bidasks) {
-            if (volume > 0)
+        for (let i = 0; i < bidasks.length; i++) {
+            const [ price, volume ] = bidasks[i];
+            if (volume > 0) {
                 result[price] = (result[price] || 0) + volume
+            }
         }
 
         return Object.keys (result).map (price => [parseFloat (price), parseFloat (result[price])])
     },
 
     parseTimeframe,
+    roundTimeframe,
     buildOHLCVC,
+    ROUND_UP,
+    ROUND_DOWN
 }
 
 /*  ------------------------------------------------------------------------ */
 
-},{}],15:[function(require,module,exports){
+},{"./number":15}],15:[function(require,module,exports){
 'use strict'
 
 const { isString, isNumber } = require ('./type')
-const { max } = Math
+    , { max } = Math
 
 /*  ------------------------------------------------------------------------
 
@@ -4588,8 +4581,10 @@ const { max } = Math
 
             decimalToPrecision ('123.456', ROUND, 2, DECIMAL_PLACES)                     */
 
-const ROUND    = 0                  // rounding mode
-    , TRUNCATE = 1
+const ROUND      = 0                // rounding mode
+    , TRUNCATE   = 1
+    , ROUND_UP   = 2
+    , ROUND_DOWN = 3
 
 const DECIMAL_PLACES     = 0        // digits counting mode
     , SIGNIFICANT_DIGITS = 1
@@ -4621,7 +4616,7 @@ function numberToString (x) { // avoids scientific notation for too large and to
         const e = parseInt (s.split ('e-')[1])
         const neg = (s[0] === '-')
         if (e) {
-            x *= Math.pow (10, e-1)
+            x *= Math.pow (10, e - 1)
             x = (neg ? '-' : '') + '0.' + (new Array (e)).join ('0') + x.toString ().substring (neg ? 3 : 2)
         }
     } else {
@@ -4629,7 +4624,7 @@ function numberToString (x) { // avoids scientific notation for too large and to
         if (e > 20) {
             e -= 20
             x /= Math.pow (10, e)
-            x += (new Array (e+1)).join ('0')
+            x += (new Array (e + 1)).join ('0')
         }
     }
     return x.toString ()
@@ -4642,8 +4637,8 @@ const truncate_regExpCache = []
     , truncate_to_string = (num, precision = 0) => {
         num = numberToString (num)
         if (precision > 0) {
-            const re = truncate_regExpCache[precision] || (truncate_regExpCache[precision] = new RegExp("([-]*\\d+\\.\\d{" + precision + "})(\\d)"))
-            const [,result] = num.toString ().match (re) || [null, num]
+            const re = truncate_regExpCache[precision] || (truncate_regExpCache[precision] = new RegExp ("([-]*\\d+\\.\\d{" + precision + "})(\\d)"))
+            const [ , result] = num.toString ().match (re) || [null, num]
             return result.toString ()
         }
         return parseInt (num).toString ()
@@ -4666,7 +4661,7 @@ const decimalToPrecision = (x, roundingMode
         if (countingMode === TICK_SIZE) {
             throw new Error (`TICK_SIZE cant be used with negative numPrecisionDigits`)
         }
-        let toNearest = Math.pow (10, -numPrecisionDigits)
+        const toNearest = Math.pow (10, -numPrecisionDigits)
         if (roundingMode === ROUND) {
             return (toNearest * decimalToPrecision (x / toNearest, roundingMode, 0, countingMode, paddingMode)).toString ()
         }
@@ -4679,7 +4674,7 @@ const decimalToPrecision = (x, roundingMode
     if (countingMode === TICK_SIZE) {
         const missing = x % numPrecisionDigits
         const reminder = x / numPrecisionDigits
-        if (reminder !== Math.floor(reminder)) {
+        if (reminder !== Math.floor (reminder)) {
             if (roundingMode === ROUND) {
                 if (x > 0) {
                     if (missing >= numPrecisionDigits / 2) {
@@ -4689,9 +4684,9 @@ const decimalToPrecision = (x, roundingMode
                     }
                 } else {
                     if (missing >= numPrecisionDigits / 2) {
-                        x = Number(x) - missing
+                        x = Number (x) - missing
                     } else {
-                        x = Number(x) - missing - numPrecisionDigits
+                        x = Number (x) - missing - numPrecisionDigits
                     }
                 }
             } else if (roundingMode === TRUNCATE) {
@@ -4865,6 +4860,8 @@ module.exports = {
     precisionConstants,
     ROUND,
     TRUNCATE,
+    ROUND_UP,
+    ROUND_DOWN,
     DECIMAL_PLACES,
     SIGNIFICANT_DIGITS,
     TICK_SIZE,
@@ -6156,7 +6153,7 @@ module.exports = class bibox extends Exchange {
                         'max': undefined,
                     },
                     'price': {
-                        'min': undefined,
+                        'min': Math.pow (10, -precision['price']),
                         'max': undefined,
                     },
                 },
@@ -9421,10 +9418,7 @@ module.exports = class bit2c extends Exchange {
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
         let url = this.urls['api'] + '/' + this.implodeParams (path, params);
         if (api === 'public') {
-            // lasttrades is the only endpoint that doesn't require the .json extension/suffix
-            if (path.indexOf ('lasttrades') < 0) {
-                url += '.json';
-            }
+            url += '.json';
         } else {
             this.checkRequiredCredentials ();
             const nonce = this.nonce ();
@@ -14046,9 +14040,10 @@ module.exports = class bithumb extends Exchange {
             const account = this.account ();
             const currency = this.currency (code);
             const currencyId = currency['id'];
-            account['total'] = this.safeFloat (balances, 'total_' + currencyId);
-            account['used'] = this.safeFloat (balances, 'in_use_' + currencyId);
-            account['free'] = this.safeFloat (balances, 'available_' + currencyId);
+            const lowercase = currencyId.toLowerCase ();
+            account['total'] = this.safeFloat (balances, 'total_' + lowercase);
+            account['used'] = this.safeFloat (balances, 'in_use_' + lowercase);
+            account['free'] = this.safeFloat (balances, 'available_' + lowercase);
             result[code] = account;
         }
         return this.parseBalance (result);
@@ -23888,6 +23883,21 @@ module.exports = class btcbox extends Exchange {
             throw new exceptions[errorCode] (feedback);
         }
         throw new ExchangeError (feedback); // unknown message
+    }
+
+    async request (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
+        let response = await this.fetch2 (path, api, method, params, headers, body);
+        // sometimes the exchange returns whitespace prepended to json
+        // the code below removes excessive spaces
+        if (typeof response === 'string') {
+            response = response.split (' ');
+            response = response.join ('');
+            if (!this.isJsonEncodedObject (response)) {
+                throw new ExchangeError (this.id + ' ' + response);
+            }
+            response = JSON.parse (response);
+        }
+        return response;
     }
 };
 
@@ -44572,6 +44582,7 @@ module.exports = class fcoin extends Exchange {
                 '429': DDoSProtection, // Too Many Requests, exceed api request limit
                 '1002': ExchangeNotAvailable, // System busy
                 '1016': InsufficientFunds,
+                '2136': AuthenticationError, // The API key is expired
                 '3008': InvalidOrder,
                 '6004': InvalidNonce,
                 '6005': AuthenticationError, // Illegal API Signature
@@ -46023,6 +46034,7 @@ module.exports = class gateio extends Exchange {
                 '21': 'You don\'t have enough fund',
             },
             'options': {
+                'fetchTradesMethod': 'public_get_tradehistory_id', // 'public_get_tradehistory_id_tid'
                 'limits': {
                     'cost': {
                         'min': {
@@ -46316,7 +46328,8 @@ module.exports = class gateio extends Exchange {
         const request = {
             'id': market['id'],
         };
-        const response = await this.publicGetTradeHistoryId (this.extend (request, params));
+        const method = this.safeString (this.options, 'fetchTradesMethod', 'public_get_tradehistory_id');
+        const response = await this[method] (this.extend (request, params));
         return this.parseTrades (response['data'], market, since, limit);
     }
 
@@ -48325,8 +48338,8 @@ module.exports = class hitbtc extends Exchange {
                 'trading': {
                     'tierBased': false,
                     'percentage': true,
-                    'maker': -0.01 / 100,
-                    'taker': 0.1 / 100,
+                    'maker': 0.07 / 100,
+                    'taker': 0.07 / 100,
                 },
                 'funding': {
                     'tierBased': false,
@@ -52095,7 +52108,7 @@ module.exports = class ice3x extends Exchange {
     }
 
     async fetchMarkets (params = {}) {
-        if (!Object.keys (this.currencies_by_id).length) {
+        if (this.currencies_by_id === undefined) {
             this.currencies = await this.fetchCurrencies ();
             this.currencies_by_id = this.indexBy (this.currencies, 'id');
         }
@@ -55315,6 +55328,13 @@ module.exports = class kraken extends Exchange {
             // therefore we use string concatenation here
             request['since'] = since * 1e6;
             request['since'] = since.toString () + '000000'; // expected to be in nanoseconds
+        }
+        // https://github.com/ccxt/ccxt/issues/5698
+        if (limit !== undefined && limit !== 1000) {
+            const fetchTradesWarning = this.safeValue (this.options, 'fetchTradesWarning', true);
+            if (fetchTradesWarning) {
+                throw new ExchangeError (this.id + ' fetchTrades() cannot serve ' + limit.toString () + " trades without breaking the pagination, see https://github.com/ccxt/ccxt/issues/5698 for more details. Set exchange.options['fetchTradesWarning'] to acknowledge this warning and silence it.");
+            }
         }
         const response = await this.publicGetTrades (this.extend (request, params));
         //
@@ -59634,7 +59654,6 @@ module.exports = class liquid extends Exchange {
                     ],
                 },
             },
-            'skipJsonOnStatusCodes': [401],
             'exceptions': {
                 'API rate limit exceeded. Please retry after 300s': DDoSProtection,
                 'API Authentication failed': AuthenticationError,
@@ -67396,6 +67415,7 @@ module.exports = class okex extends okcoinusd {
                 'HSR': 'HC',
                 'MAG': 'Maggie',
                 'YOYO': 'YOYOW',
+                'WIN': 'WinToken', // https://github.com/ccxt/ccxt/issues/5701
             },
         });
     }
@@ -67854,6 +67874,7 @@ module.exports = class okex3 extends Exchange {
                 'HSR': 'HC',
                 'MAG': 'Maggie',
                 'YOYO': 'YOYOW',
+                'WIN': 'WinToken', // https://github.com/ccxt/ccxt/issues/5701
             },
         });
     }
@@ -71945,7 +71966,7 @@ module.exports = class rightbtc extends Exchange {
         };
         const response = await this.publicGetTickerTradingPair (this.extend (request, params));
         const result = this.safeValue (response, 'result');
-        if (!Object.keys (result).length) {
+        if (result === undefined) {
             throw new ExchangeError (this.id + ' fetchTicker returned an empty response for symbol ' + symbol);
         }
         return this.parseTicker (result, market);
