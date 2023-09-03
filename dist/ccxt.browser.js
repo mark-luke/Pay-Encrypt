@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.65'
+const version = '1.30.66'
 
 Exchange.ccxtVersion = version
 
@@ -23284,7 +23284,7 @@ module.exports = class bitstamp extends Exchange {
         const market = this.market (symbol);
         const request = {
             'pair': market['id'],
-            'interval': this.timeframes[timeframe],
+            'step': this.timeframes[timeframe],
         };
         const duration = this.parseTimeframe (timeframe);
         if (limit === undefined) {
