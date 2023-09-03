@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.61'
+const version = '1.26.62'
 
 Exchange.ccxtVersion = version
 
@@ -51378,6 +51378,8 @@ module.exports = class exmo extends Exchange {
                         'user_info',
                         'order_create',
                         'order_cancel',
+                        'stop_market_order_create',
+                        'stop_market_order_cancel',
                         'user_open_orders',
                         'user_trades',
                         'user_cancelled_orders',
