@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.37'
+const version = '1.34.38'
 
 Exchange.ccxtVersion = version
 
@@ -48977,6 +48977,9 @@ module.exports = class coinex extends Exchange {
             'market': market['id'],
             'type': this.timeframes[timeframe],
         };
+        if (limit !== undefined) {
+            request['limit'] = limit;
+        }
         const response = await this.publicGetMarketKline (this.extend (request, params));
         //
         //     {
