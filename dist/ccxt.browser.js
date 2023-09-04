@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.76'
+const version = '1.22.77'
 
 Exchange.ccxtVersion = version
 
@@ -13729,6 +13729,7 @@ module.exports = class bitfinex extends Exchange {
                 'UST': 'USDT',
                 'UTN': 'UTNP',
                 'VSY': 'VSYS',
+                'WAX': 'WAXP',
                 'XCH': 'XCHF',
                 'ZBT': 'ZB',
             },
@@ -58196,6 +58197,7 @@ module.exports = class idex extends Exchange {
                 'ONE': 'Menlo One',
                 'FT': 'Fabric Token',
                 'PLA': 'PlayChip',
+                'WAX': 'WAXP',
             },
         });
     }
@@ -62933,6 +62935,7 @@ module.exports = class kucoin extends Exchange {
             'commonCurrencies': {
                 'HOT': 'HOTNOW',
                 'EDGE': 'DADI', // https://github.com/ccxt/ccxt/issues/5756
+                'WAX': 'WAXP',
             },
             'options': {
                 'version': 'v1',
@@ -67485,6 +67488,7 @@ module.exports = class livecoin extends Exchange {
                 'RUR': 'RUB',
                 'SCT': 'SpaceCoin',
                 'TPI': 'ThaneCoin',
+                'WAX': 'WAXP',
                 'wETT': 'WETT',
                 'XBT': 'Bricktox',
             },
