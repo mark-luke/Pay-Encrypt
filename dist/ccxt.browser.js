@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.56'
+const version = '1.19.57'
 
 Exchange.ccxtVersion = version
 
@@ -52948,6 +52948,7 @@ module.exports = class gateio extends Exchange {
         const statuses = {
             'PEND': 'pending',
             'REQUEST': 'pending',
+            'DMOVE': 'pending',
             'CANCEL': 'failed',
             'DONE': 'ok',
         };
