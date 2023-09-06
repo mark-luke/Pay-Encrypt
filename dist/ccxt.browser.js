@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.71'
+const version = '1.20.72'
 
 Exchange.ccxtVersion = version
 
@@ -57775,6 +57775,7 @@ module.exports = class idex extends Exchange {
             },
             'commonCurrencies': {
                 'ONE': 'Menlo One',
+                'FT': 'Fabric Token',
             },
         });
     }
