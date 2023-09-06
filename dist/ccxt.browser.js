@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.71'
+const version = '1.28.72'
 
 Exchange.ccxtVersion = version
 
@@ -85380,6 +85380,7 @@ module.exports = class qtrade extends Exchange {
             const code = this.safeCurrencyCode (currencyId);
             const account = (code in result) ? result[code] : this.account ();
             account['free'] = this.safeFloat (balance, 'balance');
+            account['used'] = 0;
             result[code] = account;
         }
         balances = this.safeValue (data, 'order_balances', []);
