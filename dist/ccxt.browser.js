@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.42'
+const version = '1.31.43'
 
 Exchange.ccxtVersion = version
 
@@ -201,6 +201,7 @@ module.exports = class acx extends Exchange {
             'has': {
                 'CORS': true,
                 'fetchTickers': true,
+                'fetchTime': true,
                 'fetchOHLCV': true,
                 'withdraw': true,
                 'fetchOrder': true,
@@ -445,6 +446,14 @@ module.exports = class acx extends Exchange {
             'cost': this.safeFloat (trade, 'funds'),
             'fee': undefined,
         };
+    }
+
+    async fetchTime (params = {}) {
+        const response = await this.publicGetTimestamp (params);
+        //
+        //     1594911427
+        //
+        return response * 1000;
     }
 
     async fetchTrades (symbol, since = undefined, limit = undefined, params = {}) {
