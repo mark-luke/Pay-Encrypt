@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.47'
+const version = '1.25.48'
 
 Exchange.ccxtVersion = version
 
@@ -79524,7 +79524,7 @@ module.exports = class okex extends Exchange {
 
     parseMyTrade (pair, market = undefined) {
         if (!Array.isArray (pair)) {
-            throw new NotSupported (this.id + ' parseMyTrade() received unrecognized response format, the exchange API might have changed, paste your verbose outpu: https://github.com/ccxt/ccxt/wiki/FAQ#what-is-required-to-get-help');
+            throw new NotSupported (this.id + ' parseMyTrade() received unrecognized response format, the exchange API might have changed, paste your verbose output: https://github.com/ccxt/ccxt/wiki/FAQ#what-is-required-to-get-help');
         }
         // make sure it has exactly 2 trades, no more, no less
         const numTradesInPair = pair.length;
