@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1054'
+const version = '1.18.1055'
 
 Exchange.ccxtVersion = version
 
@@ -31218,7 +31218,7 @@ module.exports = class coinex extends Exchange {
             'done': 'closed',
             'cancel': 'canceled',
         };
-        return this.safeFloat (statuses, status, status);
+        return this.safeString (statuses, status, status);
     }
 
     parseOrder (order, market = undefined) {
