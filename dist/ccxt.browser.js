@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.85'
+const version = '1.35.86'
 
 Exchange.ccxtVersion = version
 
@@ -49677,10 +49677,10 @@ module.exports = class coinfalcon extends Exchange {
         let cost = undefined;
         if (amount !== undefined) {
             if (filled !== undefined) {
-                remaining = parseFloat (this.amountToPrecision (symbol, amount - filled));
+                remaining = Math.max (0, amount - filled);
             }
             if (price !== undefined) {
-                cost = parseFloat (this.priceToPrecision (symbol, filled * price));
+                cost = filled * price;
             }
         }
         const status = this.parseOrderStatus (this.safeString (order, 'status'));
