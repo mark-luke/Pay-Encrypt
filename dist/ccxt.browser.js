@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.88'
+const version = '1.21.89'
 
 Exchange.ccxtVersion = version
 
@@ -7466,7 +7466,7 @@ module.exports = class bibox extends Exchange {
         for (let i = 0; i < currencies.length; i++) {
             const currency = currencies[i];
             const id = this.safeString (currency, 'symbol');
-            const name = this.safeString (currency, 'name');
+            const name = currency['name']; // contains hieroglyphs causing python ASCII bug
             const code = this.safeCurrencyCode (id);
             const precision = 8;
             const deposit = this.safeValue (currency, 'enable_deposit');
@@ -7884,12 +7884,21 @@ module.exports = class bibox extends Exchange {
         const response = await this.privatePostTransfer (request);
         //
         //     {
+        //         "result":"3Jx6RZ9TNMsAoy9NUzBwZf68QBppDruSKW","cmd":"transfer/transferIn"
+        //     }
+        //
+        //     {
         //         "result":"{\"account\":\"PERSONALLY OMITTED\",\"memo\":\"PERSONALLY OMITTED\"}","cmd":"transfer/transferIn"
         //     }
         //
-        const result = JSON.parse (this.safeString (response, 'result'));
-        const address = this.safeString (result, 'account');
-        const tag = this.safeString (result, 'memo');
+        const result = this.safeString (response, 'result');
+        let address = result;
+        let tag = undefined;
+        if (this.isJsonEncodedObject (result)) {
+            const parsed = JSON.parse (result);
+            address = this.safeString (parsed, 'account');
+            tag = this.safeString (parsed, 'memo');
+        }
         return {
             'currency': code,
             'address': address,
@@ -46492,7 +46501,7 @@ module.exports = class dsx extends Exchange {
         return this.parseOrderBook (orderbook);
     }
 
-    async fetchOrderBooks (symbols = undefined, params = {}) {
+    async fetchOrderBooks (symbols = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         let ids = undefined;
         if (symbols === undefined) {
@@ -46509,6 +46518,9 @@ module.exports = class dsx extends Exchange {
         const request = {
             'pair': ids,
         };
+        if (limit !== undefined) {
+            request['limit'] = limit; // default = 150, max = 2000
+        }
         const response = await this.publicGetDepthPair (this.extend (request, params));
         const result = {};
         ids = Object.keys (response);
@@ -47945,7 +47957,7 @@ module.exports = class exmo extends Exchange {
         return this.parseOrderBook (result, undefined, 'bid', 'ask');
     }
 
-    async fetchOrderBooks (symbols = undefined, params = {}) {
+    async fetchOrderBooks (symbols = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         let ids = undefined;
         if (symbols === undefined) {
@@ -47962,6 +47974,9 @@ module.exports = class exmo extends Exchange {
         const request = {
             'pair': ids,
         };
+        if (limit !== undefined) {
+            request['limit'] = limit;
+        }
         const response = await this.publicGetOrderBook (this.extend (request, params));
         const result = {};
         const marketIds = Object.keys (response);
@@ -74759,16 +74774,14 @@ module.exports = class poloniex extends Exchange {
         return orderbook;
     }
 
-    async fetchOrderBooks (symbols = undefined, params = {}) {
+    async fetchOrderBooks (symbols = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const request = {
             'currencyPair': 'all',
         };
-        //
-        //     if (limit !== undefined) {
-        //         request['depth'] = limit; // 100
-        //     }
-        //
+        if (limit !== undefined) {
+            request['depth'] = limit; // 100
+        }
         const response = await this.publicGetReturnOrderBook (this.extend (request, params));
         const marketIds = Object.keys (response);
         const result = {};
@@ -100750,7 +100763,7 @@ module.exports = class tidex extends Exchange {
         return this.parseOrderBook (orderbook);
     }
 
-    async fetchOrderBooks (symbols = undefined, params = {}) {
+    async fetchOrderBooks (symbols = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         let ids = undefined;
         if (symbols === undefined) {
@@ -100767,6 +100780,9 @@ module.exports = class tidex extends Exchange {
         const request = {
             'pair': ids,
         };
+        if (limit !== undefined) {
+            request['limit'] = limit; // default = 150, max = 2000
+        }
         const response = await this.publicGetDepthPair (this.extend (request, params));
         const result = {};
         ids = Object.keys (response);
@@ -103001,7 +103017,7 @@ module.exports = class upbit extends Exchange {
         return base + '/' + quote;
     }
 
-    async fetchOrderBooks (symbols = undefined, params = {}) {
+    async fetchOrderBooks (symbols = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         let ids = undefined;
         if (symbols === undefined) {
@@ -103064,7 +103080,7 @@ module.exports = class upbit extends Exchange {
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
-        const orderbooks = await this.fetchOrderBooks ([ symbol ], params);
+        const orderbooks = await this.fetchOrderBooks ([ symbol ], limit, params);
         return this.safeValue (orderbooks, symbol);
     }
 
@@ -105613,7 +105629,7 @@ module.exports = class yobit extends Exchange {
         return this.parseOrderBook (orderbook);
     }
 
-    async fetchOrderBooks (symbols = undefined, params = {}) {
+    async fetchOrderBooks (symbols = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         let ids = undefined;
         if (symbols === undefined) {
@@ -105629,7 +105645,11 @@ module.exports = class yobit extends Exchange {
         }
         const request = {
             'pair': ids,
+            // 'ignore_invalid': true,
         };
+        if (limit !== undefined) {
+            request['limit'] = limit;
+        }
         const response = await this.publicGetDepthPair (this.extend (request, params));
         const result = {};
         ids = Object.keys (response);
