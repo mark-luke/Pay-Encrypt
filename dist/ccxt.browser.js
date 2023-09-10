@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1238'
+const version = '1.18.1239'
 
 Exchange.ccxtVersion = version
 
@@ -12344,7 +12344,7 @@ module.exports = class bitbay extends Exchange {
             this.checkRequiredCredentials ();
             const query = this.omit (params, this.extractParams (path));
             url += '/' + this.implodeParams (path, params);
-            const nonce = this.milliseconds ();
+            const nonce = this.milliseconds ().toString ();
             let payload = undefined;
             if (method !== 'POST') {
                 if (Object.keys (query).length) {
