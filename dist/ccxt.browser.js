@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.86'
+const version = '1.30.87'
 
 Exchange.ccxtVersion = version
 
@@ -28883,7 +28883,7 @@ module.exports = class bleutrade extends Exchange {
                     'v3Private': 'https://{hostname}/api/v3/private',
                     'v3Public': 'https://{hostname}/api/v3/public',
                 },
-                'www': ['https://bleutrade.com'],
+                'www': 'https://bleutrade.com',
                 'doc': [
                     'https://app.swaggerhub.com/apis-docs/bleu/white-label/3.0.0',
                 ],
