@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1100'
+const version = '1.18.1101'
 
 Exchange.ccxtVersion = version
 
@@ -19170,7 +19170,7 @@ module.exports = class bittrex extends Exchange {
             },
             'commonCurrencies': {
                 'BITS': 'SWIFT',
-                'CPC': 'CapriCoin',
+                'CPC': 'Capricoin',
             },
         });
     }
