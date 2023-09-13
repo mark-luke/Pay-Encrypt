@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1060'
+const version = '1.18.1063'
 
 Exchange.ccxtVersion = version
 
@@ -3873,13 +3873,12 @@ module.exports = class Exchange {
         return this.web3.eth.accounts.hashMessage (message)
     }
 
-    // works with Node only
     signHash (hash, privateKey) {
-        const signature = ethUtil.ecsign (Buffer.from (hash.slice (-64), 'hex'), Buffer.from (privateKey.slice (-64), 'hex'))
+        const signature = this.ecdsa (hash.slice (-64), privateKey.slice (-64), 'secp256k1', undefined)
         return {
-            v: signature.v, // integer
-            r: '0x' + signature.r.toString ('hex'), // '0x'-prefixed hex string
-            s: '0x' + signature.s.toString ('hex'), // '0x'-prefixed hex string
+            'r': '0x' + signature['r'],
+            's': '0x' + signature['s'],
+            'v': 27 + signature['v'],
         }
     }
 
@@ -4137,14 +4136,17 @@ function jwt (request, secret, alg = 'HS256') {
     return [ token, signature ].join ('.')
 }
 
-function ecdsa (request, secret, algorithm = 'p256', hash = 'sha256') {
-    const digest = this.hash (request, hash, 'hex')
+function ecdsa (request, secret, algorithm = 'p256', hash = undefined) {
+    let digest = request
+    if (hash !== undefined) {
+        digest = this.hash (request, hash, 'hex')
+    }
     const curve = new EC (algorithm)
     const signature = curve.sign (digest, secret, 'hex',  { 'canonical': true })
     return {
         'r': signature.r.toString (16).padStart (64, '0'),
         's': signature.s.toString (16).padStart (64, '0'),
-        'v': signature.recoveryParam.toString (16),
+        'v': signature.recoveryParam,
     }
 }
 
@@ -55309,7 +55311,10 @@ module.exports = class kraken extends Exchange {
         // https://support.kraken.com/hc/en-us/articles/218198197-How-to-pull-all-trade-data-using-the-Kraken-REST-API
         // https://github.com/ccxt/ccxt/issues/5677
         if (since !== undefined) {
-            request['since'] = since * 1000000; // expected to be in nanoseconds
+            // php does not format it properly
+            // therefore we use string concatenation here
+            request['since'] = since * 1e6;
+            request['since'] = since.toString () + '000000'; // expected to be in nanoseconds
         }
         const response = await this.publicGetTrades (this.extend (request, params));
         //
@@ -56448,12 +56453,25 @@ module.exports = class kucoin extends Exchange {
         const marketId = market['id'];
         const request = {
             'symbol': marketId,
-            'endAt': this.seconds (), // required param
             'type': this.timeframes[timeframe],
         };
+        const duration = this.parseTimeframe (timeframe) * 1000;
+        let endAt = this.milliseconds (); // required param
         if (since !== undefined) {
-            request['startAt'] = Math.floor (since / 1000);
+            request['startAt'] = parseInt (Math.floor (since / 1000));
+            if (limit === undefined) {
+                // https://docs.kucoin.com/#get-klines
+                // https://docs.kucoin.com/#details
+                // For each query, the system would return at most 1500 pieces of data.
+                // To obtain more data, please page the data by time.
+                limit = this.safeInteger (this.options, 'fetchOHLCVLimit', 1500);
+            }
+            endAt = this.sum (since, limit * duration);
+        } else if (limit !== undefined) {
+            since = endAt - limit * duration;
+            request['startAt'] = parseInt (Math.floor (since / 1000));
         }
+        request['endAt'] = parseInt (Math.floor (endAt / 1000));
         const response = await this.publicGetMarketCandles (this.extend (request, params));
         const responseData = this.safeValue (response, 'data', []);
         return this.parseOHLCVs (responseData, market, timeframe, since, limit);
