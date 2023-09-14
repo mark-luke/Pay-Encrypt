@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1171'
+const version = '1.18.1172'
 
 Exchange.ccxtVersion = version
 
@@ -71459,7 +71459,7 @@ module.exports = class okex3 extends Exchange {
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'symbol': symbol,
-            'id': this.safeString (trade, 'trade_id'),
+            'id': this.safeString2 (trade, 'trade_id', 'ledger_id'),
             'order': orderId,
             'type': undefined,
             'takerOrMaker': takerOrMaker,
@@ -72718,7 +72718,7 @@ module.exports = class okex3 extends Exchange {
             address = addressTo;
         } else {
             type = 'deposit';
-            address = addressFrom;
+            address = addressTo;
         }
         const currencyId = this.safeString (transaction, 'currency');
         const code = this.safeCurrencyCode (currencyId);
@@ -72749,6 +72749,8 @@ module.exports = class okex3 extends Exchange {
             'addressFrom': addressFrom,
             'addressTo': addressTo,
             'address': address,
+            'tagFrom': undefined,
+            'tagTo': undefined,
             'tag': undefined,
             'status': status,
             'type': type,
@@ -72764,6 +72766,10 @@ module.exports = class okex3 extends Exchange {
     }
 
     async fetchOrderTrades (id, symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        // okex actually returns ledger entries instead of fills here, so each fill in the order
+        // is represented by two trades with opposite buy/sell sides, not one :\
+        // this aspect renders the 'fills' endpoint unusable for fetchOrderTrades
+        // until either OKEX fixes the API or we workaround this on our side somehow
         if (symbol === undefined) {
             throw new ArgumentsRequired (this.id + ' fetchOrderTrades requires a symbol argument');
         }
@@ -72788,25 +72794,19 @@ module.exports = class okex3 extends Exchange {
         // spot trades, margin trades
         //
         //     [
-        //         [
-        //             {
-        //                 "created_at":"2019-03-15T02:52:56.000Z",
-        //                 "exec_type":"T", // whether the order is taker or maker
-        //                 "fee":"0.00000082",
-        //                 "instrument_id":"BTC-USDT",
-        //                 "ledger_id":"3963052721",
-        //                 "liquidity":"T", // whether the order is taker or maker
-        //                 "order_id":"2482659399697408",
-        //                 "price":"3888.6",
-        //                 "product_id":"BTC-USDT",
-        //                 "side":"buy",
-        //                 "size":"0.00055306",
-        //                 "timestamp":"2019-03-15T02:52:56.000Z"
-        //             },
-        //         ],
         //         {
-        //             "before":"3963052722",
-        //             "after":"3963052718"
+        //             "created_at":"2019-09-20T07:15:24.000Z",
+        //             "exec_type":"T",
+        //             "fee":"0",
+        //             "instrument_id":"ETH-USDT",
+        //             "ledger_id":"7173486113",
+        //             "liquidity":"T",
+        //             "order_id":"3553868136523776",
+        //             "price":"217.59",
+        //             "product_id":"ETH-USDT",
+        //             "side":"sell",
+        //             "size":"0.04619899",
+        //             "timestamp":"2019-09-20T07:15:24.000Z"
         //         }
         //     ]
         //
@@ -72827,17 +72827,7 @@ module.exports = class okex3 extends Exchange {
         //         }
         //     ]
         //
-        let trades = undefined;
-        if (market['type'] === 'swap' || market['type'] === 'futures') {
-            trades = response;
-        } else {
-            const responseLength = response.length;
-            if (responseLength < 1) {
-                return [];
-            }
-            trades = response[0];
-        }
-        return this.parseTrades (trades, market, since, limit);
+        return this.parseTrades (response, market, since, limit);
     }
 
     async fetchLedger (code = undefined, since = undefined, limit = undefined, params = {}) {
