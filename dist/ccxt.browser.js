@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.45'
+const version = '1.19.46'
 
 Exchange.ccxtVersion = version
 
@@ -67276,6 +67276,7 @@ module.exports = class livecoin extends Exchange {
                 'FORTYTWO': '42',
                 'LEO': 'LeoCoin',
                 'ORE': 'Orectic',
+                'PLN': 'Plutaneum', // conflict with Polish Zloty
                 'RUR': 'RUB',
                 'SCT': 'SpaceCoin',
                 'TPI': 'ThaneCoin',
