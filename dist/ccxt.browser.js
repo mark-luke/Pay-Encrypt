@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.50'
+const version = '1.24.51'
 
 Exchange.ccxtVersion = version
 
@@ -107449,7 +107449,10 @@ module.exports = class upbit extends Exchange {
             'hostname': 'api.upbit.com',
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/49245610-eeaabe00-f423-11e8-9cba-4b0aed794799.jpg',
-                'api': 'https://{hostname}',
+                'api': {
+                    'public': 'https://{hostname}',
+                    'private': 'https://{hostname}',
+                },
                 'www': 'https://upbit.com',
                 'doc': 'https://docs.upbit.com/docs/%EC%9A%94%EC%B2%AD-%EC%88%98-%EC%A0%9C%ED%95%9C',
                 'fees': 'https://upbit.com/service_center/guide',
@@ -107938,7 +107941,7 @@ module.exports = class upbit extends Exchange {
         //                     timestamp:  1542883543813  }
         //
         const timestamp = this.safeInteger (ticker, 'trade_timestamp');
-        const symbol = this.getSymbolFromMarketId (this.safeString (ticker, 'market'), market);
+        const symbol = this.getSymbolFromMarketId (this.safeString2 (ticker, 'market', 'code'), market);
         const previous = this.safeFloat (ticker, 'prev_closing_price');
         const last = this.safeFloat (ticker, 'trade_price');
         const change = this.safeFloat (ticker, 'signed_change_price');
@@ -108079,8 +108082,8 @@ module.exports = class upbit extends Exchange {
                 }
             }
         }
-        const marketId = this.safeString (trade, 'market');
-        market = this.safeValue (this.markets_by_id, marketId);
+        const marketId = this.safeString2 (trade, 'market', 'code');
+        market = this.safeValue (this.markets_by_id, marketId, market);
         let fee = undefined;
         let feeCurrency = undefined;
         let symbol = undefined;
@@ -108858,7 +108861,7 @@ module.exports = class upbit extends Exchange {
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
-        let url = this.implodeParams (this.urls['api'], {
+        let url = this.implodeParams (this.urls['api'][api], {
             'hostname': this.hostname,
         });
         url += '/' + this.version + '/' + this.implodeParams (path, params);
