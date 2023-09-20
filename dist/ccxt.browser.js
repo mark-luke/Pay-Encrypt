@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.90'
+const version = '1.26.91'
 
 Exchange.ccxtVersion = version
 
@@ -5383,6 +5383,22 @@ module.exports = class Exchange {
 
     fetchOrder (id, symbol = undefined, params = {}) {
         throw new NotSupported (this.id + ' fetchOrder not supported yet');
+    }
+
+    fetchUnifiedOrder (order, params = {}) {
+        return this.fetchOrder (this.safeValue (order, 'id'), this.safeValue (order, 'symbol'), params);
+    }
+
+    createOrder (symbol, type, side, amount, price = undefined, params = {}) {
+        throw new NotSupported (this.id + ' createOrder not supported yet');
+    }
+
+    cancelOrder (id, symbol = undefined, params = {}) {
+        throw new NotSupported (this.id + ' cancelOrder not supported yet');
+    }
+
+    cancelUnifiedOrder (order, params = {}) {
+        return this.cancelOrder (this.safeValue (order, 'id'), this.safeValue (order, 'symbol'), params);
     }
 
     fetchOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -18829,6 +18845,13 @@ module.exports = class bithumb extends Exchange {
             'payment_currency': market['quote'],
         };
         return await this.privatePostTradeCancel (this.extend (request, params));
+    }
+
+    cancelUnifiedOrder (order, params = {}) {
+        const request = {
+            'side': order['side'],
+        };
+        return this.cancelOrder (order['id'], order['symbol'], this.extend (request, params));
     }
 
     async withdraw (code, amount, address, tag = undefined, params = {}) {
