@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.1'
+const version = '1.20.2'
 
 Exchange.ccxtVersion = version
 
@@ -106185,7 +106185,7 @@ module.exports = class upbit extends Exchange {
         });
         url += '/' + this.version + '/' + this.implodeParams (path, params);
         const query = this.omit (params, this.extractParams (path));
-        if (method === 'GET') {
+        if (method !== 'POST') {
             if (Object.keys (query).length) {
                 url += '?' + this.urlencode (query);
             }
@@ -106204,7 +106204,7 @@ module.exports = class upbit extends Exchange {
             headers = {
                 'Authorization': 'Bearer ' + jwt,
             };
-            if ((method !== 'GET') && (method !== 'DELETE')) {
+            if (method !== 'POST') {
                 body = this.json (params);
                 headers['Content-Type'] = 'application/json';
             }
