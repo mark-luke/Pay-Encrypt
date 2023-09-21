@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1105'
+const version = '1.18.1106'
 
 Exchange.ccxtVersion = version
 
@@ -61593,6 +61593,7 @@ module.exports = class livecoin extends Exchange {
                     '503': ExchangeNotAvailable,
                 },
                 'broad': {
+                    'insufficient funds': InsufficientFunds, // https://github.com/ccxt/ccxt/issues/5749
                     'NOT FOUND': OrderNotFound,
                     'Cannot find order': OrderNotFound,
                     'Minimal amount is': InvalidOrder,
