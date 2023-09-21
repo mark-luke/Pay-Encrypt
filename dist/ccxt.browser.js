@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.25'
+const version = '1.25.26'
 
 Exchange.ccxtVersion = version
 
@@ -66409,6 +66409,20 @@ module.exports = class kkex extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "status": 2,
+        //         "source": "NORMAL",
+        //         "amount": "10.852019",
+        //         "create_date": 1523938461036,
+        //         "avg_price": "0.00096104",
+        //         "order_id": "100",
+        //         "price": "0.00096105",
+        //         "type": "buy",
+        //         "symbol": "READBTC",
+        //         "deal_amount": "10.852019"
+        //     }
+        //
         let symbol = undefined;
         if (market !== undefined) {
             symbol = market['symbol'];
@@ -66437,6 +66451,7 @@ module.exports = class kkex extends Exchange {
         }
         return {
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -70839,8 +70854,10 @@ module.exports = class latoken extends Exchange {
         if ((timeFilled !== undefined) && (timeFilled > 0)) {
             lastTradeTimestamp = timeFilled;
         }
+        const clientOrderId = this.safeString (order, 'cliOrdId');
         return {
             'id': id,
+            'clientOrderId': clientOrderId,
             'info': order,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -71498,6 +71515,19 @@ module.exports = class lbank extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "symbol"："eth_btc",
+        //         "amount"：10.000000,
+        //         "create_time"：1484289832081,
+        //         "price"：5000.000000,
+        //         "avg_price"：5277.301200,
+        //         "type"："sell",
+        //         "order_id"："ab704110-af0d-48fd-a083-c218f19a4a55",
+        //         "deal_amount"：10.000000,
+        //         "status"：2
+        //     }
+        //
         let symbol = undefined;
         const responseMarket = this.safeValue (this.marketsById, order['symbol']);
         if (responseMarket !== undefined) {
@@ -71528,6 +71558,7 @@ module.exports = class lbank extends Exchange {
         }
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -72405,6 +72436,7 @@ module.exports = class liquid extends Exchange {
         const side = this.safeString (order, 'side');
         return {
             'id': orderId,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -73737,6 +73769,23 @@ module.exports = class luno extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "base": "string",
+        //         "completed_timestamp": "string",
+        //         "counter": "string",
+        //         "creation_timestamp": "string",
+        //         "expiration_timestamp": "string",
+        //         "fee_base": "string",
+        //         "fee_counter": "string",
+        //         "limit_price": "string",
+        //         "limit_volume": "string",
+        //         "order_id": "string",
+        //         "pair": "string",
+        //         "state": "PENDING",
+        //         "type": "BID"
+        //     }
+        //
         const timestamp = this.safeInteger (order, 'creation_timestamp');
         const status = (order['state'] === 'PENDING') ? 'open' : 'closed';
         const side = (order['type'] === 'ASK') ? 'sell' : 'buy';
@@ -73775,6 +73824,7 @@ module.exports = class luno extends Exchange {
         const id = this.safeString (order, 'order_id');
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -74365,6 +74415,23 @@ module.exports = class lykke extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "Id": "string",
+        //         "Status": "Unknown",
+        //         "AssetPairId": "string",
+        //         "Volume": 0,
+        //         "Price": 0,
+        //         "RemainingVolume": 0,
+        //         "LastMatchTime": "2020-03-26T20:58:50.710Z",
+        //         "CreatedAt": "2020-03-26T20:58:50.710Z",
+        //         "Type": "Unknown",
+        //         "LowerLimitPrice": 0,
+        //         "LowerPrice": 0,
+        //         "UpperLimitPrice": 0,
+        //         "UpperPrice": 0
+        //     }
+        //
         const status = this.parseOrderStatus (this.safeString (order, 'Status'));
         let symbol = undefined;
         if (market === undefined) {
@@ -74390,6 +74457,7 @@ module.exports = class lykke extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -74861,6 +74929,7 @@ module.exports = class mercado extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -75798,6 +75867,23 @@ module.exports = class oceanex extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "created_at": "2019-01-18T00:38:18Z",
+        //         "trades_count": 0,
+        //         "remaining_volume": "0.2",
+        //         "price": "1001.0",
+        //         "created_on": "1547771898",
+        //         "side": "buy",
+        //         "volume": "0.2",
+        //         "state": "wait",
+        //         "ord_type": "limit",
+        //         "avg_price": "0.0",
+        //         "executed_volume": "0.0",
+        //         "id": 473797,
+        //         "market": "veteth"
+        //     }
+        //
         const status = this.parseOrderStatus (this.safeValue (order, 'state'));
         const marketId = this.safeValue2 (order, 'market', 'market_id');
         let symbol = undefined;
@@ -75821,6 +75907,7 @@ module.exports = class oceanex extends Exchange {
         return {
             'info': order,
             'id': this.safeString (order, 'id'),
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -81281,6 +81368,7 @@ module.exports = class rightbtc extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
