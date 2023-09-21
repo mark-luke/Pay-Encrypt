@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.61'
+const version = '1.22.62'
 
 Exchange.ccxtVersion = version
 
@@ -26050,7 +26050,7 @@ module.exports = class bleutrade extends Exchange {
                     'currency': code,
                 };
             } else if (part.indexOf ('order id') === 0) {
-                referenceId = part.replace ('order id', '');
+                referenceId = part.replace ('order id ', '');
             }
             //
             // does not belong to Ledger, related to parseTransaction
