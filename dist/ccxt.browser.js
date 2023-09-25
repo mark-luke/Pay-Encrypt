@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.39'
+const version = '1.34.40'
 
 Exchange.ccxtVersion = version
 
@@ -8194,8 +8194,7 @@ module.exports = class binance extends Exchange {
             },
             // exchange-specific options
             'options': {
-                'fetchTradesMethod': 'publicGetAggTrades', // publicGetTrades, publicGetHistoricalTrades
-                'fetchTickersMethod': 'publicGetTicker24hr',
+                // 'fetchTradesMethod': 'publicGetAggTrades', // publicGetTrades, publicGetHistoricalTrades
                 'defaultTimeInForce': 'GTC', // 'GTC' = Good To Cancel (default), 'IOC' = Immediate Or Cancel
                 'defaultType': 'spot', // 'spot', 'future', 'margin', 'delivery'
                 'hasAlreadyAuthenticatedSuccessfully': false,
@@ -8864,11 +8863,13 @@ module.exports = class binance extends Exchange {
         const defaultType = this.safeString2 (this.options, 'fetchBidsAsks', 'defaultType', 'spot');
         const type = this.safeString (params, 'type', defaultType);
         const query = this.omit (params, 'type');
-        let method = 'publicGetTickerBookTicker';
+        let method = undefined;
         if (type === 'future') {
             method = 'fapiPublicGetTickerBookTicker';
         } else if (type === 'delivery') {
             method = 'dapiPublicGetTickerBookTicker';
+        } else {
+            method = 'publicGetTickerBookTicker';
         }
         const response = await this[method] (query);
         return this.parseTickers (response, symbols);
@@ -8876,8 +8877,19 @@ module.exports = class binance extends Exchange {
 
     async fetchTickers (symbols = undefined, params = {}) {
         await this.loadMarkets ();
-        const method = this.options['fetchTickersMethod'];
-        const response = await this[method] (params);
+        const defaultType = this.safeString2 (this.options, 'fetchTickers', 'defaultType', 'spot');
+        const type = this.safeString (params, 'type', defaultType);
+        const query = this.omit (params, 'type');
+        let defaultMethod = undefined;
+        if (type === 'future') {
+            defaultMethod = 'fapiPublicGetTicker24hr';
+        } else if (type === 'delivery') {
+            defaultMethod = 'dapiPublicGetTicker24hr';
+        } else {
+            defaultMethod = 'publicGetTicker24hr';
+        }
+        const method = this.safeString (this.options, 'fetchTickersMethod', defaultMethod);
+        const response = await this[method] (query);
         return this.parseTickers (response, symbols);
     }
 
@@ -9078,11 +9090,13 @@ module.exports = class binance extends Exchange {
         const defaultType = this.safeString2 (this.options, 'fetchTrades', 'defaultType', 'spot');
         const type = this.safeString (params, 'type', defaultType);
         const query = this.omit (params, 'type');
-        let defaultMethod = 'publicGetTrades';
+        let defaultMethod = undefined;
         if (type === 'future') {
-            defaultMethod = 'fapiPublicGetTrades';
+            defaultMethod = 'fapiPublicGetAggTrades';
         } else if (type === 'delivery') {
-            defaultMethod = 'dapiPublicGetTrades';
+            defaultMethod = 'dapiPublicGetAggTrades';
+        } else {
+            defaultMethod = 'publicGetAggTrades';
         }
         let method = this.safeString (this.options, 'fetchTradesMethod', defaultMethod);
         if (method === 'publicGetAggTrades') {
