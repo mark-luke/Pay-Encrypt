@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.66'
+const version = '1.25.67'
 
 Exchange.ccxtVersion = version
 
@@ -8148,10 +8148,10 @@ module.exports = class bcex extends Exchange {
 
 // ---------------------------------------------------------------------------
 
-const hitbtc2 = require ('./hitbtc2');
+const hitbtc = require ('./hitbtc');
 // ---------------------------------------------------------------------------
 
-module.exports = class bequant extends hitbtc2 {
+module.exports = class bequant extends hitbtc {
     describe () {
         return this.deepExtend (super.describe (), {
             'id': 'bequant',
@@ -8176,7 +8176,7 @@ module.exports = class bequant extends hitbtc2 {
     }
 };
 
-},{"./hitbtc2":91}],24:[function(require,module,exports){
+},{"./hitbtc":90}],24:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
