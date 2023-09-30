@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.73'
+const version = '1.20.74'
 
 Exchange.ccxtVersion = version
 
@@ -49668,11 +49668,21 @@ module.exports = class fcoin extends Exchange {
             }
         }
         let feeCurrency = undefined;
-        if (market !== undefined) {
-            symbol = market['symbol'];
-            feeCurrency = (side === 'buy') ? market['base'] : market['quote'];
+        let feeCost = undefined;
+        const feeRebate = this.safeFloat (order, 'fees_income');
+        if ((feeRebate !== undefined) && (feeRebate > 0)) {
+            if (market !== undefined) {
+                symbol = market['symbol'];
+                feeCurrency = (side === 'buy') ? market['quote'] : market['base'];
+            }
+            feeCost = -feeRebate;
+        } else {
+            feeCost = this.safeFloat (order, 'fill_fees');
+            if (market !== undefined) {
+                symbol = market['symbol'];
+                feeCurrency = (side === 'buy') ? market['base'] : market['quote'];
+            }
         }
-        const feeCost = this.safeFloat (order, 'fill_fees');
         return {
             'info': order,
             'id': id,
