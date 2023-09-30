@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.83'
+const version = '1.35.84'
 
 Exchange.ccxtVersion = version
 
@@ -41214,7 +41214,7 @@ module.exports = class bybit extends Exchange {
         const marketId = this.safeString (trade, 'symbol');
         const amount = this.safeFloat2 (trade, 'qty', 'exec_qty');
         let cost = this.safeFloat (trade, 'exec_value');
-        const price = this.safeFloat2 (trade, 'price', 'exec_price');
+        const price = this.safeFloat2 (trade, 'exec_price', 'price');
         if (marketId in this.markets_by_id) {
             market = this.markets_by_id[marketId];
             symbol = market['symbol'];
