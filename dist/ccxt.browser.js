@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.79'
+const version = '1.26.80'
 
 Exchange.ccxtVersion = version
 
@@ -36290,7 +36290,7 @@ module.exports = class bytetrade extends Exchange {
                 this.numberToLE (address.length, 1),
                 this.stringToBinary (this.encode (address)),
                 this.numberToLE (parseInt (coinId), 4),
-                this.numberToLE (Math.floor (parseInt (parseFloat (this.integerDivide (amountChain, eightBytes)))), 8),
+                this.numberToLE (this.integerDivide (amountChain, eightBytes), 8),
                 this.numberToLE (this.integerModulo (amountChain, eightBytes), 8),
                 this.numberToLE (1, 1),
                 this.numberToLE (this.integerDivide (assetFee, eightBytes), 8),
@@ -36323,7 +36323,7 @@ module.exports = class bytetrade extends Exchange {
                 this.numberToLE (middleAddress.length, 1),
                 this.stringToBinary (this.encode (middleAddress)),
                 this.numberToLE (parseInt (coinId), 4),
-                this.numberToLE (Math.floor (parseInt (parseFloat (this.integerDivide (amountChain, eightBytes)))), 8),
+                this.numberToLE (this.integerDivide (amountChain, eightBytes), 8),
                 this.numberToLE (this.integerModulo (amountChain, eightBytes), 8),
                 this.numberToLE (0, 1),
                 this.numberToLE (1, 1),
