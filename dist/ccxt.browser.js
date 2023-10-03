@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.47'
+const version = '1.29.48'
 
 Exchange.ccxtVersion = version
 
@@ -71436,6 +71436,16 @@ module.exports = class kkex extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         "1521072000000",
+        //         "0.000002",
+        //         "0.00003",
+        //         "0.000002",
+        //         "0.00003",
+        //         "3.106889"
+        //     ]
+        //
         return [
             this.safeInteger (ohlcv, 0),
             this.safeFloat (ohlcv, 1),
@@ -71481,7 +71491,7 @@ module.exports = class kkex extends Exchange {
         //         ]
         //     ]
         //
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        return this.parseOHLCVs (response, market);
     }
 
     parseOrderStatus (status) {
@@ -72302,6 +72312,18 @@ module.exports = class kraken extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         1591475640,
+        //         "0.02500",
+        //         "0.02500",
+        //         "0.02500",
+        //         "0.02500",
+        //         "0.02500",
+        //         "9.12201000",
+        //         5
+        //     ]
+        //
         return [
             this.safeTimestamp (ohlcv, 0),
             this.safeFloat (ohlcv, 1),
@@ -72323,8 +72345,22 @@ module.exports = class kraken extends Exchange {
             request['since'] = parseInt ((since - 1) / 1000);
         }
         const response = await this.publicGetOHLC (this.extend (request, params));
-        const ohlcvs = response['result'][market['id']];
-        return this.parseOHLCVs (ohlcvs, market, timeframe, since, limit);
+        //
+        //     {
+        //         "error":[],
+        //         "result":{
+        //             "XETHXXBT":[
+        //                 [1591475580,"0.02499","0.02499","0.02499","0.02499","0.00000","0.00000000",0],
+        //                 [1591475640,"0.02500","0.02500","0.02500","0.02500","0.02500","9.12201000",5],
+        //                 [1591475700,"0.02499","0.02499","0.02499","0.02499","0.02499","1.28681415",2],
+        //                 [1591475760,"0.02499","0.02499","0.02499","0.02499","0.02499","0.08800000",1],
+        //             ],
+        //             "last":1591517580
+        //         }
+        //     }
+        const result = this.safeValue (response, 'result', {});
+        const ohlcvs = this.safeValue (result, market['id'], []);
+        return this.parseOHLCVs (ohlcvs, market);
     }
 
     parseLedgerEntryType (type) {
@@ -74035,8 +74071,18 @@ module.exports = class kucoin extends Exchange {
         }
         request['endAt'] = parseInt (Math.floor (endAt / 1000));
         const response = await this.publicGetMarketCandles (this.extend (request, params));
-        const responseData = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (responseData, market, timeframe, since, limit);
+        //
+        //     {
+        //         "code":"200000",
+        //         "data":[
+        //             ["1591517700","0.025078","0.025069","0.025084","0.025064","18.9883256","0.4761861079404"],
+        //             ["1591516800","0.025089","0.025079","0.025089","0.02506","99.4716622","2.494143499081"],
+        //             ["1591515900","0.025079","0.02509","0.025091","0.025068","59.83701271","1.50060885172798"],
+        //         ]
+        //     }
+        //
+        const data = this.safeValue (response, 'data', []);
+        return this.parseOHLCVs (data, market);
     }
 
     async createDepositAddress (code, params = {}) {
@@ -76956,6 +77002,16 @@ module.exports = class lbank extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         1590969600,
+        //         0.02451657,
+        //         0.02452675,
+        //         0.02443701,
+        //         0.02447814,
+        //         238.38210000
+        //     ]
+        //
         return [
             this.safeTimestamp (ohlcv, 0),
             this.safeFloat (ohlcv, 1),
@@ -76982,7 +77038,14 @@ module.exports = class lbank extends Exchange {
             'time': parseInt (since / 1000),
         };
         const response = await this.publicGetKline (this.extend (request, params));
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        //
+        //     [
+        //         [1590969600,0.02451657,0.02452675,0.02443701,0.02447814,238.38210000],
+        //         [1590969660,0.02447814,0.02449883,0.02443209,0.02445973,212.40270000],
+        //         [1590969720,0.02445973,0.02452067,0.02445909,0.02446151,266.16920000],
+        //     ]
+        //
+        return this.parseOHLCVs (response, market);
     }
 
     async fetchBalance (params = {}) {
@@ -80730,7 +80793,7 @@ module.exports = class mercado extends Exchange {
         }
         const response = await this.v4PublicGetCoinCandle (this.extend (request, params));
         const candles = this.safeValue (response, 'candles', []);
-        return this.parseOHLCVs (candles, market, timeframe, since, limit);
+        return this.parseOHLCVs (candles, market);
     }
 
     async fetchOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -83134,39 +83197,49 @@ module.exports = class okex extends Exchange {
         //
         // spot markets
         //
-        //     [ {  close: "0.02683401",
-        //           high: "0.02683401",
-        //            low: "0.02683401",
-        //           open: "0.02683401",
-        //           time: "2018-12-17T23:47:00.000Z",
-        //         volume: "0"                         },
-        //       ...
-        //       {  close: "0.02684545",
-        //           high: "0.02685084",
-        //            low: "0.02683312",
-        //           open: "0.02683894",
-        //           time: "2018-12-17T20:28:00.000Z",
-        //         volume: "101.457222"                }  ]
+        //     [
+        //         {
+        //             close: "0.02683401",
+        //             high: "0.02683401",
+        //             low: "0.02683401",
+        //             open: "0.02683401",
+        //             time: "2018-12-17T23:47:00.000Z",
+        //             volume: "0"
+        //         },
+        //         {
+        //             close: "0.02684545",
+        //             high: "0.02685084",
+        //             low: "0.02683312",
+        //             open: "0.02683894",
+        //             time: "2018-12-17T20:28:00.000Z",
+        //             volume: "101.457222"
+        //         }
+        //     ]
         //
         // futures
         //
-        //     [ [ 1545090660000,
-        //         0.3171,
-        //         0.3174,
-        //         0.3171,
-        //         0.3173,
-        //         1648,
-        //         51930.38579450868 ],
-        //       ...
-        //       [ 1545072720000,
-        //         0.3159,
-        //         0.3161,
-        //         0.3144,
-        //         0.3149,
-        //         22886,
-        //         725179.26172331 ]    ]
+        //     [
+        //         [
+        //             1545090660000,
+        //             0.3171,
+        //             0.3174,
+        //             0.3171,
+        //             0.3173,
+        //             1648,
+        //             51930.38579450868
+        //         ],
+        //         [
+        //             1545072720000,
+        //             0.3159,
+        //             0.3161,
+        //             0.3144,
+        //             0.3149,
+        //             22886,
+        //             725179.26172331
+        //         ]
+        //     ]
         //
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        return this.parseOHLCVs (response, market);
     }
 
     parseAccountBalance (response) {
@@ -85447,6 +85520,18 @@ module.exports = class poloniex extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+        //
+        //     {
+        //         "date":1590913773,
+        //         "high":0.02491611,
+        //         "low":0.02491611,
+        //         "open":0.02491611,
+        //         "close":0.02491611,
+        //         "volume":0,
+        //         "quoteVolume":0,
+        //         "weightedAverage":0.02491611
+        //     }
+        //
         return [
             this.safeTimestamp (ohlcv, 'date'),
             this.safeFloat (ohlcv, 'open'),
@@ -85479,7 +85564,14 @@ module.exports = class poloniex extends Exchange {
             }
         }
         const response = await this.publicGetReturnChartData (this.extend (request, params));
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        //
+        //     [
+        //         {"date":1590913773,"high":0.02491611,"low":0.02491611,"open":0.02491611,"close":0.02491611,"volume":0,"quoteVolume":0,"weightedAverage":0.02491611},
+        //         {"date":1590913800,"high":0.02495324,"low":0.02489501,"open":0.02491797,"close":0.02493693,"volume":0.0927415,"quoteVolume":3.7227869,"weightedAverage":0.02491185},
+        //         {"date":1590914100,"high":0.02498596,"low":0.02488503,"open":0.02493033,"close":0.02497896,"volume":0.21196348,"quoteVolume":8.50291888,"weightedAverage":0.02492832},
+        //     ]
+        //
+        return this.parseOHLCVs (response, market);
     }
 
     async fetchMarkets (params = {}) {
@@ -87491,11 +87583,24 @@ module.exports = class probit extends Exchange {
         //         ]
         //     }
         //
-        const data = this.safeValue (response, 'data');
-        return this.parseOHLCVs (data, market, timeframe, since, limit);
+        const data = this.safeValue (response, 'data', []);
+        return this.parseOHLCVs (data, market);
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     {
+        //         "market_id":"ETH-BTC",
+        //         "open":"0.02811",
+        //         "close":"0.02811",
+        //         "low":"0.02811",
+        //         "high":"0.02811",
+        //         "base_volume":"0.0005",
+        //         "quote_volume":"0.000014055",
+        //         "start_time":"2018-11-30T18:19:00.000Z",
+        //         "end_time":"2018-11-30T18:20:00.000Z"
+        //     }
+        //
         return [
             this.parse8601 (this.safeString (ohlcv, 'start_time')),
             this.safeFloat (ohlcv, 'open'),
@@ -88301,7 +88406,7 @@ module.exports = class qtrade extends Exchange {
         //         "market_volume":"0.08465047"
         //     }
         //
-        const result = [
+        return [
             this.parse8601 (this.safeString (ohlcv, 'time')),
             this.safeFloat (ohlcv, 'open'),
             this.safeFloat (ohlcv, 'high'),
@@ -88309,7 +88414,6 @@ module.exports = class qtrade extends Exchange {
             this.safeFloat (ohlcv, 'close'),
             this.safeFloat (ohlcv, 'market_volume'),
         ];
-        return result;
     }
 
     async fetchOHLCV (symbol, timeframe = '5m', since = undefined, limit = undefined, params = {}) {
@@ -88333,7 +88437,7 @@ module.exports = class qtrade extends Exchange {
         //
         const data = this.safeValue (response, 'data', {});
         const ohlcvs = this.safeValue (data, 'slices', []);
-        return this.parseOHLCVs (ohlcvs, market, timeframe, since, limit);
+        return this.parseOHLCVs (ohlcvs, market);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
