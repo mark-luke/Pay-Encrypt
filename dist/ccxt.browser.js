@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.78'
+const version = '1.28.79'
 
 Exchange.ccxtVersion = version
 
@@ -75941,6 +75941,7 @@ module.exports = class luno extends Exchange {
                         'accounts/{id}/pending',
                         'accounts/{id}/transactions',
                         'balance',
+                        'beneficiaries',
                         'fee_info',
                         'funding_address',
                         'listorders',
@@ -75962,6 +75963,7 @@ module.exports = class luno extends Exchange {
                         'oauth2/grant',
                     ],
                     'put': [
+                        'accounts/{id}/name',
                         'quotes/{id}',
                     ],
                     'delete': [
