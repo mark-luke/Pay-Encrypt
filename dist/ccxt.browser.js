@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.8'
+const version = '1.32.9'
 
 Exchange.ccxtVersion = version
 
@@ -38869,20 +38869,27 @@ module.exports = class bytetrade extends Exchange {
             'certified': true,
             // new metainfo interface
             'has': {
+                'cancelOrder': true,
+                'CORS': false,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchBidsAsks': true,
+                'fetchClosedOrders': true,
                 'fetchCurrencies': true,
                 'fetchDepositAddress': true,
-                'CORS': false,
-                'fetchBidsAsks': true,
-                'fetchTickers': true,
-                'fetchOHLCV': true,
-                'fetchMyTrades': true,
-                'fetchOrder': true,
-                'fetchOrders': true,
-                'fetchOpenOrders': true,
-                'fetchClosedOrders': true,
-                'withdraw': true,
                 'fetchDeposits': true,
+                'fetchMarkets': true,
+                'fetchMyTrades': true,
+                'fetchOHLCV': true,
+                'fetchOpenOrders': true,
+                'fetchOrder': true,
+                'fetchOrderBook': true,
+                'fetchOrders': true,
+                'fetchTicker': true,
+                'fetchTickers': true,
+                'fetchTrades': true,
                 'fetchWithdrawals': true,
+                'withdraw': true,
             },
             'timeframes': {
                 '1m': '1m',
@@ -40276,15 +40283,23 @@ module.exports = class cex extends Exchange {
             'countries': [ 'GB', 'EU', 'CY', 'RU' ],
             'rateLimit': 1500,
             'has': {
+                'cancelOrder': true,
                 'CORS': false,
-                'fetchCurrencies': true,
-                'fetchTickers': true,
-                'fetchOHLCV': true,
-                'fetchOrder': true,
-                'fetchOpenOrders': true,
+                'createOrder': true,
+                'editOrder': true,
+                'fetchBalance': true,
                 'fetchClosedOrders': true,
+                'fetchCurrencies': true,
                 'fetchDepositAddress': true,
+                'fetchMarkets': true,
+                'fetchOHLCV': true,
+                'fetchOpenOrders': true,
+                'fetchOrder': true,
+                'fetchOrderBook': true,
                 'fetchOrders': true,
+                'fetchTicker': true,
+                'fetchTickers': true,
+                'fetchTrades': true,
             },
             'timeframes': {
                 '1m': '1m',
