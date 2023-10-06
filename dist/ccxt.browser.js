@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.91'
+const version = '1.29.92'
 
 Exchange.ccxtVersion = version
 
@@ -60200,9 +60200,15 @@ module.exports = class ftx extends Exchange {
         const remaining = this.safeFloat (order, 'remainingSize');
         let symbol = undefined;
         const marketId = this.safeString (order, 'market');
-        if (marketId in this.markets_by_id) {
-            market = this.markets_by_id[marketId];
-            symbol = market['symbol'];
+        if (marketId !== undefined) {
+            if (marketId in this.markets_by_id) {
+                market = this.markets_by_id[marketId];
+                symbol = market['symbol'];
+            } else {
+                // support for delisted market ids
+                // https://github.com/ccxt/ccxt/issues/7113
+                symbol = marketId;
+            }
         }
         if ((symbol === undefined) && (market !== undefined)) {
             symbol = market['symbol'];
