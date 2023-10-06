@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.23'
+const version = '1.31.24'
 
 Exchange.ccxtVersion = version
 
@@ -22181,6 +22181,9 @@ module.exports = class bitpanda extends Exchange {
             'version': 'v1',
             // new metainfo interface
             'has': {
+                'CORS': false,
+                'publicAPI': true,
+                'privateAPI': true,
                 'cancelAllOrders': true,
                 'cancelOrder': true,
                 'cancelOrders': true,
@@ -22192,6 +22195,7 @@ module.exports = class bitpanda extends Exchange {
                 'fetchDeposits': true,
                 'fetchDepositAddress': true,
                 'fetchMarkets': true,
+                'fetchMyTrades': true,
                 'fetchOHLCV': true,
                 'fetchOpenOrders': true,
                 'fetchOrder': true,
@@ -22936,7 +22940,7 @@ module.exports = class bitpanda extends Exchange {
         //         "sequence":603047
         //     }
         //
-        // fetchOrder, fetchOrders trades (private)
+        // fetchOrder, fetchOpenOrders, fetchClosedOrders trades (private)
         //
         //     {
         //         "fee": {
@@ -23348,7 +23352,7 @@ module.exports = class bitpanda extends Exchange {
         //         "time_in_force": "GOOD_TILL_CANCELLED"
         //     }
         //
-        // fetchOrder, fetchOrders
+        // fetchOrder, fetchOpenOrders, fetchClosedOrders
         //
         //     {
         //         "order": {
@@ -23389,10 +23393,6 @@ module.exports = class bitpanda extends Exchange {
         //             }
         //         ]
         //     }
-        //
-        // fetchOrders
-        //
-        //     ...
         //
         const rawTrades = this.safeValue (order, 'trades', []);
         order = this.safeValue (order, 'order', order);
@@ -23797,11 +23797,100 @@ module.exports = class bitpanda extends Exchange {
             request['max_page_size'] = limit;
         }
         const response = await this.privateGetAccountOrdersOrderIdTrades (this.extend (request, params));
+        //
+        //     {
+        //         "trade_history": [
+        //             {
+        //                 "trade": {
+        //                     "trade_id": "2b42efcd-d5b7-4a56-8e12-b69ffd68c5ef",
+        //                     "order_id": "66756a10-3e86-48f4-9678-b634c4b135b2",
+        //                     "account_id": "c2d0076a-c20d-41f8-9e9a-1a1d028b2b58",
+        //                     "amount": "1234.5678",
+        //                     "side": "BUY",
+        //                     "instrument_code": "BTC_EUR",
+        //                     "price": "1234.5678",
+        //                     "time": "2019-08-24T14:15:22Z",
+        //                     "price_tick_sequence": 0,
+        //                     "sequence": 123456789
+        //                 },
+        //                 "fee": {
+        //                     "fee_amount": "1234.5678",
+        //                     "fee_percentage": "1234.5678",
+        //                     "fee_group_id": "default",
+        //                     "running_trading_volume": "1234.5678",
+        //                     "fee_currency": "BTC",
+        //                     "fee_type": "TAKER"
+        //                 }
+        //             }
+        //         ],
+        //         "max_page_size": 0,
+        //         "cursor": "string"
+        //     }
+        //
         const tradeHistory = this.safeValue (response, 'trade_history', []);
         let market = undefined;
         if (symbol !== undefined) {
             market = this.market (symbol);
         }
+        return this.parseTrades (tradeHistory, market, since, limit);
+    }
+
+    async fetchMyTrades (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const request = {
+            // 'from': this.iso8601 (since),
+            // 'to': this.iso8601 (this.milliseconds ()), // max range is 100 days
+            // 'instrument_code': market['id'],
+            // 'max_page_size': 100,
+            // 'cursor': 'string', // pointer specifying the position from which the next pages should be returned
+        };
+        let market = undefined;
+        if (symbol !== undefined) {
+            market = this.market (symbol);
+            request['instrument_code'] = market['id'];
+        }
+        if (since !== undefined) {
+            const to = this.safeString (params, 'to');
+            if (to === undefined) {
+                throw new ArgumentsRequired (this.id + ' fetchMyTrades requires a "to" iso8601 string param with the since argument is specified, max range is 100 days');
+            }
+            request['from'] = this.iso8601 (since);
+        }
+        if (limit !== undefined) {
+            request['max_page_size'] = limit;
+        }
+        const response = await this.privateGetAccountTrades (this.extend (request, params));
+        //
+        //     {
+        //         "trade_history": [
+        //             {
+        //                 "trade": {
+        //                     "trade_id": "2b42efcd-d5b7-4a56-8e12-b69ffd68c5ef",
+        //                     "order_id": "66756a10-3e86-48f4-9678-b634c4b135b2",
+        //                     "account_id": "c2d0076a-c20d-41f8-9e9a-1a1d028b2b58",
+        //                     "amount": "1234.5678",
+        //                     "side": "BUY",
+        //                     "instrument_code": "BTC_EUR",
+        //                     "price": "1234.5678",
+        //                     "time": "2019-08-24T14:15:22Z",
+        //                     "price_tick_sequence": 0,
+        //                     "sequence": 123456789
+        //                 },
+        //                 "fee": {
+        //                     "fee_amount": "1234.5678",
+        //                     "fee_percentage": "1234.5678",
+        //                     "fee_group_id": "default",
+        //                     "running_trading_volume": "1234.5678",
+        //                     "fee_currency": "BTC",
+        //                     "fee_type": "TAKER"
+        //                 }
+        //             }
+        //         ],
+        //         "max_page_size": 0,
+        //         "cursor": "string"
+        //     }
+        //
+        const tradeHistory = this.safeValue (response, 'trade_history', []);
         return this.parseTrades (tradeHistory, market, since, limit);
     }
 
