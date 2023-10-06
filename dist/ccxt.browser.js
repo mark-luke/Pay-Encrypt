@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.44'
+const version = '1.33.45'
 
 Exchange.ccxtVersion = version
 
@@ -47587,10 +47587,8 @@ module.exports = class coinex extends Exchange {
             request['price'] = this.priceToPrecision (symbol, price);
         }
         const response = await this[method] (this.extend (request, params));
-        const order = this.parseOrder (response['data'], market);
-        const id = order['id'];
-        this.orders[id] = order;
-        return order;
+        const data = this.safeValue (response, 'data');
+        return this.parseOrder (data, market);
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
@@ -47601,7 +47599,8 @@ module.exports = class coinex extends Exchange {
             'market': market['id'],
         };
         const response = await this.privateDeleteOrderPending (this.extend (request, params));
-        return this.parseOrder (response['data'], market);
+        const data = this.safeValue (response, 'data');
+        return this.parseOrder (data, market);
     }
 
     async fetchOrder (id, symbol = undefined, params = {}) {
@@ -47641,7 +47640,8 @@ module.exports = class coinex extends Exchange {
         //         "message": "Ok"
         //     }
         //
-        return this.parseOrder (response['data'], market);
+        const data = this.safeValue (response, 'data');
+        return this.parseOrder (data, market);
     }
 
     async fetchOrdersByStatus (status, symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -47660,7 +47660,9 @@ module.exports = class coinex extends Exchange {
         }
         const method = 'privateGetOrder' + this.capitalize (status);
         const response = await this[method] (this.extend (request, params));
-        return this.parseOrders (response['data']['data'], market, since, limit);
+        const data = this.safeValue (response, 'data');
+        const orders = this.safeValue (data, 'data', []);
+        return this.parseOrders (orders, market, since, limit);
     }
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -47686,7 +47688,9 @@ module.exports = class coinex extends Exchange {
             request['market'] = market['id'];
         }
         const response = await this.privateGetOrderUserDeals (this.extend (request, params));
-        return this.parseTrades (response['data']['data'], market, since, limit);
+        const data = this.safeValue (response, 'data');
+        const trades = this.safeValue (data, 'data', []);
+        return this.parseTrades (trades, market, since, limit);
     }
 
     async withdraw (code, amount, address, tag = undefined, params = {}) {
@@ -47881,7 +47885,8 @@ module.exports = class coinex extends Exchange {
         //         "message": "Ok"
         //     }
         //
-        return this.parseTransactions (response['data'], currency, since, limit);
+        const data = this.safeValue (response, 'data', []);
+        return this.parseTransactions (data, currency, since, limit);
     }
 
     async fetchDeposits (code = undefined, since = undefined, limit = undefined, params = {}) {
@@ -47924,7 +47929,8 @@ module.exports = class coinex extends Exchange {
         //         "message": "Ok"
         //     }
         //
-        return this.parseTransactions (response['data'], currency, since, limit);
+        const data = this.safeValue (response, 'data', []);
+        return this.parseTransactions (data, currency, since, limit);
     }
 
     nonce () {
@@ -62130,7 +62136,6 @@ module.exports = class exx extends Exchange {
             'type': side,
             'info': response,
         }, market);
-        this.orders[id] = order;
         return order;
     }
 
@@ -73395,8 +73400,6 @@ module.exports = class ice3x extends Exchange {
             'remaining': amount,
             'info': response,
         }, market);
-        const id = order['id'];
-        this.orders[id] = order;
         return order;
     }
 
@@ -73413,15 +73416,21 @@ module.exports = class ice3x extends Exchange {
             'order _id': id,
         };
         const response = await this.privatePostOrderInfo (this.extend (request, params));
-        const order = this.safeValue (response['response'], 'entity');
+        const data = this.safeValue (response, 'response', {});
+        const order = this.safeValue (data, 'entity');
         return this.parseOrder (order);
     }
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const response = await this.privatePostOrderList (params);
-        const orders = this.safeValue (response['response'], 'entities');
-        return this.parseOrders (orders, undefined, since, limit);
+        const data = this.safeValue (response, 'response', {});
+        const orders = this.safeValue (data, 'entities', []);
+        let market = undefined;
+        if (symbol !== undefined) {
+            market = this.market (symbol);
+        }
+        return this.parseOrders (orders, market, since, limit);
     }
 
     async fetchMyTrades (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -73437,7 +73446,8 @@ module.exports = class ice3x extends Exchange {
             request['date_from'] = parseInt (since / 1000);
         }
         const response = await this.privatePostTradeList (this.extend (request, params));
-        const trades = this.safeValue (response['response'], 'entities');
+        const data = this.safeValue (response, 'response', {});
+        const trades = this.safeValue (data, 'entities', []);
         return this.parseTrades (trades, market, since, limit);
     }
 
@@ -73448,7 +73458,8 @@ module.exports = class ice3x extends Exchange {
             'currency_id': currency['id'],
         };
         const response = await this.privatePostBalanceInfo (this.extend (request, params));
-        const balance = this.safeValue (response['response'], 'entity');
+        const data = this.safeValue (response, 'response', {});
+        const balance = this.safeValue (data, 'entity', {});
         const address = this.safeString (balance, 'address');
         const status = address ? 'ok' : 'none';
         return {
@@ -81824,10 +81835,7 @@ module.exports = class lbank extends Exchange {
         order['order_type'] = type;
         order['create_time'] = this.milliseconds ();
         order['info'] = response;
-        order = this.parseOrder (order, market);
-        const id = order['id'];
-        this.orders[id] = order;
-        return order;
+        return this.parseOrder (order, market);
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
@@ -81850,7 +81858,8 @@ module.exports = class lbank extends Exchange {
             'order_id': id,
         };
         const response = await this.privatePostOrdersInfo (this.extend (request, params));
-        const orders = this.parseOrders (response['orders'], market);
+        const data = this.safeValue (response, 'orders', []);
+        const orders = this.parseOrders (data, market);
         const numOrders = orders.length;
         if (numOrders === 1) {
             return orders[0];
@@ -81871,7 +81880,8 @@ module.exports = class lbank extends Exchange {
             'page_length': limit,
         };
         const response = await this.privatePostOrdersInfoHistory (this.extend (request, params));
-        return this.parseOrders (response['orders'], undefined, since, limit);
+        const data = this.safeValue (response, 'orders', []);
+        return this.parseOrders (data, undefined, since, limit);
     }
 
     async fetchClosedOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -81897,7 +81907,7 @@ module.exports = class lbank extends Exchange {
         }
         const response = this.privatePostWithdraw (this.extend (request, params));
         return {
-            'id': response['id'],
+            'id': this.safeString (response, 'id'),
             'info': response,
         };
     }
