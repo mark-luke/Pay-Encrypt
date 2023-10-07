@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.44'
+const version = '1.29.45'
 
 Exchange.ccxtVersion = version
 
@@ -33670,6 +33670,24 @@ module.exports = class bw extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         "K",
+        //         "305",
+        //         "eth_btc",
+        //         "1591511280",
+        //         "0.02504",
+        //         "0.02504",
+        //         "0.02504",
+        //         "0.02504",
+        //         "0.0123",
+        //         "0",
+        //         "285740.17",
+        //         "1M",
+        //         "false",
+        //         "0.000308"
+        //     ]
+        //
         return [
             this.safeTimestamp (ohlcv, 3),
             this.safeFloat (ohlcv, 4),
@@ -33692,9 +33710,18 @@ module.exports = class bw extends Exchange {
             request['dataSize'] = limit;
         }
         const response = await this.publicGetApiDataV1Klines (this.extend (request, params));
+        //
+        //     {
+        //         "datas":[
+        //             ["K","305","eth_btc","1591511280","0.02504","0.02504","0.02504","0.02504","0.0123","0","285740.17","1M","false","0.000308"],
+        //             ["K","305","eth_btc","1591511220","0.02504","0.02504","0.02504","0.02504","0.0006","0","285740.17","1M","false","0.00001502"],
+        //             ["K","305","eth_btc","1591511100","0.02505","0.02505","0.02504","0.02504","0.0012","-0.0399","285740.17","1M","false","0.00003005"],
+        //         ],
+        //         "resMsg":{"code":"1","method":null,"message":"success !"}
+        //     }
+        //
         const data = this.safeValue (response, 'datas', []);
-        const ohlcvs = this.parseOHLCVs (data, market, timeframe, since, limit);
-        return this.sortBy (ohlcvs, 0);
+        return this.parseOHLCVs (data, market);
     }
 
     async fetchBalance (params = {}) {
@@ -34946,6 +34973,8 @@ module.exports = class bybit extends Exchange {
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
         //
+        // inverse perpetual BTC/USD
+        //
         //     {
         //         symbol: 'BTCUSD',
         //         interval: '1',
@@ -34956,7 +34985,9 @@ module.exports = class bybit extends Exchange {
         //         close: '7763.5',
         //         volume: '1259766',
         //         turnover: '162.32773718999994'
-        //     },
+        //     }
+        //
+        // linear perpetual BTC/USDT
         //
         //     {
         //         "id":143536,
@@ -35053,7 +35084,7 @@ module.exports = class bybit extends Exchange {
         //     }
         //
         const result = this.safeValue (response, 'result', {});
-        return this.parseOHLCVs (result, market, timeframe, since, limit);
+        return this.parseOHLCVs (result, market);
     }
 
     parseTrade (trade, market = undefined) {
@@ -36826,6 +36857,16 @@ module.exports = class bytetrade extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         1591505760000,
+        //         "242.7",
+        //         "242.76",
+        //         "242.69",
+        //         "242.76",
+        //         "0.1892"
+        //     ]
+        //
         return [
             this.safeInteger (ohlcv, 0),
             this.safeFloat (ohlcv, 1),
@@ -36850,7 +36891,14 @@ module.exports = class bytetrade extends Exchange {
             request['limit'] = limit;
         }
         const response = await this.marketGetKlines (this.extend (request, params));
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        //
+        //     [
+        //         [1591505760000,"242.7","242.76","242.69","242.76","0.1892"],
+        //         [1591505820000,"242.77","242.83","242.7","242.72","0.6378"],
+        //         [1591505880000,"242.72","242.73","242.61","242.72","0.4141"],
+        //     ]
+        //
+        return this.parseOHLCVs (response, market);
     }
 
     parseTrade (trade, market = undefined) {
@@ -38181,6 +38229,16 @@ module.exports = class cex extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         1591403940,
+        //         0.024972,
+        //         0.024972,
+        //         0.024969,
+        //         0.024969,
+        //         0.49999900
+        //     ]
+        //
         return [
             this.safeTimestamp (ohlcv, 0),
             this.safeFloat (ohlcv, 1),
@@ -38210,8 +38268,15 @@ module.exports = class cex extends Exchange {
         };
         try {
             const response = await this.publicGetOhlcvHdYyyymmddPair (this.extend (request, params));
+            //
+            //     {
+            //         "time":20200606,
+            //         "data1m":"[[1591403940,0.024972,0.024972,0.024969,0.024969,0.49999900]]",
+            //     }
+            //
             const key = 'data' + this.timeframes[timeframe];
-            const ohlcvs = JSON.parse (response[key]);
+            const data = this.safeString (response, key);
+            const ohlcvs = JSON.parse (data);
             return this.parseOHLCVs (ohlcvs, market, timeframe, since, limit);
         } catch (e) {
             if (e instanceof NullResponse) {
