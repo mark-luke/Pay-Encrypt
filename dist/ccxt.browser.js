@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.83'
+const version = '1.27.89'
 
 Exchange.ccxtVersion = version
 
@@ -14776,8 +14776,7 @@ module.exports = class bitfinex extends Exchange {
                 'request': request,
             }, query);
             body = this.json (query);
-            query = this.encode (body);
-            const payload = this.stringToBase64 (query);
+            const payload = this.stringToBase64 (this.encode (body));
             const secret = this.encode (this.secret);
             const signature = this.hmac (payload, secret, 'sha384');
             headers = {
@@ -31280,6 +31279,7 @@ module.exports = class bw extends Exchange {
                 'www': 'https://www.bw.com',
                 'doc': 'https://github.com/bw-exchange/api_docs_en/wiki',
                 'fees': 'https://www.bw.com/feesRate',
+                'referral': 'https://www.bw.com/regGetCommission/N3JuT1R3bWxKTE0',
             },
             'requiredCredentials': {
                 'apiKey': true,
@@ -40539,11 +40539,12 @@ module.exports = class coinex extends Exchange {
                 market = this.markets_by_id[marketId];
                 symbol = market['symbol'];
             }
-            const ticker = {
+            const ticker = this.parseTicker ({
                 'date': timestamp,
                 'ticker': tickers[marketId],
-            };
-            result[symbol] = this.parseTicker (ticker, market);
+            }, market);
+            ticker['symbol'] = symbol;
+            result[symbol] = ticker;
         }
         return result;
     }
@@ -40903,7 +40904,7 @@ module.exports = class coinex extends Exchange {
             'coin_type': currency['id'],
             'coin_address': address, // must be authorized, inter-user transfer by a registered mobile phone number or an email address is supported
             'actual_amount': parseFloat (amount), // the actual amount without fees, https://www.coinex.com/fees
-            'transfer_method': '1', // '1' = normal onchain transfer, '2' = internal local transfer from one user to another
+            'transfer_method': 'onchain', // onchain, local
         };
         const response = await this.privatePostBalanceCoinWithdraw (this.extend (request, params));
         //
@@ -50614,98 +50615,48 @@ module.exports = class dsx extends Exchange {
         return this.safeString (statuses, status, status);
     }
 
-    parseTransactionType (type) {
-        const types = {
-            'payin': 'deposit',
-            'payout': 'withdrawal',
-            'withdraw': 'withdrawal',
-        };
-        return this.safeString (types, type, type);
-    }
-
     parseTransaction (transaction, currency = undefined) {
-        // deposit
-        // {
-        //     "id": "03e620fa",
-        //     "hash": "bar",
-        //     "type": "payin",
-        //     "index": 2156219,
-        //     "amount": "0.26000000",
-        //     "status": "success",
-        //     "address": "foo",
-        //     "currency": "BTC",
-        //     "createdAt": "2020-05-14T18:08:28.850Z",
-        //     "updatedAt": "2020-05-14T18:10:59.502Z",
-        //     "confirmations": 1
-        // }
-        // internal transfer
-        // {
-        //     "id": "9e420465",
-        //     "type": "bankToExchange",
-        //     "index": 503401,
-        //     "amount": "0.10",
-        //     "status": "success",
-        //     "currency": "EUR",
-        //     "createdAt": "2020-03-27T15:19:28.519Z",
-        //     "updatedAt": "2020-03-27T15:19:28.656Z"
-        // }
-        // internal transfer
-        // {
-        //     "id": "48dd5e05",
-        //     "index": 054766,
-        //     "type": "exchangeToBank",
-        //     "status": "success",
-        //     "currency": "LTC",
-        //     "amount": "7.00000000",
-        //     "createdAt": "2020-05-15T20:34:59.344Z",
-        //     "updatedAt": "2020-05-15T20:34:59.439Z"
-        // }
-        // {
-        //     "id": "df03e8b0",
-        //     "index": 5430774807,
-        //     "type": "payout",
-        //     "status": "pending",
-        //     "currency": "LTC",
-        //     "amount": "6.999000000000000000000000",
-        //     "createdAt": "2020-05-15T20:39:47.140Z",
-        //     "updatedAt": "2020-05-15T21:16:49.230Z",
-        //     "hash": "bar",
-        //     "address": "foo",
-        //     "confirmations": 0,
-        //     "fee": "0.001"
-        // }
-        const id = this.safeString (transaction, 'id');
-        const timestamp = this.parse8601 (this.safeString (transaction, 'createdAt'));
-        const updated = this.parse8601 (this.safeString (transaction, 'updatedAt'));
+        //
+        //     {
+        //         "id": 1,
+        //         "timestamp": 11, // 11 in their docs (
+        //         "type": "Withdraw",
+        //         "amount": 1,
+        //         "currency": "btc",
+        //         "confirmationsCount": 6,
+        //         "address": "address",
+        //         "status": 2,
+        //         "commission": 0.0001
+        //     }
+        //
+        const timestamp = this.safeTimestamp (transaction, 'timestamp');
+        let type = this.safeString (transaction, 'type');
+        if (type !== undefined) {
+            if (type === 'Incoming') {
+                type = 'deposit';
+            } else if (type === 'Withdraw') {
+                type = 'withdrawal';
+            }
+        }
         const currencyId = this.safeString (transaction, 'currency');
         const code = this.safeCurrencyCode (currencyId, currency);
         const status = this.parseTransactionStatus (this.safeString (transaction, 'status'));
-        const amount = this.safeFloat (transaction, 'amount');
-        const address = this.safeString (transaction, 'address');
-        const txid = this.safeString (transaction, 'hash');
-        let fee = undefined;
-        const feeCost = this.safeFloat (transaction, 'fee');
-        if (feeCost !== undefined) {
-            fee = {
-                'cost': feeCost,
-                'currency': code,
-            };
-        }
-        const type = this.parseTransactionType (this.safeString (transaction, 'type'));
         return {
-            'info': transaction,
-            'id': id,
-            'txid': txid,
+            'id': this.safeString (transaction, 'id'),
+            'txid': this.safeString (transaction, 'txid'),
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
-            'address': address,
-            'tag': undefined,
+            'address': this.safeString (transaction, 'address'),
             'type': type,
-            'amount': amount,
+            'amount': this.safeFloat (transaction, 'amount'),
             'currency': code,
             'status': status,
-            'updated': updated,
-            'fee': fee,
+            'fee': {
+                'currency': code,
+                'cost': this.safeFloat (transaction, 'commission'),
+                'rate': undefined,
+            },
+            'info': transaction,
         };
     }
 
@@ -76731,6 +76682,19 @@ module.exports = class lykke extends Exchange {
                 'fetchOrder': true,
                 'fetchOrders': true,
             },
+            'timeframes': {
+                '1m': 'Minute',
+                '5m': 'Min5',
+                '15m': 'Min15',
+                '30m': 'Min30',
+                '1h': 'Hour',
+                '4h': 'Hour4',
+                '6h': 'Hour6',
+                '12h': 'Hour12',
+                '1d': 'Day',
+                '1w': 'Week',
+                '1M': 'Month',
+            },
             'requiredCredentials': {
                 'apiKey': true,
                 'secret': false,
@@ -76757,8 +76721,26 @@ module.exports = class lykke extends Exchange {
             'api': {
                 'mobile': {
                     'get': [
+                        'AssetPairs/rate',
+                        'AssetPairs/rate/{assetPairId}',
+                        'AssetPairs/dictionary/{market}',
+                        'Assets/dictionary',
+                        'Candles/history/{market}/available',
+                        'Candles/history/{market}/{assetPair}/{period}/{type}/{from}/{to}',
+                        'Company/ownershipStructure',
+                        'Company/registrationsCount',
+                        'IsAlive',
+                        'Market',
                         'Market/{market}',
+                        'Market/capitalization/{market}',
+                        'OrderBook',
+                        'OrderBook/{assetPairId}',
                         'Trades/{AssetPairId}',
+                        'Trades/Last/{assetPair}/{n}',
+                    ],
+                    'post': [
+                        'AssetPairs/rate/history',
+                        'AssetPairs/rate/history/{assetPairId}',
                     ],
                 },
                 'public': {
@@ -79780,7 +79762,7 @@ module.exports = class okex extends Exchange {
             const symbol = ticker['symbol'];
             result[symbol] = ticker;
         }
-        return result;
+        return this.filterByArray (result, 'symbol', symbols);
     }
 
     async fetchTickers (symbols = undefined, params = {}) {
@@ -81155,12 +81137,14 @@ module.exports = class okex extends Exchange {
         // fetchDeposits
         //
         //     {
-        //         amount: "0.47847546",
-        //         txid: "1723573_3_0_0_WALLET",
-        //         currency: "BTC",
-        //         to: "",
-        //         timestamp: "2018-08-16T03:41:10.000Z",
-        //         status: "2"
+        //         "amount": "4.19511659",
+        //         "txid": "14c9a8c925647cdb7e5b2937ea9aefe2b29b2c273150ad3f44b3b8a4635ed437",
+        //         "currency": "XMR",
+        //         "from": "",
+        //         "to": "48PjH3ksv1fiXniKvKvyH5UtFs5WhfS2Vf7U3TwzdRJtCc7HJWvCQe56dRahyhQyTAViXZ8Nzk4gQg6o4BJBMUoxNy8y8g7",
+        //         "deposit_id": 11571659, <-- we can use this
+        //         "timestamp": "2019-10-01T14:54:19.000Z",
+        //         "status": "2"
         //     }
         //
         let type = undefined;
@@ -81175,7 +81159,7 @@ module.exports = class okex extends Exchange {
             address = addressTo;
         } else {
             // the payment_id will appear on new deposits but appears to be removed from the response after 2 months
-            id = this.safeString (transaction, 'payment_id');
+            id = this.safeString2 (transaction, 'payment_id', 'deposit_id');
             type = 'deposit';
             address = addressTo;
         }
