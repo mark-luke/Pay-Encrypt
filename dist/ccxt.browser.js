@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.61'
+const version = '1.33.62'
 
 Exchange.ccxtVersion = version
 
@@ -94327,7 +94327,7 @@ module.exports = class poloniex extends Exchange {
 
 const Exchange = require ('./base/Exchange');
 const { ExchangeError, ExchangeNotAvailable, BadResponse, BadRequest, InvalidOrder, InsufficientFunds, AuthenticationError, ArgumentsRequired, InvalidAddress, RateLimitExceeded, DDoSProtection, BadSymbol } = require ('./base/errors');
-const { TRUNCATE } = require ('./base/functions/number');
+const { TRUNCATE, TICK_SIZE } = require ('./base/functions/number');
 
 //  ---------------------------------------------------------------------------
 
@@ -94453,6 +94453,7 @@ module.exports = class probit extends Exchange {
                 'apiKey': true,
                 'secret': true,
             },
+            'precisionMode': TICK_SIZE,
             'options': {
                 'createMarketBuyOrderRequiresPrice': true,
                 'timeInForce': {
@@ -94505,11 +94506,12 @@ module.exports = class probit extends Exchange {
             const symbol = base + '/' + quote;
             const closed = this.safeValue (market, 'closed', false);
             const active = !closed;
-            const priceIncrement = this.safeString (market, 'price_increment');
+            const amountPrecision = this.safeInteger (market, 'quantity_precision');
+            const costPrecision = this.safeInteger (market, 'cost_precision');
             const precision = {
-                'amount': this.safeInteger (market, 'quantity_precision'),
-                'price': this.precisionFromString (priceIncrement),
-                'cost': this.safeInteger (market, 'cost_precision'),
+                'amount': 1 / Math.pow (10, amountPrecision),
+                'price': this.safeFloat (market, 'price_increment'),
+                'cost': 1 / Math.pow (10, costPrecision),
             };
             const takerFeeRate = this.safeFloat (market, 'taker_fee_rate');
             const makerFeeRate = this.safeFloat (market, 'maker_fee_rate');
