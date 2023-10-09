@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.91'
+const version = '1.34.92'
 
 Exchange.ccxtVersion = version
 
@@ -43674,7 +43674,7 @@ module.exports = class cex extends Exchange {
                     'status': {
                         'c': 'canceled',
                         'd': 'closed',
-                        'cd': 'closed',
+                        'cd': 'canceled',
                         'a': 'open',
                     },
                 },
