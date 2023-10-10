@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.21'
+const version = '1.33.22'
 
 Exchange.ccxtVersion = version
 
@@ -88056,7 +88056,7 @@ module.exports = class okex extends Exchange {
             'instrument_id': market['id'],
             'granularity': this.timeframes[timeframe],
         };
-        if (market['option']) {
+        if (market['option'] || market['spot']) {
             method = market['type'] + 'GetInstrumentsInstrumentIdCandles';
             if (since !== undefined) {
                 if (limit !== undefined) {
