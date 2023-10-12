@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.83'
+const version = '1.19.84'
 
 Exchange.ccxtVersion = version
 
@@ -9471,12 +9471,8 @@ module.exports = class bigone extends Exchange {
         const message = this.safeString (response, 'message');
         if (code !== '0') {
             const feedback = this.id + ' ' + body;
-            const exact = this.exceptions['exact'];
-            if (message in exact) {
-                throw new exact[message] (feedback);
-            } else if (code in exact) {
-                throw new exact[code] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
+            this.throwExactlyMatchedException (this.exceptions['exact'], code, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
@@ -17785,10 +17781,7 @@ module.exports = class bitmart extends Exchange {
         const feedback = this.id + ' ' + body;
         const message = this.safeString2 (response, 'message', 'msg');
         if (message !== undefined) {
-            const exact = this.exceptions['exact'];
-            if (message in exact) {
-                throw new exact[message] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
@@ -31323,10 +31316,7 @@ module.exports = class bw extends Exchange {
         const errorCode = this.safeString (resMsg, 'code');
         if (errorCode !== '1') {
             const feedback = this.id + ' ' + this.json (response);
-            const exact = this.exceptions['exact'];
-            if (errorCode in exact) {
-                throw new exact[errorCode] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions['exact'], errorCode, feedback);
             throw new ExchangeError (feedback); // unknown error
         }
     }
@@ -33804,10 +33794,7 @@ module.exports = class cex extends Exchange {
         if ('error' in response) {
             const message = this.safeString (response, 'error');
             const feedback = this.id + ' ' + body;
-            const exact = this.exceptions['exact'];
-            if (message in exact) {
-                throw new exact[message] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             throw new ExchangeError (feedback);
         }
@@ -36773,10 +36760,7 @@ module.exports = class coinbasepro extends Exchange {
             if (body[0] === '{') {
                 const message = response['message'];
                 const feedback = this.id + ' ' + message;
-                const exact = this.exceptions['exact'];
-                if (message in exact) {
-                    throw new exact[message] (feedback);
-                }
+                this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
                 this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
                 throw new ExchangeError (feedback); // unknown message
             }
@@ -48627,12 +48611,8 @@ module.exports = class dsx extends Exchange {
                 const code = this.safeString (response, 'code');
                 const message = this.safeString (response, 'error');
                 const feedback = this.id + ' ' + this.json (response);
-                const exact = this.exceptions['exact'];
-                if (code in exact) {
-                    throw new exact[code] (feedback);
-                } else if (message in exact) {
-                    throw new exact[message] (feedback);
-                }
+                this.throwExactlyMatchedException (this.exceptions['exact'], code, feedback);
+                this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
                 this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
                 throw new ExchangeError (feedback); // unknown message
             }
@@ -49183,10 +49163,7 @@ module.exports = class dx extends Exchange {
         const error = response['error'];
         if (error) {
             const feedback = this.id + ' ' + this.json (response);
-            const exact = this.exceptions['exact'];
-            if (error in exact) {
-                throw new exact[error] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions['exact'], error, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], error, feedback);
             throw new ExchangeError (feedback); // unknown error
         }
@@ -53662,10 +53639,7 @@ module.exports = class ftx extends Exchange {
         if (!success) {
             const feedback = this.id + ' ' + this.json (response);
             const error = this.safeString (response, 'error');
-            const exact = this.exceptions['exact'];
-            if (error in exact) {
-                throw new exact[error] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions['exact'], error, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], error, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
@@ -55305,12 +55279,8 @@ module.exports = class gemini extends Exchange {
             const reason = this.safeString (response, 'reason');
             const message = this.safeString (response, 'message');
             const feedback = this.id + ' ' + message;
-            const exact = this.exceptions['exact'];
-            if (reason in exact) {
-                throw new exact[reason] (feedback);
-            } else if (message in exact) {
-                throw new exact[message] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions['exact'], reason, feedback);
+            this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
@@ -56375,10 +56345,7 @@ module.exports = class hitbtc extends Exchange {
         if (error) {
             const code = this.safeValue (error, 'code');
             const feedback = this.id + ' ' + this.json (response);
-            const exact = this.exceptions['exact'];
-            if (code in exact) {
-                throw new exact[code] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions['exact'], code, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], error, feedback);
             throw new ExchangeError (feedback); // unknown error
         }
@@ -61648,10 +61615,7 @@ module.exports = class indodax extends Exchange {
             }
         }
         const feedback = this.id + ' ' + body;
-        const exact = this.exceptions['exact'];
-        if (error in exact) {
-            throw new exact[error] (feedback);
-        }
+        this.throwExactlyMatchedException (this.exceptions['exact'], error, feedback);
         this.throwBroadlyMatchedException (this.exceptions['broad'], error, feedback);
         throw new ExchangeError (feedback); // unknown message
     }
@@ -67207,20 +67171,15 @@ module.exports = class latoken extends Exchange {
         //     { "error": { "message": "Order 1563460289.571254.704945@0370:1 is not found","errorType":"RequestError","statusCode":400 }}
         //
         const message = this.safeString (response, 'message');
-        const exact = this.exceptions['exact'];
         const feedback = this.id + ' ' + body;
         if (message !== undefined) {
-            if (message in exact) {
-                throw new exact[message] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
         }
         const error = this.safeValue (response, 'error', {});
         const errorMessage = this.safeString (error, 'message');
         if (errorMessage !== undefined) {
-            if (errorMessage in exact) {
-                throw new exact[errorMessage] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions['exact'], errorMessage, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], errorMessage, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
