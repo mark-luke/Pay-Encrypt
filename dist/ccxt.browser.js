@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.39'
+const version = '1.22.40'
 
 Exchange.ccxtVersion = version
 
@@ -96010,7 +96010,7 @@ module.exports = class stex extends Exchange {
         let change = undefined;
         let percentage = undefined;
         if (last !== undefined) {
-            if (open !== undefined) {
+            if ((open !== undefined) && (open > 0)) {
                 change = last - open;
                 percentage = ((100 / open) * last) - 100;
             }
