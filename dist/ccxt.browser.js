@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.4'
+const version = '1.23.5'
 
 Exchange.ccxtVersion = version
 
@@ -32355,7 +32355,7 @@ module.exports = class bytetrade extends Exchange {
             },
             'commonCurrencies': {
                 '48': 'Blocktonic',
-                'BHT': 'ByteHub',
+                '57': 'ByteHub',
             },
             'exceptions': {
                 'vertify error': AuthenticationError, // typo on the exchange side, 'vertify'
