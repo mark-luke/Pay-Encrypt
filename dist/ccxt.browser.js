@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.87'
+const version = '1.22.88'
 
 Exchange.ccxtVersion = version
 
@@ -8088,7 +8088,7 @@ module.exports = class bigone extends Exchange {
                 '1w': 'week1',
                 '1M': 'month1',
             },
-            'hostname': 'big.one', // set to 'b1.run' for China mainland
+            'hostname': 'big.one', // or 'bigone.com'
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/69354403-1d532180-0c91-11ea-88ed-44c06cefdf87.jpg',
                 'api': {
