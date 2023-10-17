@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.11'
+const version = '1.20.12'
 
 Exchange.ccxtVersion = version
 
@@ -65319,7 +65319,7 @@ module.exports = class kuna extends acx {
         if (market) {
             symbol = market['symbol'];
         }
-        let side = this.safeString (trade, 'side');
+        let side = this.safeString2 (trade, 'side', 'trend');
         if (side !== undefined) {
             const sideMap = {
                 'ask': 'sell',
