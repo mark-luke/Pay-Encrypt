@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.3'
+const version = '1.32.4'
 
 Exchange.ccxtVersion = version
 
@@ -68355,7 +68355,7 @@ module.exports = class hollaex extends Exchange {
         //         ]
         //     }
         //
-        const trades = await this.safeValue (response, market['id'], []);
+        const trades = this.safeValue (response, market['id'], []);
         return this.parseTrades (trades, market, since, limit);
     }
 
