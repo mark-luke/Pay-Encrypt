@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.89'
+const version = '1.23.90'
 
 Exchange.ccxtVersion = version
 
@@ -9942,7 +9942,7 @@ module.exports = class binance extends Exchange {
     }
 
     async fetchStatus (params = {}) {
-        const response = await this.wapiGetSystemStatus ();
+        const response = await this.wapiGetSystemStatus (params);
         let status = this.safeValue (response, 'status');
         if (status !== undefined) {
             status = (status === 0) ? 'ok' : 'maintenance';
@@ -108363,7 +108363,7 @@ module.exports = class whitebit extends Exchange {
     }
 
     async fetchStatus (params = {}) {
-        const response = await this.webGetV1Healthcheck ();
+        const response = await this.webGetV1Healthcheck (params);
         const status = this.safeInteger (response, 'status');
         let formattedStatus = 'ok';
         if (status === 503) {
