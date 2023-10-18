@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.35'
+const version = '1.35.36'
 
 Exchange.ccxtVersion = version
 
@@ -99300,21 +99300,8 @@ module.exports = class qtrade extends Exchange {
         //         "last_change":1588533365354609
         //     }
         //
-        let symbol = undefined;
         const marketId = this.safeString (ticker, 'id_hr');
-        if (marketId !== undefined) {
-            if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[marketId];
-            } else {
-                const [ baseId, quoteId ] = marketId.split ('_');
-                const base = this.safeCurrencyCode (baseId);
-                const quote = this.safeCurrencyCode (quoteId);
-                symbol = quote + '/' + base;
-            }
-        }
-        if ((symbol === undefined) && (market !== undefined)) {
-            symbol = market['symbol'];
-        }
+        const symbol = this.safeSymbol (marketId, market, '_');
         const timestamp = this.safeIntegerProduct (ticker, 'last_change', 0.001);
         const previous = this.safeFloat (ticker, 'day_open');
         const last = this.safeFloat (ticker, 'last');
@@ -99548,21 +99535,8 @@ module.exports = class qtrade extends Exchange {
             timestamp = this.parse8601 (this.safeString (trade, 'created_at'));
         }
         const side = this.safeString (trade, 'side');
-        let symbol = undefined;
         const marketId = this.safeString (trade, 'market_string');
-        if (marketId !== undefined) {
-            if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[marketId];
-            } else {
-                const [ baseId, quoteId ] = marketId.split ('_');
-                const base = this.safeCurrencyCode (baseId);
-                const quote = this.safeCurrencyCode (quoteId);
-                symbol = quote + '/' + base;
-            }
-        }
-        if ((symbol === undefined) && (market !== undefined)) {
-            symbol = market['symbol'];
-        }
+        const symbol = this.safeSymbol (marketId, market, '_');
         let cost = this.safeFloat2 (trade, 'base_volume', 'base_amount');
         const price = this.safeFloat (trade, 'price');
         const amount = this.safeFloat2 (trade, 'market_amount', 'amount');
@@ -99785,21 +99759,8 @@ module.exports = class qtrade extends Exchange {
         } else {
             status = 'closed';
         }
-        let symbol = undefined;
         const marketId = this.safeString (order, 'market_string');
-        if (marketId !== undefined) {
-            if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[marketId];
-            } else {
-                const [ baseId, quoteId ] = marketId.split ('_');
-                const base = this.safeCurrencyCode (baseId);
-                const quote = this.safeCurrencyCode (quoteId);
-                symbol = base + '/' + quote;
-            }
-        }
-        if ((symbol === undefined) && (market !== undefined)) {
-            symbol = market['symbol'];
-        }
+        const symbol = this.safeSymbol (marketId, market, '_');
         const rawTrades = this.safeValue (order, 'trades', []);
         const parsedTrades = this.parseTrades (rawTrades, market, undefined, undefined, {
             'order': id,
