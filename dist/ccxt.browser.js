@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.38'
+const version = '1.19.39'
 
 Exchange.ccxtVersion = version
 
@@ -79090,7 +79090,7 @@ module.exports = class southxchange extends Exchange {
             const base = this.safeCurrencyCode (baseId);
             const quote = this.safeCurrencyCode (quoteId);
             const symbol = base + '/' + quote;
-            const id = symbol;
+            const id = baseId + '/' + quoteId;
             result.push ({
                 'id': id,
                 'symbol': symbol,
