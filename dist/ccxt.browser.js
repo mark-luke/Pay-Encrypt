@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.64'
+const version = '1.22.65'
 
 Exchange.ccxtVersion = version
 
@@ -11127,6 +11127,10 @@ module.exports = class binance extends Exchange {
                 // checks against error codes
                 const error = this.safeString (response, 'code');
                 if (error !== undefined) {
+                    // https://github.com/ccxt/ccxt/issues/6501
+                    if (error === '200') {
+                        return;
+                    }
                     // a workaround for {"code":-2015,"msg":"Invalid API-key, IP, or permissions for action."}
                     // despite that their message is very confusing, it is raised by Binance
                     // on a temporary ban (the API key is valid, but disabled for a while)
