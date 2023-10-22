@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.73'
+const version = '1.34.74'
 
 Exchange.ccxtVersion = version
 
@@ -90820,6 +90820,7 @@ module.exports = class okex extends Exchange {
                     '33063': ExchangeError, // Leverage multiple is too low, there is insufficient margin in the account, please readjust the leverage ratio
                     '33064': ExchangeError, // The setting of the leverage ratio cannot be less than 2, please readjust the leverage ratio
                     '33065': ExchangeError, // Leverage ratio exceeds maximum leverage ratio, please readjust leverage ratio
+                    '33085': InvalidOrder, // The value of the position and buying order has reached the position limit, and no further buying is allowed.
                     // account
                     '21009': ExchangeError, // Funds cannot be transferred out within 30 minutes after swap settlement(Funds cannot be transferred out within 30 minutes after swap settlement)
                     '34001': PermissionDenied, // { "code": 34001, "message": "withdrawal suspended" }
