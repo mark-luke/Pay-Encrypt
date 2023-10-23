@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.45'
+const version = '1.30.46'
 
 Exchange.ccxtVersion = version
 
@@ -18453,7 +18453,7 @@ module.exports = class bitmart extends Exchange {
             throw new AuthenticationError (this.id + ' signIn() failed to authenticate. Access token missing from response.');
         }
         const expiresIn = this.safeInteger (response, 'expires_in');
-        this.options['expires'] = this.sum (this.nonce (), expiresIn * 1000);
+        this.options['expires'] = this.sum (this.milliseconds (), expiresIn * 1000);
         this.options['accessToken'] = accessToken;
         return response;
     }
