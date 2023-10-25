@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.21'
+const version = '1.19.22'
 
 Exchange.ccxtVersion = version
 
@@ -50805,9 +50805,12 @@ module.exports = class ftx extends Exchange {
             // check if a market is a spot or future market
             const symbol = (type === 'future') ? this.safeString (market, 'name') : (base + '/' + quote);
             const active = this.safeValue (market, 'enabled');
+            // workaround for https://github.com/ccxt/ccxt/issues/6103
+            const sizeIncrement = this.safeValue (market, 'sizeIncrement');
+            const priceIncrement = this.safeValue (market, 'priceIncrement');
             const precision = {
-                'amount': this.precisionFromString (this.safeString (market, 'sizeIncrement')),
-                'price': this.precisionFromString (this.safeString (market, 'priceIncrement')),
+                'amount': this.precisionFromString (this.numberToString (sizeIncrement)),
+                'price': this.precisionFromString (this.numberToString (priceIncrement)),
             };
             const entry = {
                 'id': id,
