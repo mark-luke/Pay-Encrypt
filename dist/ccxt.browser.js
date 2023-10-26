@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.15'
+const version = '1.20.16'
 
 Exchange.ccxtVersion = version
 
@@ -75795,7 +75795,7 @@ module.exports = class okex3 extends Exchange {
         if (feeCost !== undefined) {
             let feeCurrency = undefined;
             if (market !== undefined) {
-                feeCurrency = side === 'buy' ? market['base'] : market['quote'];
+                feeCurrency = (side === 'buy') ? market['base'] : market['quote'];
             }
             fee = {
                 // fee is either a positive number (invitation rebate)
