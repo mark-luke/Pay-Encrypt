@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.48'
+const version = '1.23.49'
 
 Exchange.ccxtVersion = version
 
@@ -72426,7 +72426,7 @@ module.exports = class okcoinusd extends Exchange {
         if (response === undefined) {
             return; // fallback to default error handler
         }
-        const error = this.safeString (response, 'error_code', 'code');
+        const error = this.safeString2 (response, 'error_code', 'code');
         if ((error !== undefined) && (error !== '0')) {
             const message = this.id + ' ' + body;
             this.throwExactlyMatchedException (this.exceptions, error, message);
