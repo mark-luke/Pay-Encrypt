@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.65'
+const version = '1.27.66'
 
 Exchange.ccxtVersion = version
 
@@ -13325,7 +13325,9 @@ module.exports = class bitbay extends Exchange {
         };
         if (type === 'limit') {
             request['rate'] = price;
+            price = parseFloat (price);
         }
+        amount = parseFloat (amount);
         const response = await this.v1_01PrivatePostTradingOfferSymbol (this.extend (request, params));
         //
         // unfilled (open order)
@@ -13415,8 +13417,8 @@ module.exports = class bitbay extends Exchange {
             'symbol': symbol,
             'type': type,
             'side': side,
-            'price': parseFloat (price),
-            'amount': parseFloat (amount),
+            'price': price,
+            'amount': amount,
             'cost': cost,
             'filled': filled,
             'remaining': remaining,
