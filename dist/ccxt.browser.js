@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.69'
+const version = '1.24.70'
 
 Exchange.ccxtVersion = version
 
@@ -9278,7 +9278,7 @@ module.exports = class bigone extends Exchange {
 
 const Exchange = require ('./base/Exchange');
 const { ExchangeError, ArgumentsRequired, ExchangeNotAvailable, InsufficientFunds, OrderNotFound, InvalidOrder, DDoSProtection, InvalidNonce, AuthenticationError, InvalidAddress, RateLimitExceeded, PermissionDenied } = require ('./base/errors');
-const { ROUND } = require ('./base/functions/number');
+const { ROUND, TRUNCATE } = require ('./base/functions/number');
 
 //  ---------------------------------------------------------------------------
 
@@ -10375,11 +10375,12 @@ module.exports = class binance extends Exchange {
         };
         if (uppercaseType === 'MARKET') {
             const quoteOrderQty = this.safeFloat (params, 'quoteOrderQty');
+            const precision = market['price']['precision'];
             if (quoteOrderQty !== undefined) {
-                request['quoteOrderQty'] = this.costToPrecision (symbol, quoteOrderQty);
+                request['quoteOrderQty'] = this.decimalToPrecision (quoteOrderQty, TRUNCATE, precision, this.precisionMode);
                 params = this.omit (params, 'quoteOrderQty');
             } else if (price !== undefined) {
-                request['quoteOrderQty'] = this.costToPrecision (symbol, amount * price);
+                request['quoteOrderQty'] = this.decimalToPrecision (amount * price, TRUNCATE, precision, this.precisionMode);
             } else {
                 request['quantity'] = this.amountToPrecision (symbol, amount);
             }
