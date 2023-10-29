@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.32'
+const version = '1.30.33'
 
 Exchange.ccxtVersion = version
 
@@ -9529,6 +9529,7 @@ module.exports = class binance extends Exchange {
                 },
                 'fapiPrivate': {
                     'get': [
+                        'allForceOrders',
                         'allOrders',
                         'openOrder',
                         'openOrders',
