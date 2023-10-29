@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.24'
+const version = '1.22.25'
 
 Exchange.ccxtVersion = version
 
@@ -62934,24 +62934,47 @@ module.exports = class kucoin extends Exchange {
     parseTicker (ticker, market = undefined) {
         //
         //     {
-        //         'buy': '0.00001168',
-        //         'changePrice': '-0.00000018',
-        //         'changeRate': '-0.0151',
-        //         'datetime': 1550661146316,
-        //         'high': '0.0000123',
-        //         'last': '0.00001169',
-        //         'low': '0.00001159',
-        //         'sell': '0.00001182',
-        //         'symbol': 'LOOM-BTC',
-        //         'vol': '44399.5669'
+        //         symbol: "ETH-BTC",
+        //         high: "0.019518",
+        //         vol: "7997.82836194",
+        //         last: "0.019329",
+        //         low: "0.019",
+        //         buy: "0.019329",
+        //         sell: "0.01933",
+        //         changePrice: "-0.000139",
+        //         time:  1580553706304,
+        //         averagePrice: "0.01926386",
+        //         changeRate: "-0.0071",
+        //         volValue: "154.40791568183474"
+        //     }
+        //
+        //     {
+        //         "trading": true,
+        //         "symbol": "KCS-BTC",
+        //         "buy": 0.00011,
+        //         "sell": 0.00012,
+        //         "sort": 100,
+        //         "volValue": 3.13851792584,   //total
+        //         "baseCurrency": "KCS",
+        //         "market": "BTC",
+        //         "quoteCurrency": "BTC",
+        //         "symbolCode": "KCS-BTC",
+        //         "datetime": 1548388122031,
+        //         "high": 0.00013,
+        //         "vol": 27514.34842,
+        //         "low": 0.0001,
+        //         "changePrice": -1.0e-5,
+        //         "changeRate": -0.0769,
+        //         "lastTradedPrice": 0.00012,
+        //         "board": 0,
+        //         "mark": 0
         //     }
         //
         let percentage = this.safeFloat (ticker, 'changeRate');
         if (percentage !== undefined) {
             percentage = percentage * 100;
         }
-        const last = this.safeFloat (ticker, 'last');
-        const average = this.safeFloat (ticker, 'averagePrice');
+        const last = this.safeFloat2 (ticker, 'last', 'lastTradedPrice');
         let symbol = undefined;
         const marketId = this.safeString (ticker, 'symbol');
         if (marketId !== undefined) {
@@ -62970,7 +62993,7 @@ module.exports = class kucoin extends Exchange {
                 symbol = market['symbol'];
             }
         }
-        const timestamp = this.safeInteger (ticker, 'time');
+        const timestamp = this.safeInteger2 (ticker, 'time', 'datetime');
         return {
             'symbol': symbol,
             'timestamp': timestamp,
@@ -62988,7 +63011,7 @@ module.exports = class kucoin extends Exchange {
             'previousClose': undefined,
             'change': this.safeFloat (ticker, 'changePrice'),
             'percentage': percentage,
-            'average': average,
+            'average': this.safeFloat (ticker, 'averagePrice'),
             'baseVolume': this.safeFloat (ticker, 'vol'),
             'quoteVolume': this.safeFloat (ticker, 'volValue'),
             'info': ticker,
