@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.74'
+const version = '1.28.77'
 
 Exchange.ccxtVersion = version
 
@@ -15946,14 +15946,19 @@ module.exports = class bitfinex2 extends bitfinex {
             id = undefined;
             status = 'failed';
         }
+        const tag = this.safeString (data, 3);
         return {
             'info': transaction,
             'id': id,
             'txid': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
+            'addressFrom': undefined,
             'address': undefined, // this is actually the tag for XRP transfers (the address is missing)
-            'tag': this.safeString (data, 3), // refix it properly for the tag from description
+            'addressTo': undefined,
+            'tagFrom': undefined,
+            'tag': tag, // refix it properly for the tag from description
+            'tagTo': tag,
             'type': 'withdrawal',
             'amount': amount,
             'currency': code,
@@ -50804,6 +50809,7 @@ const { ArgumentsRequired, InvalidOrder, ExchangeError, BadRequest } = require (
 const { TRUNCATE } = require ('./base/functions/number');
 
 // ----------------------------------------------------------------------------
+
 module.exports = class eterbase extends Exchange {
     describe () {
         return this.deepExtend (super.describe (), {
@@ -50836,7 +50842,7 @@ module.exports = class eterbase extends Exchange {
                 'fetchTickers': true,
                 'fetchTime': true,
                 'fetchTrades': true,
-                'withdraw': false,
+                'withdraw': true,
             },
             'timeframes': {
                 '1m': '1',
@@ -51154,7 +51160,7 @@ module.exports = class eterbase extends Exchange {
         const baseVolume = this.safeFloat (ticker, 'volumeBase');
         const quoteVolume = this.safeFloat (ticker, 'volume');
         let vwap = undefined;
-        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume > 0)) {
+        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && baseVolume) {
             vwap = quoteVolume / baseVolume;
         }
         const percentage = this.safeFloat (ticker, 'change');
