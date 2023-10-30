@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.94'
+const version = '1.34.95'
 
 Exchange.ccxtVersion = version
 
@@ -83046,14 +83046,8 @@ module.exports = class latoken extends Exchange {
         //         "priceChange":-0.1500
         //     }
         //
-        let symbol = undefined;
         const marketId = this.safeString (ticker, 'symbol');
-        if (marketId in this.markets_by_id) {
-            market = this.markets_by_id[marketId];
-        }
-        if ((symbol === undefined) && (market !== undefined)) {
-            symbol = market['symbol'];
-        }
+        const symbol = this.safeSymbol (marketId, market);
         const open = this.safeFloat (ticker, 'open');
         const close = this.safeFloat (ticker, 'close');
         let change = undefined;
@@ -83312,13 +83306,7 @@ module.exports = class latoken extends Exchange {
         const id = this.safeString (order, 'orderId');
         const timestamp = this.safeTimestamp (order, 'timeCreated');
         const marketId = this.safeString (order, 'symbol');
-        let symbol = marketId;
-        if (marketId in this.markets_by_id) {
-            market = this.markets_by_id[marketId];
-        }
-        if (market !== undefined) {
-            symbol = market['symbol'];
-        }
+        const symbol = this.safeSymbol (marketId, market);
         const side = this.safeString (order, 'side');
         const type = this.safeString (order, 'orderType');
         const price = this.safeFloat (order, 'price');
