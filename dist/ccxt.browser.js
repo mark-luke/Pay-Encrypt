@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1226'
+const version = '1.18.1227'
 
 Exchange.ccxtVersion = version
 
@@ -54588,7 +54588,7 @@ module.exports = class idex extends Exchange {
                 'api': 'https://api.idex.market',
                 'www': 'https://idex.market',
                 'doc': [
-                    'https://github.com/AuroraDAO/idex-api-docs',
+                    'https://docs.idex.market/',
                 ],
             },
             'api': {
