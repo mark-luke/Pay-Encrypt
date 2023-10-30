@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.34'
+const version = '1.30.35'
 
 Exchange.ccxtVersion = version
 
@@ -86444,7 +86444,7 @@ module.exports = class phemex extends Exchange {
         const quoteVolume = this.fromEp (this.safeFloat (ticker, 'turnoverEv'), market);
         const baseVolume = this.fromEv (this.safeFloat2 (ticker, 'volumeEv', 'volume'), market);
         let vwap = undefined;
-        if (market['spot']) {
+        if ((market !== undefined) && (market['spot'])) {
             if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume > 0)) {
                 vwap = quoteVolume / baseVolume;
             }
