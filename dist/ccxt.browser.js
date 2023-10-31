@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.18'
+const version = '1.30.19'
 
 Exchange.ccxtVersion = version
 
@@ -54836,6 +54836,7 @@ module.exports = class eterbase extends Exchange {
                 'www': 'https://www.eterbase.com',
                 'doc': 'https://developers.eterbase.exchange',
                 'fees': 'https://www.eterbase.com/exchange/fees',
+                'referral': 'https://eterbase.exchange/invite/1wjjh4Pe',
             },
             'api': {
                 'markets': {
