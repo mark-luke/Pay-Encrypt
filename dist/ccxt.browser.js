@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.26'
+const version = '1.26.27'
 
 Exchange.ccxtVersion = version
 
@@ -18171,7 +18171,7 @@ module.exports = class bitforex extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ExchangeNotAvailable, AuthenticationError, BadRequest, PermissionDenied, InvalidAddress } = require ('./base/errors');
+const { ExchangeError, ExchangeNotAvailable, AuthenticationError, BadRequest, PermissionDenied, InvalidAddress, ArgumentsRequired } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -18512,10 +18512,10 @@ module.exports = class bithumb extends Exchange {
     async cancelOrder (id, symbol = undefined, params = {}) {
         const side_in_params = ('side' in params);
         if (!side_in_params) {
-            throw new ExchangeError (this.id + ' cancelOrder requires a `symbol` argument and a `side` parameter (sell or buy)');
+            throw new ArgumentsRequired (this.id + ' cancelOrder requires a `symbol` argument and a `side` parameter (sell or buy)');
         }
         if (symbol === undefined) {
-            throw new ExchangeError (this.id + ' cancelOrder requires a `symbol` argument and a `side` parameter (sell or buy)');
+            throw new ArgumentsRequired (this.id + ' cancelOrder requires a `symbol` argument and a `side` parameter (sell or buy)');
         }
         const market = this.market (symbol);
         const side = (params['side'] === 'buy') ? 'bid' : 'ask';
@@ -18542,7 +18542,7 @@ module.exports = class bithumb extends Exchange {
         if (currency === 'XRP' || currency === 'XMR') {
             const destination = this.safeString (params, 'destination');
             if ((tag === undefined) && (destination === undefined)) {
-                throw new ExchangeError (this.id + ' ' + code + ' withdraw() requires a tag argument or an extra destination param');
+                throw new ArgumentsRequired (this.id + ' ' + code + ' withdraw() requires a tag argument or an extra destination param');
             } else if (tag !== undefined) {
                 request['destination'] = tag;
             }
