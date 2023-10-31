@@ -45,7 +45,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.17.386'
+const version = '1.17.387'
 
 Exchange.ccxtVersion = version
 
@@ -16785,7 +16785,12 @@ module.exports = class bitz extends Exchange {
         //         "source": "api"
         //     }
         //
-        return this.parseOrders (response['data']['data'], undefined, since, limit);
+        let orders = this.safeValue (response['data'], 'data');
+        if (orders) {
+            return this.parseOrders (response['data']['data'], undefined, since, limit);
+        } else {
+            return [];
+        }
     }
 
     async fetchOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
