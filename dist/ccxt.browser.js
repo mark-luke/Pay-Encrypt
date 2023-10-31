@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.95'
+const version = '1.25.96'
 
 Exchange.ccxtVersion = version
 
@@ -67173,6 +67173,7 @@ module.exports = class kucoin extends Exchange {
                         'market/stats',
                         'currencies',
                         'currencies/{currency}',
+                        'prices',
                     ],
                     'post': [
                         'bullet-public',
@@ -67184,6 +67185,9 @@ module.exports = class kucoin extends Exchange {
                         'accounts/{accountId}',
                         'accounts/{accountId}/ledgers',
                         'accounts/{accountId}/holds',
+                        'accounts/transferable',
+                        'sub-accounts',
+                        'sub-accounts/{subUserId}',
                         'deposit-addresses',
                         'deposits',
                         'hist-deposits',
@@ -67193,6 +67197,7 @@ module.exports = class kucoin extends Exchange {
                         'withdrawals/quotas',
                         'orders',
                         'orders/{orderId}',
+                        'limit/orders',
                         'fills',
                         'limit/fills',
                     ],
@@ -67203,10 +67208,12 @@ module.exports = class kucoin extends Exchange {
                         'deposit-addresses',
                         'withdrawals',
                         'orders',
+                        'orders/multi',
                         'bullet-private',
                     ],
                     'delete': [
                         'withdrawals/{withdrawalId}',
+                        'orders',
                         'orders/{orderId}',
                     ],
                 },
