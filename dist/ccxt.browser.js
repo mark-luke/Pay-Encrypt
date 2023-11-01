@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.22'
+const version = '1.24.23'
 
 Exchange.ccxtVersion = version
 
@@ -75600,73 +75600,6 @@ module.exports = class okcoinusd extends okcoin {
 },{"./okcoin.js":116}],118:[function(require,module,exports){
 'use strict';
 
-// ---------------------------------------------------------------------------
-
-const okcoinusd = require ('./okcoinusd.js');
-
-// ---------------------------------------------------------------------------
-
-module.exports = class okex extends okcoinusd {
-    describe () {
-        return this.deepExtend (super.describe (), {
-            'id': 'okex',
-            'name': 'OKEX',
-            'countries': [ 'CN', 'US' ],
-            'has': {
-                'CORS': false,
-                'futures': true,
-                'fetchTickers': true,
-            },
-            'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/32552768-0d6dd3c6-c4a6-11e7-90f8-c043b64756a7.jpg',
-                'api': {
-                    'v3': 'https://www.okex.com/v3',
-                    'web': 'https://www.okex.com/v2',
-                    'public': 'https://www.okex.com/api',
-                    'private': 'https://www.okex.com/api',
-                },
-                'www': 'https://www.okex.com',
-                'doc': [
-                    'https://github.com/okcoin-okex/API-docs-OKEx.com',
-                    'https://www.okex.com/docs/en/',
-                ],
-                'fees': 'https://www.okex.com/pages/products/fees.html',
-                'referral': 'https://www.okex.com',
-            },
-            'fees': {
-                'trading': {
-                    'taker': 0.0015,
-                    'maker': 0.0010,
-                },
-                'spot': {
-                    'taker': 0.0015,
-                    'maker': 0.0010,
-                },
-                'future': {
-                    'taker': 0.0005,
-                    'maker': 0.0002,
-                },
-                'swap': {
-                    'taker': 0.00075,
-                    'maker': 0.0002,
-                },
-            },
-            'commonCurrencies': {
-                // OKEX refers to ERC20 version of Aeternity (AEToken)
-                'AE': 'AET', // https://github.com/ccxt/ccxt/issues/4981
-                'HOT': 'Hydro Protocol',
-                'HSR': 'HC',
-                'MAG': 'Maggie',
-                'YOYO': 'YOYOW',
-                'WIN': 'WinToken', // https://github.com/ccxt/ccxt/issues/5701
-            },
-        });
-    }
-};
-
-},{"./okcoinusd.js":117}],119:[function(require,module,exports){
-'use strict';
-
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
@@ -75675,10 +75608,10 @@ const { TICK_SIZE } = require ('./base/functions/number');
 
 //  ---------------------------------------------------------------------------
 
-module.exports = class okex3 extends Exchange {
+module.exports = class okex extends Exchange {
     describe () {
         return this.deepExtend (super.describe (), {
-            'id': 'okex3',
+            'id': 'okex',
             'name': 'OKEX',
             'countries': [ 'CN', 'US' ],
             'version': 'v3',
@@ -78501,7 +78434,26 @@ module.exports = class okex3 extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9,"./base/functions/number":15}],120:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9,"./base/functions/number":15}],119:[function(require,module,exports){
+'use strict';
+
+// ---------------------------------------------------------------------------
+
+const okex = require ('./okex.js');
+
+// ---------------------------------------------------------------------------
+
+module.exports = class okex3 extends okex {
+    describe () {
+        return this.deepExtend (super.describe (), {
+            // this is a stub file that will be removed before 2020 Q2
+            // it is placed here for temporary backward compatibility
+            'id': 'okex3',
+        });
+    }
+};
+
+},{"./okex.js":118}],120:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
