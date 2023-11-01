@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.63'
+const version = '1.32.64'
 
 Exchange.ccxtVersion = version
 
@@ -56717,7 +56717,7 @@ module.exports = class digifinex extends Exchange {
         const marketId = this.safeString (trade, 'symbol');
         if (marketId !== undefined) {
             if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[market];
+                market = this.markets_by_id[marketId];
                 symbol = market['symbol'];
             } else {
                 const [ baseId, quoteId ] = marketId.split ('_');
