@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.26'
+const version = '1.22.27'
 
 Exchange.ccxtVersion = version
 
@@ -61171,15 +61171,15 @@ module.exports = class kraken extends Exchange {
             },
             'marketsByAltname': {},
             'timeframes': {
-                '1m': '1',
-                '5m': '5',
-                '15m': '15',
-                '30m': '30',
-                '1h': '60',
-                '4h': '240',
-                '1d': '1440',
-                '1w': '10080',
-                '2w': '21600',
+                '1m': 1,
+                '5m': 5,
+                '15m': 15,
+                '30m': 30,
+                '1h': 60,
+                '4h': 240,
+                '1d': 1440,
+                '1w': 10080,
+                '2w': 21600,
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/27766599-22709304-5ede-11e7-9de1-9f33732e1509.jpg',
