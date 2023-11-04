@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.6'
+const version = '1.32.7'
 
 Exchange.ccxtVersion = version
 
@@ -11140,20 +11140,21 @@ module.exports = class binance extends Exchange {
         if ((api === 'private') || (api === 'sapi') || (api === 'wapi' && path !== 'systemStatus') || (api === 'fapiPrivate')) {
             this.checkRequiredCredentials ();
             let query = undefined;
+            const recvWindow = this.safeInteger (this.options, 'recvWindow', 5000);
             if ((api === 'sapi') && (path === 'asset/dust')) {
                 query = this.urlencodeWithArrayRepeat (this.extend ({
                     'timestamp': this.nonce (),
-                    'recvWindow': this.options['recvWindow'],
+                    'recvWindow': recvWindow,
                 }, params));
             } else if (path === 'batchOrders') {
                 query = this.rawencode (this.extend ({
                     'timestamp': this.nonce (),
-                    'recvWindow': this.options['recvWindow'],
+                    'recvWindow': recvWindow,
                 }, params));
             } else {
                 query = this.urlencode (this.extend ({
                     'timestamp': this.nonce (),
-                    'recvWindow': this.options['recvWindow'],
+                    'recvWindow': recvWindow,
                 }, params));
             }
             const signature = this.hmac (this.encode (query), this.encode (this.secret));
