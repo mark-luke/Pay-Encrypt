@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1266'
+const version = '1.18.1267'
 
 Exchange.ccxtVersion = version
 
@@ -40942,7 +40942,7 @@ module.exports = class crex24 extends Exchange {
                     'tierBased': true,
                     'percentage': true,
                     'taker': 0.001,
-                    'maker': -0.01,
+                    'maker': -0.0001,
                 },
                 // should be deleted, these are outdated and inaccurate
                 'funding': {
