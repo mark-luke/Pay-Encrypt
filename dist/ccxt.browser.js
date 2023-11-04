@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.38'
+const version = '1.25.39'
 
 Exchange.ccxtVersion = version
 
@@ -3457,7 +3457,7 @@ module.exports = class aofex extends Exchange {
         return this.deepExtend (super.describe (), {
             'id': 'aofex',
             'name': 'AOFEX',
-            'countries': [ 'GB', 'CN' ],
+            'countries': [ 'GB' ],
             'rateLimit': 1000,
             'has': {
                 'fetchMarkets': true,
