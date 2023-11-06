@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.54'
+const version = '1.27.55'
 
 Exchange.ccxtVersion = version
 
@@ -150,6 +150,7 @@ const exchanges = {
     'okex':                    require ('./js/okex.js'),
     'paymium':                 require ('./js/paymium.js'),
     'poloniex':                require ('./js/poloniex.js'),
+    'probit':                  require ('./js/probit.js'),
     'rightbtc':                require ('./js/rightbtc.js'),
     'southxchange':            require ('./js/southxchange.js'),
     'stex':                    require ('./js/stex.js'),
@@ -177,7 +178,7 @@ module.exports = Object.assign ({ version, Exchange, 'exchanges': Object.keys (e
 
 //-----------------------------------------------------------------------------
 
-},{"./js/_1btcxe.js":3,"./js/acx.js":4,"./js/anxpro.js":5,"./js/aofex.js":6,"./js/base/Exchange":7,"./js/base/errors":9,"./js/base/functions":10,"./js/bcex.js":21,"./js/bequant.js":22,"./js/bibox.js":23,"./js/bigone.js":24,"./js/binance.js":25,"./js/binanceje.js":26,"./js/binanceus.js":27,"./js/bit2c.js":28,"./js/bitbank.js":29,"./js/bitbay.js":30,"./js/bitfinex.js":31,"./js/bitfinex2.js":32,"./js/bitflyer.js":33,"./js/bitforex.js":34,"./js/bithumb.js":35,"./js/bitkk.js":36,"./js/bitmart.js":37,"./js/bitmax.js":38,"./js/bitmex.js":39,"./js/bitso.js":40,"./js/bitstamp.js":41,"./js/bitstamp1.js":42,"./js/bittrex.js":43,"./js/bitz.js":44,"./js/bl3p.js":45,"./js/bleutrade.js":46,"./js/braziliex.js":47,"./js/btcalpha.js":48,"./js/btcbox.js":49,"./js/btcmarkets.js":50,"./js/btctradeim.js":51,"./js/btctradeua.js":52,"./js/btcturk.js":53,"./js/buda.js":54,"./js/bw.js":55,"./js/bybit.js":56,"./js/bytetrade.js":57,"./js/cex.js":58,"./js/chilebit.js":59,"./js/coinbase.js":60,"./js/coinbaseprime.js":61,"./js/coinbasepro.js":62,"./js/coincheck.js":63,"./js/coinegg.js":64,"./js/coinex.js":65,"./js/coinfalcon.js":66,"./js/coinfloor.js":67,"./js/coingi.js":68,"./js/coinmarketcap.js":69,"./js/coinmate.js":70,"./js/coinone.js":71,"./js/coinspot.js":72,"./js/coolcoin.js":73,"./js/coss.js":74,"./js/crex24.js":75,"./js/deribit.js":76,"./js/digifinex.js":77,"./js/dsx.js":78,"./js/exmo.js":79,"./js/exx.js":80,"./js/fcoin.js":81,"./js/fcoinjp.js":82,"./js/flowbtc.js":83,"./js/foxbit.js":84,"./js/ftx.js":85,"./js/fybse.js":86,"./js/gateio.js":87,"./js/gemini.js":88,"./js/hbtc.js":89,"./js/hitbtc.js":90,"./js/hollaex.js":91,"./js/huobipro.js":92,"./js/huobiru.js":93,"./js/ice3x.js":94,"./js/idex.js":95,"./js/independentreserve.js":96,"./js/indodax.js":97,"./js/itbit.js":98,"./js/kkex.js":99,"./js/kraken.js":100,"./js/kucoin.js":101,"./js/kuna.js":102,"./js/lakebtc.js":103,"./js/latoken.js":104,"./js/lbank.js":105,"./js/liquid.js":106,"./js/livecoin.js":107,"./js/luno.js":108,"./js/lykke.js":109,"./js/mercado.js":110,"./js/mixcoins.js":111,"./js/oceanex.js":112,"./js/okcoin.js":113,"./js/okex.js":114,"./js/paymium.js":115,"./js/poloniex.js":116,"./js/rightbtc.js":117,"./js/southxchange.js":118,"./js/stex.js":156,"./js/stronghold.js":157,"./js/surbitcoin.js":158,"./js/theocean.js":159,"./js/therock.js":160,"./js/tidebit.js":161,"./js/tidex.js":162,"./js/timex.js":163,"./js/topq.js":164,"./js/upbit.js":165,"./js/vaultoro.js":166,"./js/vbtc.js":167,"./js/whitebit.js":168,"./js/xbtce.js":169,"./js/yobit.js":170,"./js/zaif.js":171,"./js/zb.js":172}],3:[function(require,module,exports){
+},{"./js/_1btcxe.js":3,"./js/acx.js":4,"./js/anxpro.js":5,"./js/aofex.js":6,"./js/base/Exchange":7,"./js/base/errors":9,"./js/base/functions":10,"./js/bcex.js":21,"./js/bequant.js":22,"./js/bibox.js":23,"./js/bigone.js":24,"./js/binance.js":25,"./js/binanceje.js":26,"./js/binanceus.js":27,"./js/bit2c.js":28,"./js/bitbank.js":29,"./js/bitbay.js":30,"./js/bitfinex.js":31,"./js/bitfinex2.js":32,"./js/bitflyer.js":33,"./js/bitforex.js":34,"./js/bithumb.js":35,"./js/bitkk.js":36,"./js/bitmart.js":37,"./js/bitmax.js":38,"./js/bitmex.js":39,"./js/bitso.js":40,"./js/bitstamp.js":41,"./js/bitstamp1.js":42,"./js/bittrex.js":43,"./js/bitz.js":44,"./js/bl3p.js":45,"./js/bleutrade.js":46,"./js/braziliex.js":47,"./js/btcalpha.js":48,"./js/btcbox.js":49,"./js/btcmarkets.js":50,"./js/btctradeim.js":51,"./js/btctradeua.js":52,"./js/btcturk.js":53,"./js/buda.js":54,"./js/bw.js":55,"./js/bybit.js":56,"./js/bytetrade.js":57,"./js/cex.js":58,"./js/chilebit.js":59,"./js/coinbase.js":60,"./js/coinbaseprime.js":61,"./js/coinbasepro.js":62,"./js/coincheck.js":63,"./js/coinegg.js":64,"./js/coinex.js":65,"./js/coinfalcon.js":66,"./js/coinfloor.js":67,"./js/coingi.js":68,"./js/coinmarketcap.js":69,"./js/coinmate.js":70,"./js/coinone.js":71,"./js/coinspot.js":72,"./js/coolcoin.js":73,"./js/coss.js":74,"./js/crex24.js":75,"./js/deribit.js":76,"./js/digifinex.js":77,"./js/dsx.js":78,"./js/exmo.js":79,"./js/exx.js":80,"./js/fcoin.js":81,"./js/fcoinjp.js":82,"./js/flowbtc.js":83,"./js/foxbit.js":84,"./js/ftx.js":85,"./js/fybse.js":86,"./js/gateio.js":87,"./js/gemini.js":88,"./js/hbtc.js":89,"./js/hitbtc.js":90,"./js/hollaex.js":91,"./js/huobipro.js":92,"./js/huobiru.js":93,"./js/ice3x.js":94,"./js/idex.js":95,"./js/independentreserve.js":96,"./js/indodax.js":97,"./js/itbit.js":98,"./js/kkex.js":99,"./js/kraken.js":100,"./js/kucoin.js":101,"./js/kuna.js":102,"./js/lakebtc.js":103,"./js/latoken.js":104,"./js/lbank.js":105,"./js/liquid.js":106,"./js/livecoin.js":107,"./js/luno.js":108,"./js/lykke.js":109,"./js/mercado.js":110,"./js/mixcoins.js":111,"./js/oceanex.js":112,"./js/okcoin.js":113,"./js/okex.js":114,"./js/paymium.js":115,"./js/poloniex.js":116,"./js/probit.js":117,"./js/rightbtc.js":118,"./js/southxchange.js":119,"./js/stex.js":157,"./js/stronghold.js":158,"./js/surbitcoin.js":159,"./js/theocean.js":160,"./js/therock.js":161,"./js/tidebit.js":162,"./js/tidex.js":163,"./js/timex.js":164,"./js/topq.js":165,"./js/upbit.js":166,"./js/vaultoro.js":167,"./js/vbtc.js":168,"./js/whitebit.js":169,"./js/xbtce.js":170,"./js/yobit.js":171,"./js/zaif.js":172,"./js/zb.js":173}],3:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -4800,7 +4801,7 @@ module.exports = class Exchange {
 
 
 }).call(this,require("buffer").Buffer)
-},{"../static_dependencies/BN/bn":119,"./errors":9,"./functions":10,"buffer":178}],8:[function(require,module,exports){
+},{"../static_dependencies/BN/bn":120,"./errors":9,"./functions":10,"buffer":179}],8:[function(require,module,exports){
 'use strict';
 
 const errorHierarchy = {
@@ -5078,7 +5079,7 @@ module.exports = {
 
 /*  ------------------------------------------------------------------------ */
 
-},{"../../static_dependencies/BN/bn.js":119,"../../static_dependencies/crypto-js/crypto-js":120,"./../../static_dependencies/elliptic/lib/elliptic":121,"./../../static_dependencies/node-rsa/NodeRSA":136,"./../errors":9,"./encode":12,"./string":17}],12:[function(require,module,exports){
+},{"../../static_dependencies/BN/bn.js":120,"../../static_dependencies/crypto-js/crypto-js":121,"./../../static_dependencies/elliptic/lib/elliptic":122,"./../../static_dependencies/node-rsa/NodeRSA":137,"./../errors":9,"./encode":12,"./string":17}],12:[function(require,module,exports){
 "use strict";
 
 /*  ------------------------------------------------------------------------ */
@@ -5151,7 +5152,7 @@ module.exports['byteArrayToWordArray'] = byteArrayToWordArray
 
 /*  ------------------------------------------------------------------------ */
 
-},{"../../static_dependencies/BN/bn":119,"../../static_dependencies/crypto-js/crypto-js":120,"../../static_dependencies/qs/index":152}],13:[function(require,module,exports){
+},{"../../static_dependencies/BN/bn":120,"../../static_dependencies/crypto-js/crypto-js":121,"../../static_dependencies/qs/index":153}],13:[function(require,module,exports){
 "use strict";
 
 /*  ------------------------------------------------------------------------ */
@@ -5903,7 +5904,7 @@ module.exports = {
     defaultFetch,
 }
 }).call(this,require('_process'))
-},{"../../static_dependencies/fetch-ponyfill/fetch-node":134,"_process":200}],17:[function(require,module,exports){
+},{"../../static_dependencies/fetch-ponyfill/fetch-node":135,"_process":201}],17:[function(require,module,exports){
 "use strict";
 
 /*  ------------------------------------------------------------------------ */
@@ -17901,7 +17902,7 @@ module.exports = class bitkk extends zb {
     }
 };
 
-},{"./zb.js":172}],37:[function(require,module,exports){
+},{"./zb.js":173}],37:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -82248,6 +82249,1299 @@ module.exports = class poloniex extends Exchange {
 },{"./base/Exchange":7,"./base/errors":9}],117:[function(require,module,exports){
 'use strict';
 
+//  ---------------------------------------------------------------------------
+
+const Exchange = require ('./base/Exchange');
+const { ExchangeError, ExchangeNotAvailable, BadResponse, BadRequest, InvalidOrder, InsufficientFunds, AuthenticationError, ArgumentsRequired, InvalidAddress, RateLimitExceeded, DDoSProtection, BadSymbol } = require ('./base/errors');
+const { TRUNCATE } = require ('./base/functions/number');
+
+//  ---------------------------------------------------------------------------
+
+module.exports = class probit extends Exchange {
+    describe () {
+        return this.deepExtend (super.describe (), {
+            'id': 'probit',
+            'name': 'ProBit',
+            'countries': [ 'SC', 'KR' ], // Seychelles, South Korea
+            'rateLimit': 250, // ms
+            'has': {
+                'CORS': true,
+                'fetchTime': true,
+                'fetchMarkets': true,
+                'fetchCurrencies': true,
+                'fetchTickers': true,
+                'fetchTicker': true,
+                'fetchOHLCV': true,
+                'fetchOrderBook': true,
+                'fetchTrades': true,
+                'fetchBalance': true,
+                'createOrder': true,
+                'createMarketOrder': true,
+                'cancelOrder': true,
+                'fetchOrder': true,
+                'fetchOpenOrders': true,
+                'fetchClosedOrders': true,
+                'fetchMyTrades': true,
+                'fetchDepositAddress': true,
+                'withdraw': true,
+                'signIn': true,
+            },
+            'timeframes': {
+                '1m': '1m',
+                '3m': '3m',
+                '5m': '5m',
+                '10m': '10m',
+                '15m': '15m',
+                '30m': '30m',
+                '1h': '1h',
+                '4h': '4h',
+                '6h': '6h',
+                '12h': '12h',
+                '1d': '1D',
+                '1w': '1W',
+                '1M': '1M',
+            },
+            'version': 'v1',
+            'urls': {
+                'logo': 'https://user-images.githubusercontent.com/51840849/79268032-c4379480-7ea2-11ea-80b3-dd96bb29fd0d.jpg',
+                'api': {
+                    'accounts': 'https://accounts.probit.com',
+                    'public': 'https://api.probit.com/api/exchange',
+                    'private': 'https://api.probit.com/api/exchange',
+                },
+                'www': 'https://www.probit.com',
+                'doc': [
+                    'https://docs-en.probit.com',
+                    'https://docs-ko.probit.com',
+                ],
+                'fees': 'https://support.probit.com/hc/en-us/articles/360020968611-Trading-Fees',
+                'referral': 'https://www.probit.com/r/34608773',
+            },
+            'api': {
+                'public': {
+                    'get': [
+                        'market',
+                        'currency',
+                        'currency_with_platform',
+                        'time',
+                        'ticker',
+                        'order_book',
+                        'trade',
+                        'candle',
+                    ],
+                },
+                'private': {
+                    'post': [
+                        'new_order',
+                        'cancel_order',
+                        'withdrawal',
+                    ],
+                    'get': [
+                        'balance',
+                        'order',
+                        'open_order',
+                        'order_history',
+                        'trade_history',
+                        'deposit_address',
+                    ],
+                },
+                'accounts': {
+                    'post': [
+                        'token',
+                    ],
+                },
+            },
+            'fees': {
+                'trading': {
+                    'tierBased': false,
+                    'percentage': true,
+                    'maker': 0.2 / 100,
+                    'taker': 0.2 / 100,
+                },
+            },
+            'exceptions': {
+                'exact': {
+                    'UNAUTHORIZED': AuthenticationError,
+                    'INVALID_ARGUMENT': BadRequest, // Parameters are not a valid format, parameters are empty, or out of range, or a parameter was sent when not required.
+                    'TRADING_UNAVAILABLE': ExchangeNotAvailable,
+                    'NOT_ENOUGH_BALANCE': InsufficientFunds,
+                    'NOT_ALLOWED_COMBINATION': BadRequest,
+                    'INVALID_ORDER': InvalidOrder, // Requested order does not exist, or it is not your order
+                    'RATE_LIMIT_EXCEEDED': RateLimitExceeded, // You are sending requests too frequently. Please try it later.
+                    'MARKET_UNAVAILABLE': ExchangeNotAvailable, // Market is closed today
+                    'INVALID_MARKET': BadSymbol, // Requested market is not exist
+                    'INVALID_CURRENCY': BadRequest, // Requested currency is not exist on ProBit system
+                    'TOO_MANY_OPEN_ORDERS': DDoSProtection, // Too many open orders
+                    'DUPLICATE_ADDRESS': InvalidAddress, // Address already exists in withdrawal address list
+                },
+            },
+            'requiredCredentials': {
+                'apiKey': true,
+                'secret': true,
+            },
+            'options': {
+                'createMarketBuyOrderRequiresPrice': true,
+                'timeInForce': {
+                    'limit': 'gtc',
+                    'market': 'ioc',
+                },
+            },
+        });
+    }
+
+    async fetchMarkets (params = {}) {
+        const response = await this.publicGetMarket (params);
+        //
+        //     {
+        //         "data":[
+        //             {
+        //                 "id":"MONA-USDT",
+        //                 "base_currency_id":"MONA",
+        //                 "quote_currency_id":"USDT",
+        //                 "min_price":"0.001",
+        //                 "max_price":"9999999999999999",
+        //                 "price_increment":"0.001",
+        //                 "min_quantity":"0.0001",
+        //                 "max_quantity":"9999999999999999",
+        //                 "quantity_precision":4,
+        //                 "min_cost":"1",
+        //                 "max_cost":"9999999999999999",
+        //                 "cost_precision":8,
+        //                 "taker_fee_rate":"0.2",
+        //                 "maker_fee_rate":"0.2",
+        //                 "show_in_ui":true,
+        //                 "closed":false
+        //             },
+        //         ]
+        //     }
+        //
+        const markets = this.safeValue (response, 'data', []);
+        const result = [];
+        for (let i = 0; i < markets.length; i++) {
+            const market = markets[i];
+            const id = this.safeString (market, 'id');
+            const baseId = this.safeString (market, 'base_currency_id');
+            const quoteId = this.safeString (market, 'quote_currency_id');
+            const base = this.safeCurrencyCode (baseId);
+            const quote = this.safeCurrencyCode (quoteId);
+            const symbol = base + '/' + quote;
+            const closed = this.safeValue (market, 'closed', false);
+            const active = !closed;
+            const priceIncrement = this.safeString (market, 'price_increment');
+            const precision = {
+                'amount': this.safeInteger (market, 'quantity_precision'),
+                'price': this.precisionFromString (priceIncrement),
+                'cost': this.safeInteger (market, 'cost_precision'),
+            };
+            const takerFeeRate = this.safeFloat (market, 'taker_fee_rate');
+            const makerFeeRate = this.safeFloat (market, 'maker_fee_rate');
+            result.push ({
+                'id': id,
+                'info': market,
+                'symbol': symbol,
+                'base': base,
+                'quote': quote,
+                'baseId': baseId,
+                'quoteId': quoteId,
+                'active': active,
+                'precision': precision,
+                'taker': takerFeeRate / 100,
+                'maker': makerFeeRate / 100,
+                'limits': {
+                    'amount': {
+                        'min': this.safeFloat (market, 'min_quantity'),
+                        'max': this.safeFloat (market, 'max_quantity'),
+                    },
+                    'price': {
+                        'min': this.safeFloat (market, 'min_price'),
+                        'max': this.safeFloat (market, 'max_price'),
+                    },
+                    'cost': {
+                        'min': this.safeFloat (market, 'min_cost'),
+                        'max': this.safeFloat (market, 'max_cost'),
+                    },
+                },
+            });
+        }
+        return result;
+    }
+
+    async fetchCurrencies (params = {}) {
+        const response = await this.publicGetCurrencyWithPlatform (params);
+        //
+        //     {
+        //         "data":[
+        //             {
+        //                 "id":"USDT",
+        //                 "display_name":{"ko-kr":"테더","en-us":"Tether"},
+        //                 "show_in_ui":true,
+        //                 "platform":[
+        //                     {
+        //                         "id":"ETH",
+        //                         "priority":1,
+        //                         "deposit":true,
+        //                         "withdrawal":true,
+        //                         "currency_id":"USDT",
+        //                         "precision":6,
+        //                         "min_confirmation_count":15,
+        //                         "require_destination_tag":false,
+        //                         "display_name":{"name":{"ko-kr":"ERC-20","en-us":"ERC-20"}},
+        //                         "min_deposit_amount":"0",
+        //                         "min_withdrawal_amount":"1",
+        //                         "withdrawal_fee":[
+        //                             {"amount":"0.01","priority":2,"currency_id":"ETH"},
+        //                             {"amount":"1.5","priority":1,"currency_id":"USDT"},
+        //                         ],
+        //                         "deposit_fee":{},
+        //                         "suspended_reason":"",
+        //                         "deposit_suspended":false,
+        //                         "withdrawal_suspended":false
+        //                     },
+        //                     {
+        //                         "id":"OMNI",
+        //                         "priority":2,
+        //                         "deposit":true,
+        //                         "withdrawal":true,
+        //                         "currency_id":"USDT",
+        //                         "precision":6,
+        //                         "min_confirmation_count":3,
+        //                         "require_destination_tag":false,
+        //                         "display_name":{"name":{"ko-kr":"OMNI","en-us":"OMNI"}},
+        //                         "min_deposit_amount":"0",
+        //                         "min_withdrawal_amount":"5",
+        //                         "withdrawal_fee":[{"amount":"5","priority":1,"currency_id":"USDT"}],
+        //                         "deposit_fee":{},
+        //                         "suspended_reason":"wallet_maintenance",
+        //                         "deposit_suspended":false,
+        //                         "withdrawal_suspended":false
+        //                     }
+        //                 ],
+        //                 "stakeable":false,
+        //                 "unstakeable":false,
+        //                 "auto_stake":false,
+        //                 "auto_stake_amount":"0"
+        //             }
+        //         ]
+        //     }
+        //
+        const currencies = this.safeValue (response, 'data');
+        const result = {};
+        for (let i = 0; i < currencies.length; i++) {
+            const currency = currencies[i];
+            const id = this.safeString (currency, 'id');
+            const code = this.safeCurrencyCode (id);
+            const displayName = this.safeValue (currency, 'display_name');
+            const name = this.safeString (displayName, 'en-us');
+            const platforms = this.safeValue (currency, 'platform', []);
+            const platformsByPriority = this.sortBy (platforms, 'priority');
+            const platform = this.safeValue (platformsByPriority, 0, {});
+            const precision = this.safeInteger (platform, 'precision');
+            const depositSuspended = this.safeValue (platform, 'deposit_suspended');
+            const withdrawalSuspended = this.safeValue (platform, 'withdrawal_suspended');
+            const active = !(depositSuspended && withdrawalSuspended);
+            const withdrawalFees = this.safeValue (platform, 'withdrawal_fee', {});
+            const withdrawalFeesByPriority = this.sortBy (withdrawalFees, 'priority');
+            const withdrawalFee = this.safeValue (withdrawalFeesByPriority, 0, {});
+            const fee = this.safeFloat (withdrawalFee, 'amount');
+            result[code] = {
+                'id': id,
+                'code': code,
+                'info': currency,
+                'name': name,
+                'active': active,
+                'fee': fee,
+                'precision': precision,
+                'limits': {
+                    'amount': {
+                        'min': Math.pow (10, -precision),
+                        'max': Math.pow (10, precision),
+                    },
+                    'price': {
+                        'min': Math.pow (10, -precision),
+                        'max': Math.pow (10, precision),
+                    },
+                    'cost': {
+                        'min': undefined,
+                        'max': undefined,
+                    },
+                    'deposit': {
+                        'min': this.safeFloat (platform, 'min_deposit_amount'),
+                        'max': undefined,
+                    },
+                    'withdraw': {
+                        'min': this.safeFloat (platform, 'min_withdrawal_amount'),
+                        'max': undefined,
+                    },
+                },
+            };
+        }
+        return result;
+    }
+
+    async fetchBalance (params = {}) {
+        await this.loadMarkets ();
+        const response = await this.privateGetBalance (params);
+        //
+        //     {
+        //         data: [
+        //             {
+        //                 "currency_id":"XRP",
+        //                 "total":"100",
+        //                 "available":"0",
+        //             }
+        //         ]
+        //     }
+        //
+        const data = this.safeValue (response, 'data');
+        const result = { 'info': data };
+        for (let i = 0; i < data.length; i++) {
+            const balance = data[i];
+            const currencyId = this.safeString (balance, 'currency_id');
+            const code = this.safeCurrencyCode (currencyId);
+            const account = this.account ();
+            account['total'] = this.safeFloat (balance, 'total');
+            account['free'] = this.safeFloat (balance, 'available');
+            result[code] = account;
+        }
+        return this.parseBalance (result);
+    }
+
+    async fetchOrderBook (symbol, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'market_id': market['id'],
+        };
+        const response = await this.publicGetOrderBook (this.extend (request, params));
+        //
+        //     {
+        //         data: [
+        //             { side: 'buy', price: '0.000031', quantity: '10' },
+        //             { side: 'buy', price: '0.00356007', quantity: '4.92156877' },
+        //             { side: 'sell', price: '0.1857', quantity: '0.17' },
+        //         ]
+        //     }
+        //
+        const data = this.safeValue (response, 'data', []);
+        const dataBySide = this.groupBy (data, 'side');
+        return this.parseOrderBook (dataBySide, undefined, 'buy', 'sell', 'price', 'quantity');
+    }
+
+    async fetchTickers (symbols = undefined, params = {}) {
+        await this.loadMarkets ();
+        const request = {};
+        if (symbols !== undefined) {
+            const marketIds = this.marketIds (symbols);
+            request['market_ids'] = marketIds.join (',');
+        }
+        const response = await this.publicGetTicker (this.extend (request, params));
+        //
+        //     {
+        //         "data":[
+        //             {
+        //                 "last":"0.022902",
+        //                 "low":"0.021693",
+        //                 "high":"0.024093",
+        //                 "change":"-0.000047",
+        //                 "base_volume":"15681.986",
+        //                 "quote_volume":"360.514403624",
+        //                 "market_id":"ETH-BTC",
+        //                 "time":"2020-04-12T18:43:38.000Z"
+        //             }
+        //         ]
+        //     }
+        //
+        const data = this.safeValue (response, 'data', []);
+        return this.parseTickers (data, symbols);
+    }
+
+    parseTickers (rawTickers, symbols = undefined) {
+        const tickers = [];
+        for (let i = 0; i < rawTickers.length; i++) {
+            tickers.push (this.parseTicker (rawTickers[i]));
+        }
+        return this.filterByArray (tickers, 'symbol', symbols);
+    }
+
+    async fetchTicker (symbol, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'market_ids': market['id'],
+        };
+        const response = await this.publicGetTicker (this.extend (request, params));
+        //
+        //     {
+        //         "data":[
+        //             {
+        //                 "last":"0.022902",
+        //                 "low":"0.021693",
+        //                 "high":"0.024093",
+        //                 "change":"-0.000047",
+        //                 "base_volume":"15681.986",
+        //                 "quote_volume":"360.514403624",
+        //                 "market_id":"ETH-BTC",
+        //                 "time":"2020-04-12T18:43:38.000Z"
+        //             }
+        //         ]
+        //     }
+        //
+        const data = this.safeValue (response, 'data', []);
+        const ticker = this.safeValue (data, 0);
+        if (ticker === undefined) {
+            throw new BadResponse (this.id + ' fetchTicker() returned an empty response');
+        }
+        return this.parseTicker (ticker, market);
+    }
+
+    parseTicker (ticker, market = undefined) {
+        //
+        //     {
+        //         "last":"0.022902",
+        //         "low":"0.021693",
+        //         "high":"0.024093",
+        //         "change":"-0.000047",
+        //         "base_volume":"15681.986",
+        //         "quote_volume":"360.514403624",
+        //         "market_id":"ETH-BTC",
+        //         "time":"2020-04-12T18:43:38.000Z"
+        //     }
+        //
+        const timestamp = this.parse8601 (this.safeString (ticker, 'time'));
+        let symbol = undefined;
+        const marketId = this.safeString (ticker, 'market_id');
+        if (marketId !== undefined) {
+            if (marketId in this.markets_by_id) {
+                market = this.markets_by_id[marketId];
+            } else {
+                const [ baseId, quoteId ] = marketId.split ('-');
+                const base = this.safeCurrencyCode (baseId);
+                const quote = this.safeCurrencyCode (quoteId);
+                symbol = base + '/' + quote;
+            }
+        }
+        if ((symbol === undefined) && (market !== undefined)) {
+            symbol = market['symbol'];
+        }
+        const close = this.safeFloat (ticker, 'last');
+        const change = this.safeFloat (ticker, 'change');
+        let percentage = undefined;
+        let open = undefined;
+        if (change !== undefined) {
+            if (close !== undefined) {
+                open = close - change;
+                percentage = (change / open) * 100;
+            }
+        }
+        const baseVolume = this.safeFloat (ticker, 'base_volume');
+        const quoteVolume = this.safeFloat (ticker, 'quote_volume');
+        let vwap = undefined;
+        if ((baseVolume !== undefined) && (quoteVolume !== undefined)) {
+            vwap = baseVolume / quoteVolume;
+        }
+        return {
+            'symbol': symbol,
+            'timestamp': timestamp,
+            'datetime': this.iso8601 (timestamp),
+            'high': this.safeFloat (ticker, 'high'),
+            'low': this.safeFloat (ticker, 'low'),
+            'bid': undefined,
+            'bidVolume': undefined,
+            'ask': undefined,
+            'askVolume': undefined,
+            'vwap': vwap,
+            'open': open,
+            'close': close,
+            'last': close,
+            'previousClose': undefined, // previous day close
+            'change': change,
+            'percentage': percentage,
+            'average': undefined,
+            'baseVolume': baseVolume,
+            'quoteVolume': quoteVolume,
+            'info': ticker,
+        };
+    }
+
+    async fetchMyTrades (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        let market = undefined;
+        const request = {
+            'limit': 100,
+            'start_time': this.iso8601 (0),
+            'end_time': this.iso8601 (this.milliseconds ()),
+        };
+        if (symbol !== undefined) {
+            market = this.market (symbol);
+            request['market_id'] = market['id'];
+        }
+        if (since !== undefined) {
+            request['start_time'] = this.iso8601 (since);
+        }
+        if (limit !== undefined) {
+            request['limit'] = limit;
+        }
+        const response = await this.privateGetTradeHistory (this.extend (request, params));
+        //
+        //     {
+        //         data: [
+        //             {
+        //                 "id":"BTC-USDT:183566",
+        //                 "order_id":"17209376",
+        //                 "side":"sell",
+        //                 "fee_amount":"0.657396569175",
+        //                 "fee_currency_id":"USDT",
+        //                 "status":"settled",
+        //                 "price":"6573.96569175",
+        //                 "quantity":"0.1",
+        //                 "cost":"657.396569175",
+        //                 "time":"2018-08-10T06:06:46.000Z",
+        //                 "market_id":"BTC-USDT"
+        //             }
+        //         ]
+        //     }
+        //
+        const data = this.safeValue (response, 'data', []);
+        return this.parseTrades (data, market, since, limit);
+    }
+
+    async fetchTrades (symbol, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'market_id': market['id'],
+            'limit': 100,
+            'start_time': '1970-01-01T00:00:00.000Z',
+            'end_time': this.iso8601 (this.milliseconds ()),
+        };
+        if (since !== undefined) {
+            request['start_time'] = this.iso8601 (since);
+        }
+        if (limit !== undefined) {
+            request['limit'] = limit;
+        }
+        const response = await this.publicGetTrade (this.extend (request, params));
+        //
+        //     {
+        //         "data":[
+        //             {
+        //                 "id":"ETH-BTC:3331886",
+        //                 "price":"0.022981",
+        //                 "quantity":"12.337",
+        //                 "time":"2020-04-12T20:55:42.371Z",
+        //                 "side":"sell",
+        //                 "tick_direction":"down"
+        //             },
+        //             {
+        //                 "id":"ETH-BTC:3331885",
+        //                 "price":"0.022982",
+        //                 "quantity":"6.472",
+        //                 "time":"2020-04-12T20:55:39.652Z",
+        //                 "side":"sell",
+        //                 "tick_direction":"down"
+        //             }
+        //         ]
+        //     }
+        //
+        const data = this.safeValue (response, 'data', []);
+        return this.parseTrades (data, market, since, limit);
+    }
+
+    parseTrade (trade, market = undefined) {
+        //
+        // fetchTrades (public)
+        //
+        //     {
+        //         "id":"ETH-BTC:3331886",
+        //         "price":"0.022981",
+        //         "quantity":"12.337",
+        //         "time":"2020-04-12T20:55:42.371Z",
+        //         "side":"sell",
+        //         "tick_direction":"down"
+        //     }
+        //
+        // fetchMyTrades (private)
+        //
+        //     {
+        //         "id":"BTC-USDT:183566",
+        //         "order_id":"17209376",
+        //         "side":"sell",
+        //         "fee_amount":"0.657396569175",
+        //         "fee_currency_id":"USDT",
+        //         "status":"settled",
+        //         "price":"6573.96569175",
+        //         "quantity":"0.1",
+        //         "cost":"657.396569175",
+        //         "time":"2018-08-10T06:06:46.000Z",
+        //         "market_id":"BTC-USDT"
+        //     }
+        //
+        const timestamp = this.parse8601 (this.safeString (trade, 'time'));
+        let symbol = undefined;
+        const id = this.safeString (trade, 'id');
+        if (id !== undefined) {
+            const parts = id.split (':');
+            let marketId = this.safeString (parts, 0);
+            if (marketId === undefined) {
+                marketId = this.safeString (trade, 'market_id');
+            }
+            if (marketId !== undefined) {
+                if (marketId in this.markets_by_id) {
+                    market = this.markets_by_id[marketId];
+                } else {
+                    const [ baseId, quoteId ] = marketId.split ('-');
+                    const base = this.safeCurrencyCode (baseId);
+                    const quote = this.safeCurrencyCode (quoteId);
+                    symbol = base + '/' + quote;
+                }
+            }
+        }
+        if ((symbol === undefined) && (market !== undefined)) {
+            symbol = market['symbol'];
+        }
+        const side = this.safeString (trade, 'side');
+        const price = this.safeFloat (trade, 'price');
+        const amount = this.safeFloat (trade, 'quantity');
+        let cost = undefined;
+        if (price !== undefined) {
+            if (amount !== undefined) {
+                cost = price * amount;
+            }
+        }
+        const orderId = this.safeString (trade, 'order_id');
+        const feeCost = this.safeFloat (trade, 'fee_amount');
+        let fee = undefined;
+        if (feeCost !== undefined) {
+            const feeCurrencyId = this.safeString (trade, 'fee_currency_id');
+            const feeCurrencyCode = this.safeCurrencyCode (feeCurrencyId);
+            fee = {
+                'cost': feeCost,
+                'currency': feeCurrencyCode,
+            };
+        }
+        return {
+            'id': id,
+            'info': trade,
+            'timestamp': timestamp,
+            'datetime': this.iso8601 (timestamp),
+            'symbol': symbol,
+            'order': orderId,
+            'type': undefined,
+            'side': side,
+            'takerOrMaker': undefined,
+            'price': price,
+            'amount': amount,
+            'cost': cost,
+            'fee': fee,
+        };
+    }
+
+    async fetchTime (params = {}) {
+        const response = await this.publicGetTime (params);
+        //
+        //     { "data":"2020-04-12T18:54:25.390Z" }
+        //
+        const timestamp = this.parse8601 (this.safeString (response, 'data'));
+        return timestamp;
+    }
+
+    normalizeOHLCVTimestamp (timestamp, timeframe, after = false) {
+        const duration = this.parseTimeframe (timeframe);
+        if (timeframe === '1M') {
+            const iso8601 = this.iso8601 (timestamp);
+            const parts = iso8601.split ('-');
+            const year = this.safeString (parts, 0);
+            let month = this.safeInteger (parts, 1);
+            if (after) {
+                month = this.sum (month, 1);
+            }
+            if (month < 10) {
+                month = '0' + month.toString ();
+            } else {
+                month = month.toString ();
+            }
+            return year + '-' + month + '-01T00:00:00.000Z';
+        } else if (timeframe === '1w') {
+            timestamp = parseInt (timestamp / 1000);
+            const firstSunday = 259200; // 1970-01-04T00:00:00.000Z
+            const difference = timestamp - firstSunday;
+            const numWeeks = this.integerDivide (difference, duration);
+            let previousSunday = this.sum (firstSunday, numWeeks * duration);
+            if (after) {
+                previousSunday = this.sum (previousSunday, duration);
+            }
+            return this.iso8601 (previousSunday * 1000);
+        } else {
+            timestamp = parseInt (timestamp / 1000);
+            const difference = this.integerModulo (timestamp, duration);
+            timestamp -= difference;
+            if (after) {
+                timestamp = this.sum (timestamp, duration);
+            }
+            return this.iso8601 (timestamp * 1000);
+        }
+    }
+
+    async fetchOHLCV (symbol, timeframe = '1m', since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const interval = this.timeframes[timeframe];
+        limit = (limit === undefined) ? 100 : limit;
+        let requestLimit = this.sum (limit, 1);
+        requestLimit = Math.min (1000, requestLimit); // max 1000
+        const request = {
+            'market_ids': market['id'],
+            'interval': interval,
+            'sort': 'asc', // 'asc' will always include the start_time, 'desc' will always include end_time
+            'limit': requestLimit, // max 1000
+        };
+        const now = this.milliseconds ();
+        const duration = this.parseTimeframe (timeframe);
+        let startTime = since;
+        let endTime = now;
+        if (since === undefined) {
+            if (limit === undefined) {
+                throw new ArgumentsRequired (this.id + ' fetchOHLCV requires either a since argument or a limit argument');
+            } else {
+                startTime = now - limit * duration * 1000;
+            }
+        } else {
+            if (limit === undefined) {
+                endTime = now;
+            } else {
+                endTime = this.sum (since, this.sum (limit, 1) * duration * 1000);
+            }
+        }
+        const startTimeNormalized = this.normalizeOHLCVTimestamp (startTime, timeframe);
+        const endTimeNormalized = this.normalizeOHLCVTimestamp (endTime, timeframe, true);
+        request['start_time'] = startTimeNormalized;
+        request['end_time'] = endTimeNormalized;
+        const response = await this.publicGetCandle (this.extend (request, params));
+        //
+        //     {
+        //         "data":[
+        //             {
+        //                 "market_id":"ETH-BTC",
+        //                 "open":"0.02811",
+        //                 "close":"0.02811",
+        //                 "low":"0.02811",
+        //                 "high":"0.02811",
+        //                 "base_volume":"0.0005",
+        //                 "quote_volume":"0.000014055",
+        //                 "start_time":"2018-11-30T18:19:00.000Z",
+        //                 "end_time":"2018-11-30T18:20:00.000Z"
+        //             },
+        //         ]
+        //     }
+        //
+        const data = this.safeValue (response, 'data');
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
+    }
+
+    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        return [
+            this.parse8601 (this.safeString (ohlcv, 'start_time')),
+            this.safeFloat (ohlcv, 'open'),
+            this.safeFloat (ohlcv, 'high'),
+            this.safeFloat (ohlcv, 'low'),
+            this.safeFloat (ohlcv, 'close'),
+            this.safeFloat (ohlcv, 'base_volume'),
+        ];
+    }
+
+    async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        since = this.parse8601 (since);
+        const request = {};
+        let market = undefined;
+        if (symbol !== undefined) {
+            market = this.market (symbol);
+            request['market_id'] = market['id'];
+        }
+        const response = await this.privateGetOpenOrder (this.extend (request, params));
+        const data = this.safeValue (response, 'data');
+        return this.parseOrders (data, market, since, limit);
+    }
+
+    async fetchClosedOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const request = {
+            'start_time': this.iso8601 (0),
+            'end_time': this.iso8601 (this.milliseconds ()),
+            'limit': 100,
+        };
+        let market = undefined;
+        if (symbol !== undefined) {
+            market = this.market (symbol);
+            request['market_id'] = market['id'];
+        }
+        if (since) {
+            request['start_time'] = this.iso8601 (since);
+        }
+        if (limit) {
+            request['limit'] = limit;
+        }
+        const response = await this.privateGetOrderHistory (this.extend (request, params));
+        const data = this.safeValue (response, 'data');
+        return this.parseOrders (data, market, since, limit);
+    }
+
+    async fetchOrder (id, symbol = undefined, params = {}) {
+        if (symbol === undefined) {
+            throw new ArgumentsRequired (this.id + ' fetchOrder requires a symbol argument');
+        }
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'market_id': market['id'],
+        };
+        const clientOrderId = this.safeString2 (params, 'clientOrderId', 'client_order_id');
+        if (clientOrderId !== undefined) {
+            request['client_order_id'] = clientOrderId;
+        } else {
+            request['order_id'] = id;
+        }
+        const query = this.omit (params, [ 'clientOrderId', 'client_order_id' ]);
+        const response = await this.privateGetOrder (this.extend (request, query));
+        const data = this.safeValue (response, 'data', []);
+        const order = this.safeValue (data, 0);
+        return this.parseOrder (order, market);
+    }
+
+    parseOrderStatus (status) {
+        const statuses = {
+            'open': 'open',
+            'cancelled': 'canceled',
+            'filled': 'closed',
+        };
+        return this.safeString (statuses, status, status);
+    }
+
+    parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         id: string,
+        //         user_id: string,
+        //         market_id: string,
+        //         type: 'orderType',
+        //         side: 'side',
+        //         quantity: string,
+        //         limit_price: string,
+        //         time_in_force: 'timeInForce',
+        //         filled_cost: string,
+        //         filled_quantity: string,
+        //         open_quantity: string,
+        //         cancelled_quantity: string,
+        //         status: 'orderStatus',
+        //         time: 'date',
+        //         client_order_id: string,
+        //     }
+        //
+        const status = this.parseOrderStatus (this.safeString (order, 'status'));
+        const id = this.safeString (order, 'id');
+        const type = this.safeString (order, 'type');
+        const side = this.safeString (order, 'side');
+        let symbol = undefined;
+        const marketId = this.safeString (order, 'market_id');
+        if (marketId !== undefined) {
+            if (marketId in this.markets_by_id) {
+                market = this.markets_by_id[marketId];
+            } else {
+                const [ baseId, quoteId ] = marketId.split ('-');
+                const base = this.safeCurrencyCode (baseId);
+                const quote = this.safeCurrencyCode (quoteId);
+                symbol = base + '/' + quote;
+            }
+        }
+        if ((symbol === undefined) && (market !== undefined)) {
+            symbol = market['symbol'];
+        }
+        const timestamp = this.parse8601 (this.safeString (order, 'time'));
+        let price = this.safeFloat (order, 'limit_price');
+        const filled = this.safeFloat (order, 'filled_quantity');
+        let remaining = this.safeFloat (order, 'open_quantity');
+        const canceledAmount = this.safeFloat (order, 'cancelled_quantity');
+        if (canceledAmount !== undefined) {
+            remaining = this.sum (remaining, canceledAmount);
+        }
+        const amount = this.safeFloat (order, 'quantity', this.sum (filled, remaining));
+        let cost = this.safeFloat2 (order, 'filled_cost', 'cost');
+        if (type === 'market') {
+            price = undefined;
+        }
+        let average = undefined;
+        if (filled !== undefined) {
+            if (cost === undefined) {
+                if (price !== undefined) {
+                    cost = price * filled;
+                }
+            }
+            if (cost !== undefined) {
+                if (filled > 0) {
+                    average = cost / filled;
+                }
+            }
+        }
+        let clientOrderId = this.safeString (order, 'client_order_id');
+        if (clientOrderId === '') {
+            clientOrderId = undefined;
+        }
+        return {
+            'id': id,
+            'info': order,
+            'clientOrderId': clientOrderId,
+            'timestamp': timestamp,
+            'datetime': this.iso8601 (timestamp),
+            'lastTradeTimestamp': undefined,
+            'symbol': symbol,
+            'type': type,
+            'side': side,
+            'status': status,
+            'price': price,
+            'amount': amount,
+            'filled': filled,
+            'remaining': remaining,
+            'average': average,
+            'cost': cost,
+            'fee': undefined,
+            'trades': undefined,
+        };
+    }
+
+    costToPrecision (symbol, cost) {
+        return this.decimalToPrecision (cost, TRUNCATE, this.markets[symbol]['precision']['cost'], this.precisionMode);
+    }
+
+    async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const options = this.safeValue (this.options, 'timeInForce');
+        const defaultTimeInForce = this.safeValue (options, type);
+        const timeInForce = this.safeString2 (params, 'timeInForce', 'time_in_force', defaultTimeInForce);
+        const request = {
+            'market_id': market['id'],
+            'type': type,
+            'side': side,
+            'time_in_force': timeInForce,
+        };
+        const clientOrderId = this.safeString2 (params, 'clientOrderId', 'client_order_id');
+        if (clientOrderId !== undefined) {
+            request['client_order_id'] = clientOrderId;
+        }
+        let costToPrecision = undefined;
+        if (type === 'limit') {
+            request['limit_price'] = this.priceToPrecision (symbol, price);
+            request['quantity'] = this.amountToPrecision (symbol, amount);
+        } else if (type === 'market') {
+            // for market buy it requires the amount of quote currency to spend
+            if (side === 'buy') {
+                let cost = this.safeFloat (params, 'cost');
+                const createMarketBuyOrderRequiresPrice = this.safeValue (this.options, 'createMarketBuyOrderRequiresPrice', true);
+                if (createMarketBuyOrderRequiresPrice) {
+                    if (price !== undefined) {
+                        if (cost === undefined) {
+                            cost = amount * price;
+                        }
+                    } else if (cost === undefined) {
+                        throw new InvalidOrder (this.id + " createOrder() requires the price argument for market buy orders to calculate total order cost (amount to spend), where cost = amount * price. Supply a price argument to createOrder() call if you want the cost to be calculated for you from price and amount, or, alternatively, add .options['createMarketBuyOrderRequiresPrice'] = false and supply the total cost value in the 'amount' argument or in the 'cost' extra parameter (the exchange-specific behaviour)");
+                    }
+                } else {
+                    cost = (cost === undefined) ? amount : cost;
+                }
+                costToPrecision = this.costToPrecision (symbol, cost);
+                request['cost'] = costToPrecision;
+            } else {
+                request['quantity'] = this.amountToPrecision (symbol, amount);
+            }
+        }
+        const query = this.omit (params, [ 'timeInForce', 'time_in_force', 'clientOrderId', 'client_order_id' ]);
+        const response = await this.privatePostNewOrder (this.extend (request, query));
+        //
+        //     {
+        //         data: {
+        //             id: string,
+        //             user_id: string,
+        //             market_id: string,
+        //             type: 'orderType',
+        //             side: 'side',
+        //             quantity: string,
+        //             limit_price: string,
+        //             time_in_force: 'timeInForce',
+        //             filled_cost: string,
+        //             filled_quantity: string,
+        //             open_quantity: string,
+        //             cancelled_quantity: string,
+        //             status: 'orderStatus',
+        //             time: 'date',
+        //             client_order_id: string,
+        //         }
+        //     }
+        //
+        const data = this.safeValue (response, 'data');
+        const order = this.parseOrder (data, market);
+        // a workaround for incorrect huge amounts
+        // returned by the exchange on market buys
+        if ((type === 'market') && (side === 'buy')) {
+            order['amount'] = undefined;
+            order['cost'] = parseFloat (costToPrecision);
+            order['remaining'] = undefined;
+        }
+        return order;
+    }
+
+    async cancelOrder (id, symbol = undefined, params = {}) {
+        if (symbol === undefined) {
+            throw new ArgumentsRequired (this.id + ' cancelOrder requires a symbol argument');
+        }
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'market_id': market['id'],
+            'order_id': id,
+        };
+        const response = await this.privatePostCancelOrder (this.extend (request, params));
+        const data = this.safeValue (response, 'data');
+        return this.parseOrder (data);
+    }
+
+    parseDepositAddress (depositAddress, currency = undefined) {
+        const address = this.safeString (depositAddress, 'address');
+        const tag = this.safeString (depositAddress, 'destination_tag');
+        const currencyId = this.safeString (depositAddress, 'currency_id');
+        const code = this.safeCurrencyCode (currencyId);
+        this.checkAddress (address);
+        return {
+            'currency': code,
+            'address': address,
+            'tag': tag,
+            'info': depositAddress,
+        };
+    }
+
+    async fetchDepositAddress (code, params = {}) {
+        await this.loadMarkets ();
+        const currency = this.currency (code);
+        const request = {
+            'currency_id': currency['id'],
+        };
+        const response = await this.privateGetDepositAddress (this.extend (request, params));
+        //
+        //     {
+        //         "data":[
+        //             {
+        //                 "currency_id":"ETH",
+        //                 "address":"0x12e2caf3c4051ba1146e612f532901a423a9898a",
+        //                 "destination_tag":null
+        //             }
+        //         ]
+        //     }
+        //
+        const data = this.safeValue (response, 'data', []);
+        const firstAddress = this.safeValue (data, 0);
+        if (firstAddress === undefined) {
+            throw new InvalidAddress (this.id + ' fetchDepositAddress returned an empty response');
+        }
+        return this.parseDepositAddress (firstAddress, currency);
+    }
+
+    async fetchDepositAddresses (codes = undefined, params = {}) {
+        await this.loadMarkets ();
+        const request = {};
+        if (codes) {
+            const currencyIds = [];
+            for (let i = 0; i < codes.length; i++) {
+                const currency = this.currency (codes[i]);
+                currencyIds.push (currency['id']);
+            }
+            request['currency_id'] = codes.join (',');
+        }
+        const response = await this.privateGetDepositAddress (this.extend (request, params));
+        const data = this.safeValue (response, 'data', []);
+        return this.parseDepositAddresses (data);
+    }
+
+    parseDepositAddresses (addresses) {
+        const result = {};
+        for (let i = 0; i < addresses.length; i++) {
+            const address = this.parseDepositAddress (addresses[i]);
+            const code = address['currency'];
+            result[code] = address;
+        }
+        return result;
+    }
+
+    async withdraw (code, amount, address, tag = undefined, params = {}) {
+        // In order to use this method
+        // you need to allow API withdrawal from the API Settings Page, and
+        // and register the list of withdrawal addresses and destination tags on the API Settings page
+        // you can only withdraw to the registered addresses using the API
+        this.checkAddress (address);
+        await this.loadMarkets ();
+        const currency = this.currency (code);
+        if (tag === undefined) {
+            tag = '';
+        }
+        const request = {
+            'currency_id': currency['id'],
+            // 'platform_id': 'ETH', // if omitted it will use the default platform for the currency
+            'address': address,
+            'destination_tag': tag,
+            'amount': this.currencyToPrecision (code, amount),
+            // which currency to pay the withdrawal fees
+            // only applicable for currencies that accepts multiple withdrawal fee options
+            // 'fee_currency_id': 'ETH', // if omitted it will use the default fee policy for each currency
+            // whether the amount field includes fees
+            // 'include_fee': false, // makes sense only when fee_currency_id is equal to currency_id
+        };
+        const response = await this.privatePostWithdrawal (this.extend (request, params));
+        const data = this.safeValue (response, 'data');
+        return this.parseTransaction (data, currency);
+    }
+
+    parseTransaction (transaction, currency = undefined) {
+        const id = this.safeString (transaction, 'id');
+        const amount = this.safeFloat (transaction, 'amount');
+        const address = this.safeString (transaction, 'address');
+        const tag = this.safeString (transaction, 'destination_tag');
+        const txid = this.safeString (transaction, 'hash');
+        const timestamp = this.parse8601 (this.safeString (transaction, 'time'));
+        const type = this.safeString (transaction, 'type');
+        const currencyId = this.safeString (transaction, 'currency_id');
+        const code = this.safeCurrencyCode (currencyId);
+        const status = this.parseTransactionStatus (this.safeString (transaction, 'status'));
+        const feeCost = this.safeFloat (transaction, 'fee');
+        let fee = undefined;
+        if (feeCost !== undefined && feeCost !== 0) {
+            fee = {
+                'currency': code,
+                'cost': feeCost,
+            };
+        }
+        return {
+            'id': id,
+            'currency': code,
+            'amount': amount,
+            'addressFrom': undefined,
+            'address': address,
+            'addressTo': address,
+            'tagFrom': undefined,
+            'tag': tag,
+            'tagTo': tag,
+            'status': status,
+            'type': type,
+            'txid': txid,
+            'timestamp': timestamp,
+            'datetime': this.iso8601 (timestamp),
+            'fee': fee,
+            'info': transaction,
+        };
+    }
+
+    parseTransactionStatus (status) {
+        const statuses = {
+            'requested': 'pending',
+            'pending': 'pending',
+            'confirming': 'pending',
+            'confirmed': 'pending',
+            'applying': 'pending',
+            'done': 'ok',
+            'cancelled': 'canceled',
+            'cancelling': 'canceled',
+        };
+        return this.safeString (statuses, status, status);
+    }
+
+    nonce () {
+        return this.milliseconds ();
+    }
+
+    sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
+        let url = this.urls['api'][api] + '/';
+        const query = this.omit (params, this.extractParams (path));
+        if (api === 'accounts') {
+            this.checkRequiredCredentials ();
+            url += this.implodeParams (path, params);
+            const auth = this.apiKey + ':' + this.secret;
+            const auth64 = this.stringToBase64 (this.encode (auth));
+            headers = {
+                'Authorization': 'Basic ' + this.decode (auth64),
+                'Content-Type': 'application/json',
+            };
+            if (Object.keys (query).length) {
+                body = this.json (query);
+            }
+        } else {
+            url += this.version + '/';
+            if (api === 'public') {
+                url += this.implodeParams (path, params);
+                if (Object.keys (query).length) {
+                    url += '?' + this.urlencode (query);
+                }
+            } else if (api === 'private') {
+                const now = this.milliseconds ();
+                this.checkRequiredCredentials ();
+                const expires = this.safeInteger (this.options, 'expires');
+                if ((expires === undefined) || (expires < now)) {
+                    throw new AuthenticationError (this.id + ' accessToken expired, call signIn() method');
+                }
+                const accessToken = this.safeString (this.options, 'accessToken');
+                headers = {
+                    'Authorization': 'Bearer ' + accessToken,
+                };
+                url += this.implodeParams (path, params);
+                if (method === 'GET') {
+                    if (Object.keys (query).length) {
+                        url += '?' + this.urlencode (query);
+                    }
+                } else if (Object.keys (query).length) {
+                    body = this.json (query);
+                    headers['Content-Type'] = 'application/json';
+                }
+            }
+        }
+        return { 'url': url, 'method': method, 'body': body, 'headers': headers };
+    }
+
+    async signIn (params = {}) {
+        this.checkRequiredCredentials ();
+        const request = {
+            'grant_type': 'client_credentials', // the only supported value
+        };
+        const response = await this.accountsPostToken (this.extend (request, params));
+        //
+        //     {
+        //         access_token: '0ttDv/2hTTn3bLi8GP1gKaneiEQ6+0hOBenPrxNQt2s=',
+        //         token_type: 'bearer',
+        //         expires_in: 900
+        //     }
+        //
+        const expiresIn = this.safeInteger (response, 'expires_in');
+        const accessToken = this.safeString (response, 'access_token');
+        this.options['accessToken'] = accessToken;
+        this.options['expires'] = this.sum (this.milliseconds (), expiresIn * 1000);
+        return response;
+    }
+
+    handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
+        if (response === undefined) {
+            return; // fallback to default error handler
+        }
+        if ('errorCode' in response) {
+            const errorCode = this.safeString (response, 'errorCode');
+            const message = this.safeString (response, 'message');
+            if (errorCode !== undefined) {
+                const feedback = this.id + ' ' + body;
+                this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
+                this.throwBroadlyMatchedException (this.exceptions['exact'], errorCode, feedback);
+                throw new ExchangeError (feedback);
+            }
+        }
+    }
+};
+
+},{"./base/Exchange":7,"./base/errors":9,"./base/functions/number":15}],118:[function(require,module,exports){
+'use strict';
+
 const Exchange = require ('./base/Exchange');
 const { ROUND } = require ('./base/functions/number');
 const { ExchangeError, ArgumentsRequired, AuthenticationError, InsufficientFunds, InvalidOrder, OrderNotFound } = require ('./base/errors');
@@ -83010,7 +84304,7 @@ module.exports = class rightbtc extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9,"./base/functions/number":15}],118:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9,"./base/functions/number":15}],119:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -83380,7 +84674,7 @@ module.exports = class southxchange extends Exchange {
     }
 };
 
-},{"./base/Exchange":7}],119:[function(require,module,exports){
+},{"./base/Exchange":7}],120:[function(require,module,exports){
 (function (module, exports) {
     'use strict';
 
@@ -86908,7 +88202,7 @@ module.exports = class southxchange extends Exchange {
     };
 })(typeof module === 'undefined' || module, this);
 
-},{"buffer":178}],120:[function(require,module,exports){
+},{"buffer":179}],121:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -92897,7 +94191,7 @@ module.exports = class southxchange extends Exchange {
 	return CryptoJS;
 
 }));
-},{}],121:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 'use strict';
 
 var elliptic = exports;
@@ -92920,7 +94214,7 @@ elliptic.curves = require('./elliptic/curves');
 // Protocols
 elliptic.ec = require('./elliptic/ec');
 
-},{"./elliptic/curve":124,"./elliptic/curves":127,"./elliptic/ec":128,"./elliptic/utils":132}],122:[function(require,module,exports){
+},{"./elliptic/curve":125,"./elliptic/curves":128,"./elliptic/ec":129,"./elliptic/utils":133}],123:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -93297,7 +94591,7 @@ BasePoint.prototype.dblp = function dblp(k) {
   return r;
 };
 
-},{"../../../../BN/bn":119,"../../elliptic":121}],123:[function(require,module,exports){
+},{"../../../../BN/bn":120,"../../elliptic":122}],124:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -93732,7 +95026,7 @@ Point.prototype.eqXToP = function eqXToP(x) {
 Point.prototype.toP = Point.prototype.normalize;
 Point.prototype.mixedAdd = Point.prototype.add;
 
-},{"../../../../BN/bn":119,"../../elliptic":121,"../curve":124}],124:[function(require,module,exports){
+},{"../../../../BN/bn":120,"../../elliptic":122,"../curve":125}],125:[function(require,module,exports){
 'use strict';
 
 var curve = exports;
@@ -93742,7 +95036,7 @@ curve.short = require('./short');
 curve.mont = require('./mont');
 curve.edwards = require('./edwards');
 
-},{"./base":122,"./edwards":123,"./mont":125,"./short":126}],125:[function(require,module,exports){
+},{"./base":123,"./edwards":124,"./mont":126,"./short":127}],126:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -93924,7 +95218,7 @@ Point.prototype.getX = function getX() {
   return this.x.fromRed();
 };
 
-},{"../../../../BN/bn":119,"../../elliptic":121,"../curve":124}],126:[function(require,module,exports){
+},{"../../../../BN/bn":120,"../../elliptic":122,"../curve":125}],127:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -94864,7 +96158,7 @@ JPoint.prototype.isInfinity = function isInfinity() {
   return this.z.cmpn(0) === 0;
 };
 
-},{"../../../../BN/bn":119,"../../elliptic":121,"../curve":124}],127:[function(require,module,exports){
+},{"../../../../BN/bn":120,"../../elliptic":122,"../curve":125}],128:[function(require,module,exports){
 'use strict';
 
 var curves = exports;
@@ -95070,7 +96364,7 @@ defineCurve('secp256k1', {
   ]
 });
 
-},{"../elliptic":121,"./precomputed/secp256k1":131}],128:[function(require,module,exports){
+},{"../elliptic":122,"./precomputed/secp256k1":132}],129:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -95312,7 +96606,7 @@ EC.prototype.getKeyRecoveryParam = function(e, signature, Q, enc) {
   throw new Error('Unable to find valid recovery factor');
 };
 
-},{"../../../../BN/bn":119,"../../elliptic":121,"../../hmac-drbg/hmac-drbg":133,"./key":129,"./signature":130}],129:[function(require,module,exports){
+},{"../../../../BN/bn":120,"../../elliptic":122,"../../hmac-drbg/hmac-drbg":134,"./key":130,"./signature":131}],130:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -95433,7 +96727,7 @@ KeyPair.prototype.inspect = function inspect() {
          ' pub: ' + (this.pub && this.pub.inspect()) + ' >';
 };
 
-},{"../../../../BN/bn":119,"../../elliptic":121}],130:[function(require,module,exports){
+},{"../../../../BN/bn":120,"../../elliptic":122}],131:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -95459,7 +96753,7 @@ function Signature(options, enc) {
 }
 module.exports = Signature;
 
-},{"../../../../BN/bn":119,"../../elliptic":121}],131:[function(require,module,exports){
+},{"../../../../BN/bn":120,"../../elliptic":122}],132:[function(require,module,exports){
 module.exports = {
   doubles: {
     step: 4,
@@ -96241,7 +97535,7 @@ module.exports = {
   }
 };
 
-},{}],132:[function(require,module,exports){
+},{}],133:[function(require,module,exports){
 'use strict';
 
 var utils = exports;
@@ -96399,7 +97693,7 @@ function wordArrayToBuffer(wordArray) {
 
 utils.wordArrayToBuffer = wordArrayToBuffer;
 
-},{"../../../BN/bn":119}],133:[function(require,module,exports){
+},{"../../../BN/bn":120}],134:[function(require,module,exports){
 'use strict';
 
 var CryptoJS = require('../../../crypto-js/crypto-js');
@@ -96515,7 +97809,7 @@ HmacDRBG.prototype.generate = function generate(len, enc, add, addEnc) {
   return utils.wordArrayToBuffer(res);
 };
 
-},{"../../../../base/functions/encode":12,"../../../crypto-js/crypto-js":120,"../elliptic/utils":132}],134:[function(require,module,exports){
+},{"../../../../base/functions/encode":12,"../../../crypto-js/crypto-js":121,"../elliptic/utils":133}],135:[function(require,module,exports){
 'use strict';
 
 var fetch = require('../node-fetch/index');
@@ -96556,7 +97850,7 @@ module.exports = function (context) {
   };
 };
 
-},{"../node-fetch/index":135}],135:[function(require,module,exports){
+},{"../node-fetch/index":136}],136:[function(require,module,exports){
 (function (global,Buffer){
 'use strict';
 
@@ -98124,7 +99418,7 @@ exports.Response = Response;
 exports.FetchError = FetchError;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"buffer":178,"http":220,"https":183,"stream":219,"url":226,"zlib":177}],136:[function(require,module,exports){
+},{"buffer":179,"http":221,"https":184,"stream":220,"url":227,"zlib":178}],137:[function(require,module,exports){
 (function (Buffer){
 /*!
  * RSA library for Node.js
@@ -98351,7 +99645,7 @@ module.exports = (function () {
 })();
 
 }).call(this,require("buffer").Buffer)
-},{"./formats/formats.js":143,"./libs/rsa.js":147,"./schemes/schemes.js":149,"./utils":150,"buffer":178}],137:[function(require,module,exports){
+},{"./formats/formats.js":144,"./libs/rsa.js":148,"./schemes/schemes.js":150,"./utils":151,"buffer":179}],138:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 
@@ -98366,7 +99660,7 @@ module.exports = {
 
 };
 
-},{}],138:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 var errors = require('./errors');
@@ -98389,7 +99683,7 @@ for (var e in errors) {
     module.exports[e] = errors[e];
 }
 
-},{"./errors":137,"./reader":139,"./types":140}],139:[function(require,module,exports){
+},{"./errors":138,"./reader":140,"./types":141}],140:[function(require,module,exports){
 (function (Buffer){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
@@ -98655,7 +99949,7 @@ Reader.prototype._readTag = function (tag) {
 module.exports = Reader;
 
 }).call(this,require("buffer").Buffer)
-},{"./errors":137,"./types":140,"assert":173,"buffer":178}],140:[function(require,module,exports){
+},{"./errors":138,"./types":141,"assert":174,"buffer":179}],141:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 
@@ -98693,7 +99987,7 @@ module.exports = {
   Context: 128
 };
 
-},{}],141:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 // If you have no idea what ASN.1 or BER is, see this:
@@ -98712,7 +100006,7 @@ module.exports = {
   BerReader: Ber.Reader,
 };
 
-},{"./ber/index":138}],142:[function(require,module,exports){
+},{"./ber/index":139}],143:[function(require,module,exports){
 var _ = require('../utils')._;
 var utils = require('../utils');
 
@@ -98785,7 +100079,7 @@ module.exports = {
     }
 };
 
-},{"../utils":150}],143:[function(require,module,exports){
+},{"../utils":151}],144:[function(require,module,exports){
 var _ = require('../utils')._;
 
 module.exports = {
@@ -98818,7 +100112,7 @@ module.exports = {
     },
 };
 
-},{"../utils":150,"./components":142,"./pkcs1":144,"./pkcs8":145}],144:[function(require,module,exports){
+},{"../utils":151,"./components":143,"./pkcs1":145,"./pkcs8":146}],145:[function(require,module,exports){
 (function (Buffer){
 var ber = require('../asn1/index').Ber;
 var _ = require('../utils')._;
@@ -98970,7 +100264,7 @@ module.exports = {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"../asn1/index":141,"../utils":150,"buffer":178}],145:[function(require,module,exports){
+},{"../asn1/index":142,"../utils":151,"buffer":179}],146:[function(require,module,exports){
 (function (Buffer){
 var ber = require('../asn1/index').Ber;
 var _ = require('../utils')._;
@@ -99161,7 +100455,7 @@ module.exports = {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"../asn1/index":141,"../utils":150,"buffer":178}],146:[function(require,module,exports){
+},{"../asn1/index":142,"../utils":151,"buffer":179}],147:[function(require,module,exports){
 (function (Buffer){
 /*
  * Basic JavaScript BN library - subset useful for RSA encryption.
@@ -100417,7 +101711,7 @@ BigInteger.prototype.square = bnSquare;
 module.exports = BigInteger;
 
 }).call(this,require("buffer").Buffer)
-},{"../utils":150,"buffer":178}],147:[function(require,module,exports){
+},{"../utils":151,"buffer":179}],148:[function(require,module,exports){
 /*
  * RSA Encryption / Decryption with PKCS1 v2 Padding.
  *
@@ -100566,7 +101860,7 @@ module.exports.Key = (function () {
 })();
 
 
-},{"../schemes/schemes.js":149,"../utils":150,"../utils.js":150,"./jsbn.js":146}],148:[function(require,module,exports){
+},{"../schemes/schemes.js":150,"../utils":151,"../utils.js":151,"./jsbn.js":147}],149:[function(require,module,exports){
 (function (Buffer){
 /**
  * PKCS1 padding and signature scheme
@@ -100746,7 +102040,7 @@ function wordArrayToBuffer(wordArray) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"../../crypto-js/crypto-js":120,"../libs/jsbn":146,"buffer":178,"constants":180}],149:[function(require,module,exports){
+},{"../../crypto-js/crypto-js":121,"../libs/jsbn":147,"buffer":179,"constants":181}],150:[function(require,module,exports){
 module.exports = {
     pkcs1: require('./pkcs1'),
 
@@ -100769,7 +102063,7 @@ module.exports = {
     }
 };
 
-},{"./pkcs1":148}],150:[function(require,module,exports){
+},{"./pkcs1":149}],151:[function(require,module,exports){
 /*
  * Utils functions
  *
@@ -100869,7 +102163,7 @@ module.exports.trimSurroundingText = function (data, opening, closing) {
     return data.substring(trimStartIndex, trimEndIndex);
 }
 
-},{}],151:[function(require,module,exports){
+},{}],152:[function(require,module,exports){
 'use strict';
 
 var replace = String.prototype.replace;
@@ -100889,7 +102183,7 @@ module.exports = {
     RFC3986: 'RFC3986'
 };
 
-},{}],152:[function(require,module,exports){
+},{}],153:[function(require,module,exports){
 'use strict';
 
 var stringify = require('./stringify');
@@ -100902,7 +102196,7 @@ module.exports = {
     stringify: stringify
 };
 
-},{"./formats":151,"./parse":153,"./stringify":154}],153:[function(require,module,exports){
+},{"./formats":152,"./parse":154,"./stringify":155}],154:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -101146,7 +102440,7 @@ module.exports = function (str, opts) {
     return utils.compact(obj);
 };
 
-},{"./utils":155}],154:[function(require,module,exports){
+},{"./utils":156}],155:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -101417,7 +102711,7 @@ module.exports = function (object, opts) {
     return joined.length > 0 ? prefix + joined : '';
 };
 
-},{"./formats":151,"./utils":155}],155:[function(require,module,exports){
+},{"./formats":152,"./utils":156}],156:[function(require,module,exports){
 'use strict';
 
 var has = Object.prototype.hasOwnProperty;
@@ -101649,7 +102943,7 @@ module.exports = {
     merge: merge
 };
 
-},{}],156:[function(require,module,exports){
+},{}],157:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -103450,7 +104744,7 @@ module.exports = class stex extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],157:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],158:[function(require,module,exports){
 'use strict';
 
 // ----------------------------------------------------------------------------
@@ -104243,7 +105537,7 @@ module.exports = class stronghold extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],158:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],159:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -104277,7 +105571,7 @@ module.exports = class surbitcoin extends foxbit {
     }
 };
 
-},{"./foxbit.js":84}],159:[function(require,module,exports){
+},{"./foxbit.js":84}],160:[function(require,module,exports){
 'use strict';
 
 const Exchange = require ('./base/Exchange');
@@ -105192,7 +106486,7 @@ module.exports = class theocean extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],160:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],161:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -106423,7 +107717,7 @@ module.exports = class therock extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],161:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],162:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -106956,7 +108250,7 @@ module.exports = class tidebit extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],162:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],163:[function(require,module,exports){
 'use strict';
 
 const Exchange = require ('./base/Exchange');
@@ -107819,7 +109113,7 @@ module.exports = class tidex extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],163:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],164:[function(require,module,exports){
 'use strict';
 
 const Exchange = require ('./base/Exchange');
@@ -109075,7 +110369,7 @@ module.exports = class timex extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],164:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],165:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -109102,7 +110396,7 @@ module.exports = class topq extends bw {
     }
 };
 
-},{"./bw.js":55}],165:[function(require,module,exports){
+},{"./bw.js":55}],166:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -110635,7 +111929,7 @@ module.exports = class upbit extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],166:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],167:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -110840,7 +112134,7 @@ module.exports = class vaultoro extends Exchange {
     }
 };
 
-},{"./base/Exchange":7}],167:[function(require,module,exports){
+},{"./base/Exchange":7}],168:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -110874,7 +112168,7 @@ module.exports = class vbtc extends foxbit {
     }
 };
 
-},{"./foxbit.js":84}],168:[function(require,module,exports){
+},{"./foxbit.js":84}],169:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -111506,7 +112800,7 @@ module.exports = class whitebit extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],169:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],170:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -111871,7 +113165,7 @@ module.exports = class xbtce extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],170:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],171:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -112807,7 +114101,7 @@ module.exports = class yobit extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],171:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],172:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -113319,7 +114613,7 @@ module.exports = class zaif extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],172:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],173:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -113970,7 +115264,7 @@ module.exports = class zb extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],173:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9}],174:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -114464,7 +115758,7 @@ var objectKeys = Object.keys || function (obj) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"util/":231}],174:[function(require,module,exports){
+},{"util/":232}],175:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -114580,9 +115874,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],175:[function(require,module,exports){
-
 },{}],176:[function(require,module,exports){
+
+},{}],177:[function(require,module,exports){
 (function (process,Buffer){
 'use strict';
 /* eslint camelcase: "off" */
@@ -114994,7 +116288,7 @@ Zlib.prototype._reset = function () {
 
 exports.Zlib = Zlib;
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":200,"assert":173,"buffer":178,"pako/lib/zlib/constants":190,"pako/lib/zlib/deflate.js":192,"pako/lib/zlib/inflate.js":194,"pako/lib/zlib/zstream":198}],177:[function(require,module,exports){
+},{"_process":201,"assert":174,"buffer":179,"pako/lib/zlib/constants":191,"pako/lib/zlib/deflate.js":193,"pako/lib/zlib/inflate.js":195,"pako/lib/zlib/zstream":199}],178:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -115606,7 +116900,7 @@ util.inherits(DeflateRaw, Zlib);
 util.inherits(InflateRaw, Zlib);
 util.inherits(Unzip, Zlib);
 }).call(this,require('_process'))
-},{"./binding":176,"_process":200,"assert":173,"buffer":178,"stream":219,"util":231}],178:[function(require,module,exports){
+},{"./binding":177,"_process":201,"assert":174,"buffer":179,"stream":220,"util":232}],179:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -117322,7 +118616,7 @@ function numberIsNaN (obj) {
   return obj !== obj // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":174,"ieee754":184}],179:[function(require,module,exports){
+},{"base64-js":175,"ieee754":185}],180:[function(require,module,exports){
 module.exports = {
   "100": "Continue",
   "101": "Switching Protocols",
@@ -117388,7 +118682,7 @@ module.exports = {
   "511": "Network Authentication Required"
 }
 
-},{}],180:[function(require,module,exports){
+},{}],181:[function(require,module,exports){
 module.exports={
   "O_RDONLY": 0,
   "O_WRONLY": 1,
@@ -117599,7 +118893,7 @@ module.exports={
   "UV_UDP_REUSEADDR": 4
 }
 
-},{}],181:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -117710,7 +119004,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":186}],182:[function(require,module,exports){
+},{"../../is-buffer/index.js":187}],183:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -118014,7 +119308,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],183:[function(require,module,exports){
+},{}],184:[function(require,module,exports){
 var http = require('http')
 var url = require('url')
 
@@ -118047,7 +119341,7 @@ function validateParams (params) {
   return params
 }
 
-},{"http":220,"url":226}],184:[function(require,module,exports){
+},{"http":221,"url":227}],185:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -118133,7 +119427,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],185:[function(require,module,exports){
+},{}],186:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -118158,7 +119452,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],186:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -118181,14 +119475,14 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],187:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],188:[function(require,module,exports){
+},{}],189:[function(require,module,exports){
 'use strict';
 
 
@@ -118295,7 +119589,7 @@ exports.setTyped = function (on) {
 
 exports.setTyped(TYPED_OK);
 
-},{}],189:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 'use strict';
 
 // Note: adler32 takes 12% for level 0 and 2% for level 6.
@@ -118348,7 +119642,7 @@ function adler32(adler, buf, len, pos) {
 
 module.exports = adler32;
 
-},{}],190:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -118418,7 +119712,7 @@ module.exports = {
   //Z_NULL:                 null // Use -1 or null inline, depending on var type
 };
 
-},{}],191:[function(require,module,exports){
+},{}],192:[function(require,module,exports){
 'use strict';
 
 // Note: we can't get significant speed boost here.
@@ -118479,7 +119773,7 @@ function crc32(crc, buf, len, pos) {
 
 module.exports = crc32;
 
-},{}],192:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -120355,7 +121649,7 @@ exports.deflatePrime = deflatePrime;
 exports.deflateTune = deflateTune;
 */
 
-},{"../utils/common":188,"./adler32":189,"./crc32":191,"./messages":196,"./trees":197}],193:[function(require,module,exports){
+},{"../utils/common":189,"./adler32":190,"./crc32":192,"./messages":197,"./trees":198}],194:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -120702,7 +121996,7 @@ module.exports = function inflate_fast(strm, start) {
   return;
 };
 
-},{}],194:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -122260,7 +123554,7 @@ exports.inflateSyncPoint = inflateSyncPoint;
 exports.inflateUndermine = inflateUndermine;
 */
 
-},{"../utils/common":188,"./adler32":189,"./crc32":191,"./inffast":193,"./inftrees":195}],195:[function(require,module,exports){
+},{"../utils/common":189,"./adler32":190,"./crc32":192,"./inffast":194,"./inftrees":196}],196:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -122605,7 +123899,7 @@ module.exports = function inflate_table(type, lens, lens_index, codes, table, ta
   return 0;
 };
 
-},{"../utils/common":188}],196:[function(require,module,exports){
+},{"../utils/common":189}],197:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -122639,7 +123933,7 @@ module.exports = {
   '-6':   'incompatible version' /* Z_VERSION_ERROR (-6) */
 };
 
-},{}],197:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -123861,7 +125155,7 @@ exports._tr_flush_block  = _tr_flush_block;
 exports._tr_tally = _tr_tally;
 exports._tr_align = _tr_align;
 
-},{"../utils/common":188}],198:[function(require,module,exports){
+},{"../utils/common":189}],199:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -123910,7 +125204,7 @@ function ZStream() {
 
 module.exports = ZStream;
 
-},{}],199:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -123957,7 +125251,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 }
 
 }).call(this,require('_process'))
-},{"_process":200}],200:[function(require,module,exports){
+},{"_process":201}],201:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -124143,7 +125437,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],201:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
@@ -124680,7 +125974,7 @@ process.umask = function() { return 0; };
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],202:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -124766,7 +126060,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],203:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -124853,16 +126147,16 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],204:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":202,"./encode":203}],205:[function(require,module,exports){
+},{"./decode":203,"./encode":204}],206:[function(require,module,exports){
 module.exports = require('./lib/_stream_duplex.js');
 
-},{"./lib/_stream_duplex.js":206}],206:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":207}],207:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -124987,7 +126281,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":208,"./_stream_writable":210,"core-util-is":181,"inherits":185,"process-nextick-args":199}],207:[function(require,module,exports){
+},{"./_stream_readable":209,"./_stream_writable":211,"core-util-is":182,"inherits":186,"process-nextick-args":200}],208:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -125035,7 +126329,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":209,"core-util-is":181,"inherits":185}],208:[function(require,module,exports){
+},{"./_stream_transform":210,"core-util-is":182,"inherits":186}],209:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -126045,7 +127339,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./_stream_duplex":206,"./internal/streams/BufferList":211,"./internal/streams/destroy":212,"./internal/streams/stream":213,"_process":200,"core-util-is":181,"events":182,"inherits":185,"isarray":187,"process-nextick-args":199,"safe-buffer":218,"string_decoder/":224,"util":175}],209:[function(require,module,exports){
+},{"./_stream_duplex":207,"./internal/streams/BufferList":212,"./internal/streams/destroy":213,"./internal/streams/stream":214,"_process":201,"core-util-is":182,"events":183,"inherits":186,"isarray":188,"process-nextick-args":200,"safe-buffer":219,"string_decoder/":225,"util":176}],210:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -126260,7 +127554,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":206,"core-util-is":181,"inherits":185}],210:[function(require,module,exports){
+},{"./_stream_duplex":207,"core-util-is":182,"inherits":186}],211:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -126927,7 +128221,7 @@ Writable.prototype._destroy = function (err, cb) {
   cb(err);
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./_stream_duplex":206,"./internal/streams/destroy":212,"./internal/streams/stream":213,"_process":200,"core-util-is":181,"inherits":185,"process-nextick-args":199,"safe-buffer":218,"util-deprecate":228}],211:[function(require,module,exports){
+},{"./_stream_duplex":207,"./internal/streams/destroy":213,"./internal/streams/stream":214,"_process":201,"core-util-is":182,"inherits":186,"process-nextick-args":200,"safe-buffer":219,"util-deprecate":229}],212:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -127002,7 +128296,7 @@ module.exports = function () {
 
   return BufferList;
 }();
-},{"safe-buffer":218}],212:[function(require,module,exports){
+},{"safe-buffer":219}],213:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -127075,13 +128369,13 @@ module.exports = {
   destroy: destroy,
   undestroy: undestroy
 };
-},{"process-nextick-args":199}],213:[function(require,module,exports){
+},{"process-nextick-args":200}],214:[function(require,module,exports){
 module.exports = require('events').EventEmitter;
 
-},{"events":182}],214:[function(require,module,exports){
+},{"events":183}],215:[function(require,module,exports){
 module.exports = require('./readable').PassThrough
 
-},{"./readable":215}],215:[function(require,module,exports){
+},{"./readable":216}],216:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = exports;
 exports.Readable = exports;
@@ -127090,13 +128384,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":206,"./lib/_stream_passthrough.js":207,"./lib/_stream_readable.js":208,"./lib/_stream_transform.js":209,"./lib/_stream_writable.js":210}],216:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":207,"./lib/_stream_passthrough.js":208,"./lib/_stream_readable.js":209,"./lib/_stream_transform.js":210,"./lib/_stream_writable.js":211}],217:[function(require,module,exports){
 module.exports = require('./readable').Transform
 
-},{"./readable":215}],217:[function(require,module,exports){
+},{"./readable":216}],218:[function(require,module,exports){
 module.exports = require('./lib/_stream_writable.js');
 
-},{"./lib/_stream_writable.js":210}],218:[function(require,module,exports){
+},{"./lib/_stream_writable.js":211}],219:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -127160,7 +128454,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":178}],219:[function(require,module,exports){
+},{"buffer":179}],220:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -127289,7 +128583,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":182,"inherits":185,"readable-stream/duplex.js":205,"readable-stream/passthrough.js":214,"readable-stream/readable.js":215,"readable-stream/transform.js":216,"readable-stream/writable.js":217}],220:[function(require,module,exports){
+},{"events":183,"inherits":186,"readable-stream/duplex.js":206,"readable-stream/passthrough.js":215,"readable-stream/readable.js":216,"readable-stream/transform.js":217,"readable-stream/writable.js":218}],221:[function(require,module,exports){
 (function (global){
 var ClientRequest = require('./lib/request')
 var extend = require('xtend')
@@ -127371,7 +128665,7 @@ http.METHODS = [
 	'UNSUBSCRIBE'
 ]
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./lib/request":222,"builtin-status-codes":179,"url":226,"xtend":232}],221:[function(require,module,exports){
+},{"./lib/request":223,"builtin-status-codes":180,"url":227,"xtend":233}],222:[function(require,module,exports){
 (function (global){
 exports.fetch = isFunction(global.fetch) && isFunction(global.ReadableStream)
 
@@ -127444,7 +128738,7 @@ function isFunction (value) {
 xhr = null // Help gc
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],222:[function(require,module,exports){
+},{}],223:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -127754,7 +129048,7 @@ var unsafeHeaders = [
 ]
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":221,"./response":223,"_process":200,"buffer":178,"inherits":185,"readable-stream":215,"to-arraybuffer":225}],223:[function(require,module,exports){
+},{"./capability":222,"./response":224,"_process":201,"buffer":179,"inherits":186,"readable-stream":216,"to-arraybuffer":226}],224:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -127940,7 +129234,7 @@ IncomingMessage.prototype._onXHRProgress = function () {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":221,"_process":200,"buffer":178,"inherits":185,"readable-stream":215}],224:[function(require,module,exports){
+},{"./capability":222,"_process":201,"buffer":179,"inherits":186,"readable-stream":216}],225:[function(require,module,exports){
 'use strict';
 
 var Buffer = require('safe-buffer').Buffer;
@@ -128213,7 +129507,7 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":218}],225:[function(require,module,exports){
+},{"safe-buffer":219}],226:[function(require,module,exports){
 var Buffer = require('buffer').Buffer
 
 module.exports = function (buf) {
@@ -128242,7 +129536,7 @@ module.exports = function (buf) {
 	}
 }
 
-},{"buffer":178}],226:[function(require,module,exports){
+},{"buffer":179}],227:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -128976,7 +130270,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":227,"punycode":201,"querystring":204}],227:[function(require,module,exports){
+},{"./util":228,"punycode":202,"querystring":205}],228:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -128994,7 +130288,7 @@ module.exports = {
   }
 };
 
-},{}],228:[function(require,module,exports){
+},{}],229:[function(require,module,exports){
 (function (global){
 
 /**
@@ -129065,16 +130359,16 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],229:[function(require,module,exports){
-arguments[4][185][0].apply(exports,arguments)
-},{"dup":185}],230:[function(require,module,exports){
+},{}],230:[function(require,module,exports){
+arguments[4][186][0].apply(exports,arguments)
+},{"dup":186}],231:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],231:[function(require,module,exports){
+},{}],232:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -129664,7 +130958,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":230,"_process":200,"inherits":229}],232:[function(require,module,exports){
+},{"./support/isBuffer":231,"_process":201,"inherits":230}],233:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
