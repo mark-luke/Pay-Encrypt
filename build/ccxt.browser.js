@@ -45,7 +45,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.17.369'
+const version = '1.17.370'
 
 Exchange.ccxtVersion = version
 
@@ -5054,7 +5054,8 @@ module.exports = class bibox extends Exchange {
         let response = await this.publicGetMdata (this.extend ({
             'cmd': 'marketAll',
         }, params));
-        return this.parseTickers (response['result'], symbols);
+        let tickers = this.parseTickers (response['result'], symbols);
+        return this.indexBy (tickers, 'symbol');
     }
 
     parseTrade (trade, market = undefined) {
