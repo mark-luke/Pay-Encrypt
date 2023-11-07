@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.70'
+const version = '1.21.71'
 
 Exchange.ccxtVersion = version
 
@@ -67106,7 +67106,7 @@ module.exports = class liquid extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, AuthenticationError, NotSupported, InvalidOrder, OrderNotFound, ExchangeNotAvailable, DDoSProtection, InsufficientFunds } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, AuthenticationError, NotSupported, InvalidOrder, OrderNotFound, ExchangeNotAvailable, RateLimitExceeded, InsufficientFunds } = require ('./base/errors');
 const { TRUNCATE, DECIMAL_PLACES } = require ('./base/functions/number');
 
 //  ---------------------------------------------------------------------------
@@ -67227,7 +67227,7 @@ module.exports = class livecoin extends Exchange {
                     '30': AuthenticationError,
                     '31': NotSupported,
                     '32': ExchangeError,
-                    '429': DDoSProtection,
+                    '429': RateLimitExceeded,
                     '503': ExchangeNotAvailable,
                 },
                 'broad': {
@@ -101440,7 +101440,7 @@ module.exports = class tidex extends Exchange {
 'use strict';
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, PermissionDenied, ExchangeNotAvailable, InsufficientFunds, OrderNotFound, InvalidOrder, DDoSProtection, NotSupported, BadRequest, AuthenticationError } = require ('./base/errors');
+const { ExchangeError, PermissionDenied, ExchangeNotAvailable, InsufficientFunds, OrderNotFound, InvalidOrder, RateLimitExceeded, NotSupported, BadRequest, AuthenticationError } = require ('./base/errors');
 
 module.exports = class timex extends Exchange {
     describe () {
@@ -101597,7 +101597,7 @@ module.exports = class timex extends Exchange {
                     '401': AuthenticationError,
                     '403': PermissionDenied,
                     '404': OrderNotFound,
-                    '429': DDoSProtection,
+                    '429': RateLimitExceeded,
                     '500': ExchangeError,
                     '503': ExchangeNotAvailable,
                 },
