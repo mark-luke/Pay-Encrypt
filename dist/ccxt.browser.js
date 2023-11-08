@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.46'
+const version = '1.27.47'
 
 Exchange.ccxtVersion = version
 
@@ -81820,6 +81820,7 @@ module.exports = class poloniex extends Exchange {
                 'id': newid,
                 'price': price,
                 'status': 'open',
+                'trades': [],
             });
             if (amount !== undefined) {
                 this.orders[newid]['amount'] = amount;
