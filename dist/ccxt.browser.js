@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1321'
+const version = '1.18.1322'
 
 Exchange.ccxtVersion = version
 
@@ -5440,6 +5440,7 @@ module.exports =
     , base16ToBinary: string => CryptoJS.enc.Hex.parse (string)
     , binaryToBase16: binary => binary.toString (CryptoJS.enc.Hex)
     , binaryConcat: (...args) => args.reduce ((a, b) => a.concat (b))
+    , binaryConcatArray: (arr) => arr.reduce ((a, b) => a.concat (b))
 
     , urlencode: object => qs.stringify (object)
     , rawencode: object => qs.stringify (object, { encode: false })
@@ -30011,10 +30012,7 @@ module.exports = class bytetrade extends Exchange {
             this.stringToBinary (this.encode (chainName)),
             this.numberToLE (0, 1),
         ];
-        let bytestring = byteStringArray[0];
-        for (let i = 1; i < byteStringArray.length; i++) {
-            bytestring = this.binaryConcat (bytestring, byteStringArray[i]);
-        }
+        const bytestring = this.binaryConcatArray (byteStringArray);
         const hash = this.hash (bytestring, 'sha256', 'hex');
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
         const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
@@ -30207,10 +30205,7 @@ module.exports = class bytetrade extends Exchange {
             this.stringToBinary (this.encode (chainName)),
             this.numberToLE (0, 1),
         ];
-        let bytestring = byteStringArray[0];
-        for (let i = 1; i < byteStringArray.length; i++) {
-            bytestring = this.binaryConcat (bytestring, byteStringArray[i]);
-        }
+        const bytestring = this.binaryConcatArray (byteStringArray);
         const hash = this.hash (bytestring, 'sha256', 'hex');
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
         const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
@@ -30306,10 +30301,7 @@ module.exports = class bytetrade extends Exchange {
             this.stringToBinary (this.encode (chainName)),
             this.numberToLE (0, 1),
         ];
-        let bytestring = byteStringArray[0];
-        for (let i = 1; i < byteStringArray.length; i++) {
-            bytestring = this.binaryConcat (bytestring, byteStringArray[i]);
-        }
+        const bytestring = this.binaryConcatArray (byteStringArray);
         const hash = this.hash (bytestring, 'sha256', 'hex');
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
         const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
@@ -30626,10 +30618,7 @@ module.exports = class bytetrade extends Exchange {
                 this.numberToLE (0, 1),
             ];
         }
-        let bytestring = byteStringArray[0];
-        for (let i = 1; i < byteStringArray.length; i++) {
-            bytestring = this.binaryConcat (bytestring, byteStringArray[i]);
-        }
+        const bytestring = this.binaryConcatArray (byteStringArray);
         const hash = this.hash (bytestring, 'sha256', 'hex');
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
         const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
