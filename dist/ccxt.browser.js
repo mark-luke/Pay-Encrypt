@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.47'
+const version = '1.32.48'
 
 Exchange.ccxtVersion = version
 
@@ -89927,6 +89927,7 @@ module.exports = class poloniex extends Exchange {
             const code = this.safeCurrencyCode (id);
             const active = (currency['delisted'] === 0) && !currency['disabled'];
             const numericId = this.safeInteger (currency, 'id');
+            const fee = this.safeFloat (currency, 'txFee');
             result[code] = {
                 'id': id,
                 'numericId': numericId,
@@ -89934,7 +89935,7 @@ module.exports = class poloniex extends Exchange {
                 'info': currency,
                 'name': currency['name'],
                 'active': active,
-                'fee': this.safeFloat (currency, 'txFee'), // todo: redesign
+                'fee': fee,
                 'precision': precision,
                 'limits': {
                     'amount': {
@@ -89950,7 +89951,7 @@ module.exports = class poloniex extends Exchange {
                         'max': undefined,
                     },
                     'withdraw': {
-                        'min': currency['txFee'],
+                        'min': fee,
                         'max': Math.pow (10, precision),
                     },
                 },
