@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.11'
+const version = '1.29.12'
 
 Exchange.ccxtVersion = version
 
@@ -57613,23 +57613,25 @@ module.exports = class ftx extends Exchange {
         ];
     }
 
-    async fetchOHLCV (symbol, timeframe = '1m', since = undefined, limit = undefined, params = {}) {
-        await this.loadMarkets ();
-        const request = {
-            'resolution': this.timeframes[timeframe],
-        };
+    getMarketParams (symbol, key, params = {}) {
         let market = undefined;
+        let marketId = undefined;
         if (symbol in this.markets) {
             market = this.market (symbol);
-            request['market_name'] = market['id'];
+            marketId = market['id'];
         } else {
-            const marketId = this.safeString (params, 'market_name');
-            if (marketId !== undefined) {
-                request['market_name'] = marketId;
-            } else {
-                request['market_name'] = symbol;
-            }
+            marketId = this.safeString (params, key, symbol);
         }
+        return [ market, marketId ];
+    }
+
+    async fetchOHLCV (symbol, timeframe = '1m', since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const [ market, marketId ] = this.getMarketParams (symbol, 'market_name', params);
+        const request = {
+            'resolution': this.timeframes[timeframe],
+            'market_name': marketId,
+        };
         // max 1501 candles, including the current candle when since is not specified
         limit = (limit === undefined) ? 1501 : limit;
         if (since === undefined) {
@@ -58294,10 +58296,11 @@ module.exports = class ftx extends Exchange {
 
     async fetchMyTrades (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
-        const market = this.market (symbol);
-        const request = {
-            'market': market['id'],
-        };
+        const [ market, marketId ] = this.getMarketParams (symbol, 'market', params);
+        const request = {};
+        if (marketId !== undefined) {
+            request['market'] = marketId;
+        }
         if (limit !== undefined) {
             request['limit'] = limit;
         }
