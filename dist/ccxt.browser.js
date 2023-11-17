@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.77'
+const version = '1.26.78'
 
 Exchange.ccxtVersion = version
 
@@ -106393,6 +106393,7 @@ module.exports = class timex extends Exchange {
                 'api': 'https://plasma-relay-backend.timex.io',
                 'www': 'https://timex.io',
                 'doc': 'https://docs.timex.io',
+                'referral': 'https://timex.io/?refcode=1x27vNkTbP1uwkCck',
             },
             'api': {
                 'custody': {
