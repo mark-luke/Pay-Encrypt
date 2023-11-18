@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.38'
+const version = '1.24.39'
 
 Exchange.ccxtVersion = version
 
@@ -27597,7 +27597,7 @@ module.exports = class braziliex extends Exchange {
             headers = {
                 'Content-type': 'application/x-www-form-urlencoded',
                 'Key': this.apiKey,
-                'Sign': this.decode (signature),
+                'Sign': signature,
             };
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
