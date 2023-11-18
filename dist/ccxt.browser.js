@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.36'
+const version = '1.32.37'
 
 Exchange.ccxtVersion = version
 
@@ -7900,6 +7900,7 @@ module.exports = class binance extends Exchange {
                 'test': {
                     'fapiPublic': 'https://testnet.binancefuture.com/fapi/v1',
                     'fapiPrivate': 'https://testnet.binancefuture.com/fapi/v1',
+                    'fapiPrivateV2': 'https://testnet.binancefuture.com/fapi/v2',
                     'public': 'https://testnet.binance.vision/api/v3',
                     'private': 'https://testnet.binance.vision/api/v3',
                     'v3': 'https://testnet.binance.vision/api/v3',
@@ -7910,6 +7911,7 @@ module.exports = class binance extends Exchange {
                     'sapi': 'https://api.binance.com/sapi/v1',
                     'fapiPublic': 'https://fapi.binance.com/fapi/v1',
                     'fapiPrivate': 'https://fapi.binance.com/fapi/v1',
+                    'fapiPrivateV2': 'https://fapi.binance.com/fapi/v2',
                     'public': 'https://api.binance.com/api/v3',
                     'private': 'https://api.binance.com/api/v3',
                     'v3': 'https://api.binance.com/api/v3',
@@ -8092,6 +8094,13 @@ module.exports = class binance extends Exchange {
                         'order',
                         'allOpenOrders',
                         'listenKey',
+                    ],
+                },
+                'fapiPrivateV2': {
+                    'get': [
+                        'account',
+                        'balance',
+                        'positionRisk',
                     ],
                 },
                 'v3': {
@@ -8453,7 +8462,9 @@ module.exports = class binance extends Exchange {
         const type = this.safeString (params, 'type', defaultType);
         let method = 'privateGetAccount';
         if (type === 'future') {
-            method = 'fapiPrivateGetAccount';
+            const options = this.safeValue (this.options, 'future', {});
+            const fetchBalanceOptions = this.safeValue (options, 'fetchBalance', {});
+            method = this.safeString (fetchBalanceOptions, 'method', 'fapiPrivateV2GetAccount');
         } else if (type === 'margin') {
             method = 'sapiGetMarginAccount';
         }
@@ -8496,6 +8507,8 @@ module.exports = class binance extends Exchange {
         //
         // futures (fapi)
         //
+        //     fapiPrivateGetAccount
+        //
         //     {
         //         "feeTier":0,
         //         "canTrade":true,
@@ -8535,6 +8548,72 @@ module.exports = class binance extends Exchange {
         //         ]
         //     }
         //
+        //     fapiPrivateV2GetAccount
+        //
+        //     {
+        //         "feeTier":0,
+        //         "canTrade":true,
+        //         "canDeposit":true,
+        //         "canWithdraw":true,
+        //         "updateTime":0,
+        //         "totalInitialMargin":"0.00000000",
+        //         "totalMaintMargin":"0.00000000",
+        //         "totalWalletBalance":"0.00000000",
+        //         "totalUnrealizedProfit":"0.00000000",
+        //         "totalMarginBalance":"0.00000000",
+        //         "totalPositionInitialMargin":"0.00000000",
+        //         "totalOpenOrderInitialMargin":"0.00000000",
+        //         "totalCrossWalletBalance":"0.00000000",
+        //         "totalCrossUnPnl":"0.00000000",
+        //         "availableBalance":"0.00000000",
+        //         "maxWithdrawAmount":"0.00000000",
+        //         "assets":[
+        //             {
+        //                 "asset":"BNB",
+        //                 "walletBalance":"0.01000000",
+        //                 "unrealizedProfit":"0.00000000",
+        //                 "marginBalance":"0.01000000",
+        //                 "maintMargin":"0.00000000",
+        //                 "initialMargin":"0.00000000",
+        //                 "positionInitialMargin":"0.00000000",
+        //                 "openOrderInitialMargin":"0.00000000",
+        //                 "maxWithdrawAmount":"0.01000000",
+        //                 "crossWalletBalance":"0.01000000",
+        //                 "crossUnPnl":"0.00000000",
+        //                 "availableBalance":"0.01000000"
+        //             }
+        //         ],
+        //         "positions":[
+        //             {
+        //                 "symbol":"BTCUSDT",
+        //                 "initialMargin":"0",
+        //                 "maintMargin":"0",
+        //                 "unrealizedProfit":"0.00000000",
+        //                 "positionInitialMargin":"0",
+        //                 "openOrderInitialMargin":"0",
+        //                 "leverage":"20",
+        //                 "isolated":false,
+        //                 "entryPrice":"0.00000",
+        //                 "maxNotional":"5000000",
+        //                 "positionSide":"BOTH"
+        //             },
+        //         ]
+        //     }
+        //
+        //     fapiPrivateV2GetBalance
+        //
+        //     [
+        //         {
+        //             "accountAlias":"FzFzXquXXqoC",
+        //             "asset":"BNB",
+        //             "balance":"0.01000000",
+        //             "crossWalletBalance":"0.01000000",
+        //             "crossUnPnl":"0.00000000",
+        //             "availableBalance":"0.01000000",
+        //             "maxWithdrawAmount":"0.01000000"
+        //         }
+        //     ]
+        //
         const result = { 'info': response };
         if ((type === 'spot') || (type === 'margin')) {
             const balances = this.safeValue2 (response, 'balances', 'userAssets', []);
@@ -8548,14 +8627,18 @@ module.exports = class binance extends Exchange {
                 result[code] = account;
             }
         } else {
-            const balances = this.safeValue (response, 'assets', []);
+            let balances = response;
+            if (!Array.isArray (response)) {
+                balances = this.safeValue (response, 'assets', []);
+            }
             for (let i = 0; i < balances.length; i++) {
                 const balance = balances[i];
                 const currencyId = this.safeString (balance, 'asset');
                 const code = this.safeCurrencyCode (currencyId);
                 const account = this.account ();
+                account['free'] = this.safeFloat (balance, 'availableBalance');
                 account['used'] = this.safeFloat (balance, 'initialMargin');
-                account['total'] = this.safeFloat (balance, 'marginBalance');
+                account['total'] = this.safeFloat2 (balance, 'marginBalance', 'balance');
                 result[code] = account;
             }
         }
@@ -9915,7 +9998,7 @@ module.exports = class binance extends Exchange {
                 throw new AuthenticationError (this.id + ' userDataStream endpoint requires `apiKey` credential');
             }
         }
-        if ((api === 'private') || (api === 'sapi') || (api === 'wapi' && path !== 'systemStatus') || (api === 'fapiPrivate')) {
+        if ((api === 'private') || (api === 'sapi') || (api === 'wapi' && path !== 'systemStatus') || (api === 'fapiPrivate') || (api === 'fapiPrivateV2')) {
             this.checkRequiredCredentials ();
             let query = undefined;
             const recvWindow = this.safeInteger (this.options, 'recvWindow', 5000);
