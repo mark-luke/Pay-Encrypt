@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.12'
+const version = '1.30.14'
 
 Exchange.ccxtVersion = version
 
@@ -119702,11 +119702,11 @@ module.exports = class wavesexchange extends Exchange {
     }
 
     priceToPrecision (symbol, price) {
-        return this.toWei (price, this.markets[symbol]['precision']['price']);
+        return parseInt (parseFloat (this.toWei (price, this.markets[symbol]['precision']['price'])));
     }
 
     amountToPrecision (symbol, amount) {
-        return this.toWei (amount, this.markets[symbol]['precision']['amount']);
+        return parseInt (parseFloat (this.toWei (amount, this.markets[symbol]['precision']['amount'])));
     }
 
     currencyFromPrecision (currency, amount) {
@@ -119731,8 +119731,8 @@ module.exports = class wavesexchange extends Exchange {
         const matcherPublicKey = await this.getMatcherPublicKey ();
         const amountAsset = this.getAssetId (market['baseId']);
         const priceAsset = this.getAssetId (market['quoteId']);
-        amount = parseInt (this.amountToPrecision (symbol, amount));
-        price = parseInt (this.priceToPrecision (symbol, price));
+        amount = this.amountToPrecision (symbol, amount);
+        price = this.priceToPrecision (symbol, price);
         const orderType = (side === 'buy') ? 0 : 1;
         const timestamp = this.milliseconds ();
         const expiration = this.sum (timestamp, this.getDefaultExpiry ());
