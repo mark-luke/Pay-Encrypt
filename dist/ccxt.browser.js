@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1301'
+const version = '1.18.1302'
 
 Exchange.ccxtVersion = version
 
@@ -23102,8 +23102,8 @@ module.exports = class bitz extends Exchange {
             },
             'fees': {
                 'trading': {
-                    'maker': 0.001,
-                    'taker': 0.001,
+                    'maker': 0.002,
+                    'taker': 0.002,
                 },
                 'funding': {
                     'withdraw': {
