@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.18'
+const version = '1.33.19'
 
 Exchange.ccxtVersion = version
 
@@ -53551,7 +53551,8 @@ module.exports = class currencycom extends Exchange {
             'name': 'Currency.com',
             'countries': [ 'BY' ], // Belarus
             'rateLimit': 500,
-            'certified': false,
+            'certified': true,
+            'pro': true,
             'version': 'v1',
             // new metainfo interface
             'has': {
