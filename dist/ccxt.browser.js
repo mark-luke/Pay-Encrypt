@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.23'
+const version = '1.33.24'
 
 Exchange.ccxtVersion = version
 
@@ -75051,6 +75051,13 @@ module.exports = class indodax extends Exchange {
                 'recvWindow': 5 * 1000, // default 5 sec
                 'timeDifference': 0, // the difference between system clock and exchange clock
                 'adjustForTimeDifference': false, // controls the adjustment logic upon instantiation
+            },
+            'commonCurrencies': {
+                'STR': 'XLM',
+                'BCHABC': 'BCH',
+                'BCHSV': 'BSV',
+                'DRK': 'DASH',
+                'NEM': 'XEM',
             },
         });
     }
