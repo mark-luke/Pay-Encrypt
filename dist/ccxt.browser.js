@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.54'
+const version = '1.22.55'
 
 Exchange.ccxtVersion = version
 
@@ -51139,11 +51139,16 @@ module.exports = class ftx extends Exchange {
             'market_name': market['id'],
             'resolution': this.timeframes[timeframe],
         };
-        if (limit !== undefined) {
+        // max 1501 candles, including the current candle when since is not specified
+        limit = (limit === undefined) ? 1501 : limit;
+        if (since === undefined) {
+            request['end_time'] = this.seconds ();
             request['limit'] = limit;
-        }
-        if (since !== undefined) {
+            request['start_time'] = request['end_time'] - limit * this.parseTimeframe (timeframe);
+        } else {
             request['start_time'] = parseInt (since / 1000);
+            request['limit'] = limit;
+            request['end_time'] = this.sum (request['start_time'], limit * this.parseTimeframe (timeframe));
         }
         const response = await this.publicGetMarketsMarketNameCandles (this.extend (request, params));
         //
