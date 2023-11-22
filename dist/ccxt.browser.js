@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1315'
+const version = '1.18.1324'
 
 Exchange.ccxtVersion = version
 
@@ -5119,15 +5119,15 @@ module.exports = class Exchange {
 
     // the following functions take and return numbers represented as strings
     // this is useful for arbitrary precision maths that floats lack
-    divide (a, b) {
+    integerDivide (a, b) {
         return new BN (a).div (new BN (b))
     }
 
-    modulo (a, b) {
+    integerModulo (a, b) {
         return new BN (a).mod (new BN (b))
     }
 
-    pow (a, b) {
+    integerPow (a, b) {
         return new BN (a).pow (new BN (b))
     }
 }
@@ -5440,6 +5440,7 @@ module.exports =
     , base16ToBinary: string => CryptoJS.enc.Hex.parse (string)
     , binaryToBase16: binary => binary.toString (CryptoJS.enc.Hex)
     , binaryConcat: (...args) => args.reduce ((a, b) => a.concat (b))
+    , binaryConcatArray: (arr) => arr.reduce ((a, b) => a.concat (b))
 
     , urlencode: object => qs.stringify (object)
     , rawencode: object => qs.stringify (object, { encode: false })
@@ -8207,7 +8208,7 @@ module.exports = class bibox extends Exchange {
                     throw new ExchangeError (feedback);
                 }
             }
-            throw new ExchangeError (this.id + ': "error" in response: ' + body);
+            throw new ExchangeError (this.id + ' ' + body);
         }
         if (!('result' in response)) {
             throw new ExchangeError (this.id + ' ' + body);
@@ -10793,7 +10794,7 @@ module.exports = class bit2c extends Exchange {
             timestamp = this.safeTimestamp (trade, 'ticks');
             price = this.safeFloat (trade, 'price');
             amount = this.safeFloat (trade, 'firstAmount');
-            const reference_parts = reference.split ('|'); // reference contains: 'pair|orderId|tradeId'
+            const reference_parts = reference.split ('|'); // reference contains 'pair|orderId|tradeId'
             if (market === undefined) {
                 const marketId = this.safeString (trade, 'pair');
                 if (marketId in this.markets_by_id[marketId]) {
@@ -29854,16 +29855,16 @@ module.exports = class bytetrade extends Exchange {
     }
 
     parseTrade (trade, market = undefined) {
-        const timestamp = this.safeInteger2 (trade, 'timestamp', 'timestamp');
-        const price = this.safeFloat2 (trade, 'price', 'price');
-        const amount = this.safeFloat2 (trade, 'amount', 'amount');
-        const cost = this.safeFloat2 (trade, 'cost', 'cost');
-        const id = this.safeString2 (trade, 'id', 'id');
-        const type = this.safeString2 (trade, 'type', 'type');
-        const takerOrMaker = this.safeString2 (trade, 'takerOrMaker', 'takerOrMaker');
-        const side = this.safeString2 (trade, 'side', 'side');
-        const datetime = this.safeString2 (trade, 'datetime', 'datetime');
-        const order = this.safeString2 (trade, 'order', 'order');
+        const timestamp = this.safeInteger (trade, 'timestamp');
+        const price = this.safeFloat (trade, 'price');
+        const amount = this.safeFloat (trade, 'amount');
+        const cost = this.safeFloat (trade, 'cost');
+        const id = this.safeString (trade, 'id');
+        const type = this.safeString (trade, 'type');
+        const takerOrMaker = this.safeString (trade, 'takerOrMaker');
+        const side = this.safeString (trade, 'side');
+        const datetime = this.safeString (trade, 'datetime');
+        const order = this.safeString (trade, 'order');
         const fee = this.safeValue (trade, 'fee');
         let symbol = undefined;
         if (market === undefined) {
@@ -29979,7 +29980,7 @@ module.exports = class bytetrade extends Exchange {
         const chainName = 'Sagittarius';
         const defaultFee = this.safeString (this.options, 'fee', '300000000000000');
         const fee = this.safeString (params, 'fee', defaultFee);
-        const eightBytes = this.pow ('2', '64');
+        const eightBytes = this.integerPow ('2', '64');
         const byteStringArray = [
             this.numberToBE (1, 32),
             this.numberToLE (Math.floor (now / 1000), 4),
@@ -29995,10 +29996,10 @@ module.exports = class bytetrade extends Exchange {
             this.numberToLE (typeNum, 1),
             this.numberToLE (normalSymbol.length, 1),
             this.stringToBinary (this.encode (normalSymbol)),
-            this.numberToLE (this.divide (amountChain, eightBytes), 8),
-            this.numberToLE (this.modulo (amountChain, eightBytes), 8),
-            this.numberToLE (this.divide (priceChain, eightBytes), 8),
-            this.numberToLE (this.modulo (priceChain, eightBytes), 8),
+            this.numberToLE (this.integerDivide (amountChain, eightBytes), 8),
+            this.numberToLE (this.integerModulo (amountChain, eightBytes), 8),
+            this.numberToLE (this.integerDivide (priceChain, eightBytes), 8),
+            this.numberToLE (this.integerModulo (priceChain, eightBytes), 8),
             this.numberToLE (0, 2),
             this.numberToLE (Math.floor (now / 1000), 4),
             this.numberToLE (Math.floor (expiration / 1000), 4),
@@ -30011,10 +30012,7 @@ module.exports = class bytetrade extends Exchange {
             this.stringToBinary (this.encode (chainName)),
             this.numberToLE (0, 1),
         ];
-        let bytestring = byteStringArray[0];
-        for (let i = 1; i < byteStringArray.length; i++) {
-            bytestring = this.binaryConcat (bytestring, byteStringArray[i]);
-        }
+        const bytestring = this.binaryConcatArray (byteStringArray);
         const hash = this.hash (bytestring, 'sha256', 'hex');
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
         const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
@@ -30207,10 +30205,7 @@ module.exports = class bytetrade extends Exchange {
             this.stringToBinary (this.encode (chainName)),
             this.numberToLE (0, 1),
         ];
-        let bytestring = byteStringArray[0];
-        for (let i = 1; i < byteStringArray.length; i++) {
-            bytestring = this.binaryConcat (bytestring, byteStringArray[i]);
-        }
+        const bytestring = this.binaryConcatArray (byteStringArray);
         const hash = this.hash (bytestring, 'sha256', 'hex');
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
         const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
@@ -30283,7 +30278,7 @@ module.exports = class bytetrade extends Exchange {
         expirationDatetime = expirationDatetime.split ('.')[0];
         const feeAmount = '300000000000000';
         const chainName = 'Sagittarius';
-        const eightBytes = this.pow ('2', '64');
+        const eightBytes = this.integerPow ('2', '64');
         const byteStringArray = [
             this.numberToBE (1, 32),
             this.numberToLE (Math.floor (now / 1000), 4),
@@ -30298,18 +30293,15 @@ module.exports = class bytetrade extends Exchange {
             this.numberToLE (address.length, 1),
             this.stringToBinary (this.encode (address)),
             this.numberToLE (assetType, 4),
-            this.numberToLE (this.divide (amountChain, eightBytes), 8),
-            this.numberToLE (this.modulo (amountChain, eightBytes), 8),
+            this.numberToLE (this.integerDivide (amountChain, eightBytes), 8),
+            this.numberToLE (this.integerModulo (amountChain, eightBytes), 8),
             this.numberToLE (0, 1),
             this.numberToLE (1, 1),
             this.numberToLE (chainName.length, 1),
             this.stringToBinary (this.encode (chainName)),
             this.numberToLE (0, 1),
         ];
-        let bytestring = byteStringArray[0];
-        for (let i = 1; i < byteStringArray.length; i++) {
-            bytestring = this.binaryConcat (bytestring, byteStringArray[i]);
-        }
+        const bytestring = this.binaryConcatArray (byteStringArray);
         const hash = this.hash (bytestring, 'sha256', 'hex');
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
         const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
@@ -30441,16 +30433,23 @@ module.exports = class bytetrade extends Exchange {
         return this.parseTransactions (response, currency, since, limit);
     }
 
-    parseTransactionStatusByType (status) {
-        if ((status === 'DEPOSIT_FAILED') || (status === 'FEE_SEND_FAILED') || (status === 'FEE_FAILED') || (status === 'PAY_SEND_FAILED') || (status === 'PAY_FAILED') || (status === 'BTT_FAILED') || (status === 'WITHDDRAW_FAILED') || (status === 'USER_FAILED')) {
-            return 'failed';
-        } else if ((status === 'FEE_EXECUED') || (status === 'PAY_EXECUED') || (status === 'WITHDDRAW_EXECUTED') || (status === 'USER_EXECUED')) {
-            return 'pending';
-        } else if (status === 'BTT_SUCCED') {
-            return 'ok';
-        } else {
-            return status;
-        }
+    parseTransactionStatus (status) {
+        const statuses = {
+            'DEPOSIT_FAILED': 'failed',
+            'FEE_SEND_FAILED': 'failed',
+            'FEE_FAILED': 'failed',
+            'PAY_SEND_FAILED': 'failed',
+            'PAY_FAILED': 'failed',
+            'BTT_FAILED': 'failed',
+            'WITHDDRAW_FAILED': 'failed',
+            'USER_FAILED': 'failed',
+            'FEE_EXECUED': 'pending',
+            'PAY_EXECUED': 'pending',
+            'WITHDDRAW_EXECUTED': 'pending',
+            'USER_EXECUED': 'pending',
+            'BTT_SUCCED': 'ok',
+        };
+        return this.safeString (statuses, status, status);
     }
 
     parseTransaction (transaction, currency = undefined) {
@@ -30468,7 +30467,7 @@ module.exports = class bytetrade extends Exchange {
         const timestamp = this.safeInteger (transaction, 'timestamp');
         const datetime = this.safeString (transaction, 'datetime');
         const type = this.safeString (transaction, 'type');
-        const status = this.parseTransactionStatusByType (this.safeString (transaction, 'status'));
+        const status = this.parseTransactionStatus (this.safeString (transaction, 'status'));
         const amount = this.safeFloat (transaction, 'amount');
         const feeInfo = this.safeValue (transaction, 'fee');
         const feeCost = this.safeFloat (feeInfo, 'cost');
@@ -30558,7 +30557,7 @@ module.exports = class bytetrade extends Exchange {
         const coinId = currency['id'];
         const amountTruncate = this.decimalToPrecision (amount, TRUNCATE, currency['info']['transferPrecision'], DECIMAL_PLACES, NO_PADDING);
         const amountChain = this.toWei (amountTruncate, 'ether', currency['info']['externalPrecision']);
-        const eightBytes = this.pow ('2', '64');
+        const eightBytes = this.integerPow ('2', '64');
         let assetFee = 0;
         let byteStringArray = [];
         if (chainTypeString === 'bitcoin') {
@@ -30577,11 +30576,11 @@ module.exports = class bytetrade extends Exchange {
                 this.numberToLE (address.length, 1),
                 this.stringToBinary (this.encode (address)),
                 this.numberToLE (parseInt (coinId), 4),
-                this.numberToLE (Math.floor (parseInt (parseFloat (this.divide (amountChain, eightBytes)))), 8),
-                this.numberToLE (this.modulo (amountChain, eightBytes), 8),
+                this.numberToLE (Math.floor (parseInt (parseFloat (this.integerDivide (amountChain, eightBytes)))), 8),
+                this.numberToLE (this.integerModulo (amountChain, eightBytes), 8),
                 this.numberToLE (1, 1),
-                this.numberToLE (this.divide (assetFee, eightBytes), 8),
-                this.numberToLE (this.modulo (assetFee, eightBytes), 8),
+                this.numberToLE (this.integerDivide (assetFee, eightBytes), 8),
+                this.numberToLE (this.integerModulo (assetFee, eightBytes), 8),
                 this.numberToLE (0, 1),
                 this.numberToLE (1, 1),
                 this.numberToLE (chainName.length, 1),
@@ -30610,8 +30609,8 @@ module.exports = class bytetrade extends Exchange {
                 this.numberToLE (middleAddress.length, 1),
                 this.stringToBinary (this.encode (middleAddress)),
                 this.numberToLE (parseInt (coinId), 4),
-                this.numberToLE (Math.floor (parseInt (parseFloat (this.divide (amountChain, eightBytes)))), 8),
-                this.numberToLE (this.modulo (amountChain, eightBytes), 8),
+                this.numberToLE (Math.floor (parseInt (parseFloat (this.integerDivide (amountChain, eightBytes)))), 8),
+                this.numberToLE (this.integerModulo (amountChain, eightBytes), 8),
                 this.numberToLE (0, 1),
                 this.numberToLE (1, 1),
                 this.numberToLE (chainName.length, 1),
@@ -30619,10 +30618,7 @@ module.exports = class bytetrade extends Exchange {
                 this.numberToLE (0, 1),
             ];
         }
-        let bytestring = byteStringArray[0];
-        for (let i = 1; i < byteStringArray.length; i++) {
-            bytestring = this.binaryConcat (bytestring, byteStringArray[i]);
-        }
+        const bytestring = this.binaryConcatArray (byteStringArray);
         const hash = this.hash (bytestring, 'sha256', 'hex');
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
         const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
@@ -30743,7 +30739,7 @@ module.exports = class bytetrade extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, NullResponse, InvalidOrder, NotSupported, InsufficientFunds, InvalidNonce } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, NullResponse, InvalidOrder, NotSupported, InsufficientFunds, InvalidNonce, OrderNotFound } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -30863,6 +30859,8 @@ module.exports = class cex extends Exchange {
                 'broad': {
                     'Insufficient funds': InsufficientFunds,
                     'Nonce must be incremented': InvalidNonce,
+                    'Invalid Order': InvalidOrder,
+                    'Order not found': OrderNotFound,
                 },
             },
             'options': {
@@ -50508,7 +50506,7 @@ module.exports = class fybse extends Exchange {
 // ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, InvalidAddress, OrderNotFound, NotSupported, DDoSProtection, InsufficientFunds } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, InvalidAddress, OrderNotFound, NotSupported, DDoSProtection, InsufficientFunds, InvalidOrder } = require ('./base/errors');
 
 // ---------------------------------------------------------------------------
 
@@ -50614,6 +50612,7 @@ module.exports = class gateio extends Exchange {
                 '15': DDoSProtection,
                 '16': OrderNotFound,
                 '17': OrderNotFound,
+                '20': InvalidOrder,
                 '21': InsufficientFunds,
             },
             // https://gate.io/api2#errCode
@@ -50834,30 +50833,6 @@ module.exports = class gateio extends Exchange {
             'quoteVolume': this.safeFloat (ticker, 'baseVolume'),
             'info': ticker,
         };
-    }
-
-    handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
-        if (response === undefined) {
-            return;
-        }
-        const resultString = this.safeString (response, 'result', '');
-        if (resultString !== 'false') {
-            return;
-        }
-        const errorCode = this.safeString (response, 'code');
-        if (errorCode !== undefined) {
-            const exceptions = this.exceptions;
-            const errorCodeNames = this.errorCodeNames;
-            if (errorCode in exceptions) {
-                let message = '';
-                if (errorCode in errorCodeNames) {
-                    message = errorCodeNames[errorCode];
-                } else {
-                    message = this.safeString (response, 'message', '(unknown)');
-                }
-                throw new exceptions[errorCode] (message);
-            }
-        }
     }
 
     async fetchTickers (symbols = undefined, params = {}) {
@@ -51280,23 +51255,23 @@ module.exports = class gateio extends Exchange {
         return this.safeString (types, type, type);
     }
 
-    async request (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
-        const response = await this.fetch2 (path, api, method, params, headers, body);
-        if ('result' in response) {
-            const result = response['result'];
-            const message = this.id + ' ' + this.json (response);
-            if (result === undefined) {
-                throw new ExchangeError (message);
-            }
-            if (typeof result === 'string') {
-                if (result !== 'true') {
-                    throw new ExchangeError (message);
-                }
-            } else if (!result) {
-                throw new ExchangeError (message);
+    handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
+        if (response === undefined) {
+            return;
+        }
+        const resultString = this.safeString (response, 'result', '');
+        if (resultString !== 'false') {
+            return;
+        }
+        const errorCode = this.safeString (response, 'code');
+        if (errorCode !== undefined) {
+            const exceptions = this.exceptions;
+            if (errorCode in exceptions) {
+                const message = this.safeString (response, 'message', body);
+                const feedback = this.safeString (this.errorCodeNames, errorCode, message);
+                throw new exceptions[errorCode] (feedback);
             }
         }
-        return response;
     }
 };
 
@@ -102950,13 +102925,20 @@ module.exports = class whitebit extends Exchange {
         if (response !== undefined) {
             const success = this.safeValue (response, 'success');
             if (!success) {
-                const message = response['message'];
-                if (message) {
-                    throw new ExchangeError (message);
-                } else {
-                    const feedback = this.id + ' ' + this.json (response);
-                    throw new ExchangeError (feedback);
+                const feedback = this.id + ' ' + body;
+                const message = this.safeValue (response, 'message');
+                if (typeof message === 'string') {
+                    const exact = this.safeValue (this.exceptions, 'exact', {});
+                    if (message in exact) {
+                        throw new exact[message] (feedback);
+                    }
+                    const broad = this.safeValue (this.exceptions, 'broad', {});
+                    const broadKey = this.findBroadlyMatchedKey (broad, message);
+                    if (broadKey !== undefined) {
+                        throw new broad[broadKey] (feedback);
+                    }
                 }
+                throw new ExchangeError (feedback);
             }
         }
     }
