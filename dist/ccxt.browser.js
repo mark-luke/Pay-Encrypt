@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.62'
+const version = '1.25.63'
 
 Exchange.ccxtVersion = version
 
@@ -78265,7 +78265,8 @@ module.exports = class okex extends Exchange {
     handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
         const feedback = this.id + ' ' + body;
         if (code === 503) {
-            throw new ExchangeError (feedback);
+            // {"message":"name resolution failed"}
+            throw new ExchangeNotAvailable (feedback);
         }
         if (!response) {
             return; // fallback to default error handler
