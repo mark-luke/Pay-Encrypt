@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.86'
+const version = '1.34.87'
 
 Exchange.ccxtVersion = version
 
@@ -50233,13 +50233,7 @@ module.exports = class coingi extends Exchange {
         const timestamp = this.safeInteger (trade, 'timestamp');
         const id = this.safeString (trade, 'id');
         const marketId = this.safeString (trade, 'currencyPair');
-        if (marketId in this.markets_by_id) {
-            market = this.markets_by_id[marketId];
-        }
-        let symbol = undefined;
-        if (market !== undefined) {
-            symbol = market['symbol'];
-        }
+        const symbol = this.safeSymbol (marketId, market);
         return {
             'id': id,
             'info': trade,
