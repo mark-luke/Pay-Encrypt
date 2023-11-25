@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.32'
+const version = '1.31.33'
 
 Exchange.ccxtVersion = version
 
@@ -85832,7 +85832,10 @@ module.exports = class okex extends Exchange {
                 'currency': feeCurrency,
             };
         }
-        const clientOrderId = this.safeString (order, 'client_oid');
+        let clientOrderId = this.safeString (order, 'client_oid');
+        if (clientOrderId.length < 1) {
+            clientOrderId = undefined; // fix empty clientOrderId string
+        }
         return {
             'info': order,
             'id': id,
