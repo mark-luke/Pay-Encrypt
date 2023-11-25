@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.92'
+const version = '1.20.93'
 
 Exchange.ccxtVersion = version
 
@@ -98579,9 +98579,9 @@ module.exports = class stex extends Exchange {
             code = currency['code'];
         }
         const type = ('depositId' in transaction) ? 'deposit' : 'withdrawal';
-        const amount = this.safeFloat2 (transaction, 'amount');
+        const amount = this.safeFloat (transaction, 'amount');
         const status = this.parseTransactionStatus (this.safeStringLower (transaction, 'status'));
-        const timestamp = this.safeTimestamp (transaction, 'timestamp', 'created_ts');
+        const timestamp = this.safeTimestamp2 (transaction, 'timestamp', 'created_ts');
         const updated = this.safeTimestamp (transaction, 'updated_ts');
         const txid = this.safeString (transaction, 'txid');
         let fee = undefined;
