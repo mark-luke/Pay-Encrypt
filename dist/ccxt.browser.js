@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1140'
+const version = '1.18.1141'
 
 Exchange.ccxtVersion = version
 
@@ -61243,7 +61243,10 @@ module.exports = class latoken extends Exchange {
             }
         }
         const timeFilled = this.safeTimestamp (order, 'timeFilled');
-        const lastTradeTimestamp = (timeFilled > 0) ? timeFilled : undefined;
+        let lastTradeTimestamp = undefined;
+        if ((timeFilled !== undefined) && (timeFilled > 0)) {
+            lastTradeTimestamp = timeFilled;
+        }
         return {
             'id': id,
             'info': order,
