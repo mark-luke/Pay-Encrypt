@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.55'
+const version = '1.19.56'
 
 Exchange.ccxtVersion = version
 
@@ -70189,12 +70189,14 @@ module.exports = class mandala extends Exchange {
             status = status ? 'closed' : 'open';
         }
         let lastTradeTimestamp = undefined;
-        if (filled > 0) {
-            lastTradeTimestamp = completionDate;
-        }
-        if ((filled !== undefined) && (amount !== undefined)) {
-            if ((filled < amount) && (status === 'closed')) {
-                status = 'canceled';
+        if (filled !== undefined) {
+            if (filled > 0) {
+                lastTradeTimestamp = completionDate;
+            }
+            if (amount !== undefined) {
+                if ((filled < amount) && (status === 'closed')) {
+                    status = 'canceled';
+                }
             }
         }
         const feeCost = this.safeValue (order, 'serviceCharge');
