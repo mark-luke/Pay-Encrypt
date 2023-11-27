@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.89'
+const version = '1.26.90'
 
 Exchange.ccxtVersion = version
 
@@ -24106,11 +24106,19 @@ module.exports = class bitstamp extends Exchange {
                         body = this.urlencode (query);
                         contentType = 'application/x-www-form-urlencoded';
                         headers['Content-Type'] = contentType;
+                    } else {
+                        // sending an empty POST request will trigger
+                        // an API0020 error returned by the exchange
+                        // therefore for empty requests we send a dummy object
+                        // https://github.com/ccxt/ccxt/issues/6846
+                        body = this.urlencode ({ 'foo': 'bar' });
+                        contentType = 'application/x-www-form-urlencoded';
+                        headers['Content-Type'] = contentType;
                     }
                 }
                 const authBody = body ? body : '';
                 const auth = xAuth + method + url.replace ('https://', '') + contentType + xAuthNonce + xAuthTimestamp + xAuthVersion + authBody;
-                const signature = this.encode (this.hmac (this.encode (auth), this.encode (this.secret)));
+                const signature = this.hmac (this.encode (auth), this.encode (this.secret));
                 headers['X-Auth-Signature'] = signature;
             }
         }
