@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.71'
+const version = '1.35.72'
 
 Exchange.ccxtVersion = version
 
@@ -134124,11 +134124,7 @@ module.exports = class yobit extends Exchange {
         ids = Object.keys (response);
         for (let i = 0; i < ids.length; i++) {
             const id = ids[i];
-            let symbol = id;
-            if (id in this.markets_by_id) {
-                const market = this.markets_by_id[id];
-                symbol = market['symbol'];
-            }
+            const symbol = this.safeSymbol (id);
             result[symbol] = this.parseOrderBook (response[id]);
         }
         return result;
@@ -134200,12 +134196,8 @@ module.exports = class yobit extends Exchange {
         for (let k = 0; k < keys.length; k++) {
             const id = keys[k];
             const ticker = tickers[id];
-            let symbol = id;
-            let market = undefined;
-            if (id in this.markets_by_id) {
-                market = this.markets_by_id[id];
-                symbol = market['symbol'];
-            }
+            const market = this.safeMarket (id);
+            const symbol = market['symbol'];
             result[symbol] = this.parseTicker (ticker, market);
         }
         return this.filterByArray (result, 'symbol', symbols);
