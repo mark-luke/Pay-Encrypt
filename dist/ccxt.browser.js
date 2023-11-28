@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.54'
+const version = '1.31.55'
 
 Exchange.ccxtVersion = version
 
@@ -7780,17 +7780,24 @@ module.exports = class bigone extends Exchange {
             'rateLimit': 1200, // 500 request per 10 minutes
             'has': {
                 'cancelAllOrders': true,
+                'cancelOrder': true,
                 'createMarketOrder': false,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchClosedOrders': true,
                 'fetchDepositAddress': true,
                 'fetchDeposits': true,
+                'fetchMarkets': true,
                 'fetchMyTrades': true,
                 'fetchOHLCV': true,
+                'fetchOpenOrders': true,
                 'fetchOrder': true,
                 'fetchOrders': true,
-                'fetchOpenOrders': true,
-                'fetchClosedOrders': true,
+                'fetchOrderBook': true,
+                'fetchTicker': true,
                 'fetchTickers': true,
                 'fetchTime': true,
+                'fetchTrades': true,
                 'fetchWithdrawals': true,
                 'withdraw': true,
             },
