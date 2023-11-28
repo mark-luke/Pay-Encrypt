@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1348'
+const version = '1.18.1349'
 
 Exchange.ccxtVersion = version
 
@@ -64381,7 +64381,7 @@ module.exports = class latoken extends Exchange {
             'has': {
                 'CORS': false,
                 'publicAPI': true,
-                'pivateAPI': true,
+                'privateAPI': true,
                 'cancelOrder': true,
                 'cancelAllOrders': true,
                 'createMarketOrder': false,
