@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.29'
+const version = '1.21.30'
 
 Exchange.ccxtVersion = version
 
@@ -62947,9 +62947,16 @@ module.exports = class kucoin extends Exchange {
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
+        let level = '2';
+        if (limit !== undefined) {
+            if ((limit !== 20) && (limit !== 100)) {
+                throw new ExchangeError (this.id + ' fetchOrderBook limit argument must be undefined, 20 or 100');
+            }
+            level += '_' + limit.toString ();
+        }
         await this.loadMarkets ();
         const marketId = this.marketId (symbol);
-        const request = this.extend ({ 'symbol': marketId, 'level': 2 }, params);
+        const request = this.extend ({ 'symbol': marketId, 'level': level }, params);
         const response = await this.publicGetMarketOrderbookLevelLevel (request);
         //
         // { sequence: '1547731421688',
@@ -62961,8 +62968,8 @@ module.exports = class kucoin extends Exchange {
         // level can be a string such as 2_20 or 2_100
         const levelString = this.safeString (request, 'level');
         const levelParts = levelString.split ('_');
-        const level = parseInt (levelParts[0]);
-        const orderbook = this.parseOrderBook (data, timestamp, 'bids', 'asks', level - 2, level - 1);
+        const offset = parseInt (levelParts[0]);
+        const orderbook = this.parseOrderBook (data, timestamp, 'bids', 'asks', offset - 2, offset - 1);
         orderbook['nonce'] = this.safeInteger (data, 'sequence');
         return orderbook;
     }
