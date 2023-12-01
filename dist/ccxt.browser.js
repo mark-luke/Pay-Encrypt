@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1094'
+const version = '1.18.1095'
 
 Exchange.ccxtVersion = version
 
@@ -60641,6 +60641,7 @@ module.exports = class liquid extends Exchange {
             'rateLimit': 1000,
             'has': {
                 'CORS': false,
+                'fetchCurrencies': true,
                 'fetchTickers': true,
                 'fetchOrder': true,
                 'fetchOrders': true,
@@ -60843,11 +60844,11 @@ module.exports = class liquid extends Exchange {
             let minAmount = undefined;
             if (baseCurrency !== undefined) {
                 minAmount = this.safeFloat (baseCurrency['info'], 'minimum_order_quantity');
-                precision['amount'] = this.safeInteger (baseCurrency['info'], 'quoting_precision');
+                // precision['amount'] = this.safeInteger (baseCurrency['info'], 'quoting_precision');
             }
             let minPrice = undefined;
             if (quoteCurrency !== undefined) {
-                precision['price'] = this.safeInteger (quoteCurrency['info'], 'display_precision');
+                precision['price'] = this.safeInteger (quoteCurrency['info'], 'quoting_precision');
                 minPrice = Math.pow (10, -precision['price']);
             }
             let minCost = undefined;
