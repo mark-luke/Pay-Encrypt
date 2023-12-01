@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.49'
+const version = '1.25.50'
 
 Exchange.ccxtVersion = version
 
@@ -61800,7 +61800,7 @@ module.exports = class hollaex extends Exchange {
     async cancelOrder (id, symbol = undefined, params = {}) {
         await this.loadMarkets ();
         const request = {
-            'orderId': id,
+            'order_id': id,
         };
         const response = await this.privateDeleteUserOrdersOrderId (this.extend (request, params));
         //
