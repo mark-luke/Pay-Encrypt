@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1264'
+const version = '1.18.1265'
 
 Exchange.ccxtVersion = version
 
@@ -18405,6 +18405,14 @@ module.exports = class bitso extends Exchange {
                 'fees': 'https://bitso.com/fees?l=es',
                 'referral': 'https://bitso.com/?ref=itej',
             },
+            'options': {
+                'precision': {
+                    'XRP': 6,
+                    'MXN': 2,
+                    'TUSD': 2,
+                },
+                'defaultPrecision': 8,
+            },
             'api': {
                 'public': {
                     'get': [
@@ -18494,8 +18502,8 @@ module.exports = class bitso extends Exchange {
                 },
             };
             const precision = {
-                'amount': this.precisionFromString (market['minimum_amount']),
-                'price': this.precisionFromString (market['minimum_price']),
+                'amount': this.safeInteger (this.options['precision'], base, this.options['defaultPrecision']),
+                'price': this.safeInteger (this.options['precision'], quote, this.options['defaultPrecision']),
             };
             result.push ({
                 'id': id,
