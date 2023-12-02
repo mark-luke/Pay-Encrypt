@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.95'
+const version = '1.32.96'
 
 Exchange.ccxtVersion = version
 
@@ -126681,11 +126681,9 @@ module.exports = class wavesexchange extends Exchange {
             let code = undefined;
             if (currencyId in this.currencies_by_id) {
                 code = this.safeCurrencyCode (currencyId);
-            } else {
-                code = this.safeCurrencyCode (this.safeString (issueTransaction, 'name'));
+                result[code] = this.account ();
+                result[code]['total'] = this.fromWei (balance, decimals);
             }
-            result[code] = this.account ();
-            result[code]['total'] = this.fromWei (balance, decimals);
         }
         const timestamp = this.milliseconds ();
         const byteArray = [
