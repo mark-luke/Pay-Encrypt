@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.52'
+const version = '1.27.53'
 
 Exchange.ccxtVersion = version
 
@@ -9253,6 +9253,10 @@ module.exports = class binance extends Exchange {
                 'test': {
                     'fapiPublic': 'https://testnet.binancefuture.com/fapi/v1',
                     'fapiPrivate': 'https://testnet.binancefuture.com/fapi/v1',
+                    'public': 'https://testnet.binance.vision/api/v3',
+                    'private': 'https://testnet.binance.vision/api/v3',
+                    'v3': 'https://testnet.binance.vision/api/v3',
+                    'v1': 'https://testnet.binance.vision/api/v1',
                 },
                 'api': {
                     'web': 'https://www.binance.com',
@@ -9537,32 +9541,6 @@ module.exports = class binance extends Exchange {
         });
     }
 
-    setSandboxMode (enabled) {
-        if (enabled) { // eslint-disable-line no-extra-boolean-cast
-            if ('test' in this.urls) {
-                const type = this.safeString (this.options, 'defaultType', 'spot');
-                if (type !== 'future') {
-                    throw new NotSupported (this.id + ' does not have a sandbox URL for ' + type + " markets, set exchange.options['defaultType'] = 'future' or don't use the sandbox for " + this.id);
-                }
-                if (typeof this.urls['api'] === 'string') {
-                    this.urls['api_backup'] = this.urls['api'];
-                    this.urls['api'] = this.urls['test'];
-                } else {
-                    this.urls['api_backup'] = this.extend ({}, this.urls['api']);
-                    this.urls['api'] = this.extend ({}, this.urls['test']);
-                }
-            } else {
-                throw new NotSupported (this.id + ' does not have a sandbox URL');
-            }
-        } else if ('api_backup' in this.urls) {
-            if (typeof this.urls['api'] === 'string') {
-                this.urls['api'] = this.urls['api_backup'];
-            } else {
-                this.urls['api'] = this.extend ({}, this.urls['api_backup']);
-            }
-        }
-    }
-
     nonce () {
         return this.milliseconds () - this.options['timeDifference'];
     }
@@ -9786,7 +9764,12 @@ module.exports = class binance extends Exchange {
         await this.loadMarkets ();
         const defaultType = this.safeString2 (this.options, 'fetchBalance', 'defaultType', 'spot');
         const type = this.safeString (params, 'type', defaultType);
-        const method = (type === 'spot') ? 'privateGetAccount' : 'fapiPrivateGetAccount';
+        let method = 'privateGetAccount';
+        if (type === 'future') {
+            method = 'fapiPrivateGetAccount';
+        } else if (type === 'margin') {
+            method = 'sapiGetMarginAccount';
+        }
         const query = this.omit (params, 'type');
         const response = await this[method] (query);
         //
@@ -11090,6 +11073,9 @@ module.exports = class binance extends Exchange {
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
+        if (!(api in this.urls['api'])) {
+            throw new NotSupported (this.id + ' does not have a testnet/sandbox URL for ' + api + ' endpoints');
+        }
         let url = this.urls['api'][api];
         url += '/' + path;
         if (api === 'wapi') {
