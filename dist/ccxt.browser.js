@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.21'
+const version = '1.35.22'
 
 Exchange.ccxtVersion = version
 
@@ -29591,6 +29591,7 @@ module.exports = class bittrex extends Exchange {
                         'currencies',
                         'currencies/{symbol}',
                         'markets',
+                        'markets/tickers',
                         'markets/summaries',
                         'markets/{marketSymbol}',
                         'markets/{marketSymbol}/summary',
@@ -29643,6 +29644,7 @@ module.exports = class bittrex extends Exchange {
                         'transfers',
                     ],
                     'delete': [
+                        'orders/open',
                         'orders/{orderId}',
                         'withdrawals/{withdrawalId}',
                         'conditional-orders/{conditionalOrderId}',
@@ -29729,6 +29731,12 @@ module.exports = class bittrex extends Exchange {
                 },
             },
             'options': {
+                'fetchTicker': {
+                    'method': 'publicGetMarketsMarketSymbolTicker', // publicGetMarketsMarketSymbolSummary
+                },
+                'fetchTickers': {
+                    'method': 'publicGetMarketsTickers', // publicGetMarketsSummaries
+                },
                 'parseOrderStatus': false,
                 'hasAlreadyAuthenticatedSuccessfully': false, // a workaround for APIKEY_INVALID
                 'symbolSeparator': '-',
@@ -29930,6 +29938,17 @@ module.exports = class bittrex extends Exchange {
 
     parseTicker (ticker, market = undefined) {
         //
+        // ticker
+        //
+        //     {
+        //         "symbol":"ETH-BTC",
+        //         "lastTradeRate":"0.03284496",
+        //         "bidRate":"0.03284523",
+        //         "askRate":"0.03286857"
+        //     }
+        //
+        // summary
+        //
         //     {
         //         "symbol":"ETH-BTC",
         //         "high":"0.03369528",
@@ -29954,6 +29973,7 @@ module.exports = class bittrex extends Exchange {
             symbol = market['symbol'];
         }
         const percentage = this.safeFloat (ticker, 'percentChange');
+        const last = this.safeFloat (ticker, 'lastTradeRate');
         return {
             'symbol': symbol,
             'timestamp': timestamp,
@@ -29966,8 +29986,8 @@ module.exports = class bittrex extends Exchange {
             'askVolume': undefined,
             'vwap': undefined,
             'open': undefined,
-            'close': undefined,
-            'last': undefined,
+            'close': last,
+            'last': last,
             'previousClose': undefined,
             'change': undefined,
             'percentage': percentage,
@@ -29980,7 +30000,22 @@ module.exports = class bittrex extends Exchange {
 
     async fetchTickers (symbols = undefined, params = {}) {
         await this.loadMarkets ();
-        const response = await this.publicGetMarketsSummaries (params);
+        const options = this.safeValue (this.options, 'fetchTickers', {});
+        const method = this.safeString (options, 'method', 'publicGetMarketsTickers');
+        const response = await this[method] (params);
+        //
+        // publicGetMarketsTickers
+        //
+        //     [
+        //         {
+        //             "symbol":"4ART-BTC",
+        //             "lastTradeRate":"0.00000210",
+        //             "bidRate":"0.00000210",
+        //             "askRate":"0.00000215"
+        //         }
+        //     ]
+        //
+        // publicGetMarketsSummaries
         //
         //     [
         //         {
@@ -30008,7 +30043,21 @@ module.exports = class bittrex extends Exchange {
         const request = {
             'marketSymbol': market['id'],
         };
-        const response = await this.publicGetMarketsMarketSymbolSummary (this.extend (request, params));
+        const options = this.safeValue (this.options, 'fetchTicker', {});
+        const method = this.safeString (options, 'method', 'publicGetMarketsMarketSymbolTicker');
+        const response = await this[method] (this.extend (request, params));
+        //
+        // publicGetMarketsMarketSymbolTicker
+        //
+        //     {
+        //         "symbol":"ETH-BTC",
+        //         "lastTradeRate":"0.03284496",
+        //         "bidRate":"0.03284523",
+        //         "askRate":"0.03286857"
+        //     }
+        //
+        //
+        // publicGetMarketsMarketSymbolSummary
         //
         //     {
         //         "symbol":"ETH-BTC",
