@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.41'
+const version = '1.24.42'
 
 Exchange.ccxtVersion = version
 
@@ -44031,8 +44031,12 @@ module.exports = class coinmate extends Exchange {
         const request = {
             'orderId': id,
         };
+        let market = undefined;
+        if (symbol) {
+            market = this.market (symbol);
+        }
         const res = await this.privatePostOrderById (this.extend (request, params));
-        return this.parseOrder (res['data']);
+        return this.parseOrder (res['data'], market);
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
