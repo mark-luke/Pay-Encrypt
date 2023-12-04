@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.26'
+const version = '1.28.27'
 
 Exchange.ccxtVersion = version
 
@@ -9580,13 +9580,13 @@ module.exports = class binance extends Exchange {
         const defaultType = this.safeString2 (this.options, 'fetchMarkets', 'defaultType', 'spot');
         const type = this.safeString (params, 'type', defaultType);
         const query = this.omit (params, 'type');
-        if ((type !== 'spot') && (type !== 'future')) {
-            throw new ExchangeError (this.id + " does not support '" + type + "' type, set exchange.options['defaultType'] to 'spot' or 'future'"); // eslint-disable-line quotes
+        if ((type !== 'spot') && (type !== 'future') && (type !== 'margin')) {
+            throw new ExchangeError (this.id + " does not support '" + type + "' type, set exchange.options['defaultType'] to 'spot', 'margin' or 'future'"); // eslint-disable-line quotes
         }
-        const method = (type === 'spot') ? 'publicGetExchangeInfo' : 'fapiPublicGetExchangeInfo';
+        const method = (type === 'future') ? 'fapiPublicGetExchangeInfo' : 'publicGetExchangeInfo';
         const response = await this[method] (query);
         //
-        // spot
+        // spot / margin
         //
         //     {
         //         "timezone":"UTC",
@@ -9687,6 +9687,7 @@ module.exports = class binance extends Exchange {
             };
             const status = this.safeString (market, 'status');
             const active = (status === 'TRADING');
+            const margin = this.safeValue (market, 'isMarginTradingAllowed', future);
             const entry = {
                 'id': id,
                 'lowercaseId': lowercaseId,
@@ -9698,6 +9699,7 @@ module.exports = class binance extends Exchange {
                 'info': market,
                 'type': marketType,
                 'spot': spot,
+                'margin': margin,
                 'future': future,
                 'active': active,
                 'precision': precision,
