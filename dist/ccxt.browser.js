@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.6'
+const version = '1.33.7'
 
 Exchange.ccxtVersion = version
 
@@ -63697,6 +63697,7 @@ module.exports = class ftx extends Exchange {
                     'Size too small': InvalidOrder, // {"error":"Size too small","success":false}
                     'Missing parameter price': InvalidOrder, // {"error":"Missing parameter price","success":false}
                     'Order not found': OrderNotFound, // {"error":"Order not found","success":false}
+                    'Order already closed': InvalidOrder, // {"error":"Order already closed","success":false}
                 },
                 'broad': {
                     'Invalid parameter': BadRequest, // {"error":"Invalid parameter start_time","success":false}
