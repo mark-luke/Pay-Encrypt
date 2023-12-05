@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.75'
+const version = '1.20.76'
 
 Exchange.ccxtVersion = version
 
@@ -32719,7 +32719,7 @@ module.exports = class bytetrade extends Exchange {
         };
         const response = await this.publicGetDepositaddress (request);
         const address = this.safeString (response[0], 'address');
-        const tag = this.safeString (response[0], 'addressTag');
+        const tag = this.safeString (response[0], 'tag');
         const chainType = this.safeString (response[0], 'chainType');
         this.checkAddress (address);
         return {
@@ -32739,21 +32739,17 @@ module.exports = class bytetrade extends Exchange {
             throw new ArgumentsRequired ('withdraw requires this.apiKey');
         }
         const addressResponse = await this.fetchDepositAddress (code);
-        const middleAddress = this.safeString (addressResponse, 'address');
         const chainTypeString = this.safeString (addressResponse, 'chainType');
-        let chainType = 0;
-        let operationId = 18;
-        if (chainTypeString === 'ethereum') {
-            chainType = 1;
-        } else if (chainTypeString === 'bitcoin') {
-            chainType = 2;
-            operationId = 26;
-        } else if (chainTypeString === 'cmt') {
-            chainType = 3;
-        } else if (chainTypeString === 'naka') {
-            chainType = 4;
+        const chainId = this.safeString (addressResponse['info'][0], 'chainId');
+        let middleAddress = '';
+        if (chainTypeString === 'eos') {
+            middleAddress = address;
         } else {
-            throw new ExchangeError (this.id + ' ' + code + ' is not supported.');
+            middleAddress = this.safeString (addressResponse, 'address');
+        }
+        let operationId = 18;
+        if (chainTypeString !== 'ethereum' && chainTypeString !== 'etc' && chainTypeString !== 'eos' && chainTypeString !== 'cmt' && chainTypeString !== 'naka') {
+            operationId = 26;
         }
         const now = this.milliseconds ();
         const expiration = 0;
@@ -32770,7 +32766,7 @@ module.exports = class bytetrade extends Exchange {
         const eightBytes = this.integerPow ('2', '64');
         let assetFee = 0;
         let byteStringArray = [];
-        if (chainTypeString === 'bitcoin') {
+        if (operationId === 26) {
             assetFee = currency['info']['fee'];
             byteStringArray = [
                 this.numberToBE (1, 32),
@@ -32837,7 +32833,7 @@ module.exports = class bytetrade extends Exchange {
         let request = undefined;
         let operation = undefined;
         const chainContractAddress = this.safeString (currency['info'], 'chainContractAddress');
-        if (chainTypeString === 'bitcoin') {
+        if (operationId === 26) {
             operation = {
                 'fee': feeAmount,
                 'from': this.apiKey,
@@ -32862,7 +32858,7 @@ module.exports = class bytetrade extends Exchange {
                 ],
             };
             request = {
-                'chainType': chainType,
+                'chainType': chainId,
                 'trObj': this.json (fatty),
                 'chainContractAddresss': chainContractAddress,
             };
@@ -32898,12 +32894,21 @@ module.exports = class bytetrade extends Exchange {
                     mySignature,
                 ],
             };
-            request = {
-                'chainType': chainType,
-                'toExternalAddress': address,
-                'trObj': this.json (fatty),
-                'chainContractAddresss': chainContractAddress,
-            };
+            if (chainTypeString === 'eos') {
+                request = {
+                    'chainType': chainId,
+                    'toExternalAddress': 'noneed',
+                    'trObj': this.json (fatty),
+                    'chainContractAddresss': chainContractAddress,
+                };
+            } else {
+                request = {
+                    'chainType': chainId,
+                    'toExternalAddress': address,
+                    'trObj': this.json (fatty),
+                    'chainContractAddresss': chainContractAddress,
+                };
+            }
         }
         const response = await this.publicPostTransactionWithdraw (request);
         return {
