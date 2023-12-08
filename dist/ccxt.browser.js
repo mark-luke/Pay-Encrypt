@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.68'
+const version = '1.21.69'
 
 Exchange.ccxtVersion = version
 
@@ -52901,7 +52901,7 @@ module.exports = class gateio extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, BadRequest, OrderNotFound, InvalidOrder, InvalidNonce, DDoSProtection, InsufficientFunds, AuthenticationError, PermissionDenied, NotSupported, OnMaintenance } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, BadRequest, OrderNotFound, InvalidOrder, InvalidNonce, InsufficientFunds, AuthenticationError, PermissionDenied, NotSupported, OnMaintenance, RateLimitExceeded } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -52999,7 +52999,7 @@ module.exports = class gemini extends Exchange {
                 '403': PermissionDenied, // The API key is missing the role necessary to access this private API endpoint
                 '404': OrderNotFound, // Unknown API entry point or Order not found
                 '406': InsufficientFunds, // Insufficient Funds
-                '429': DDoSProtection, // Rate Limiting was applied
+                '429': RateLimitExceeded, // Rate Limiting was applied
                 '500': ExchangeError, // The server encountered an error
                 '502': ExchangeError, // Technical issues are preventing the request from being satisfied
                 '503': OnMaintenance, // The exchange is down for maintenance
@@ -53042,7 +53042,7 @@ module.exports = class gemini extends Exchange {
                     'NoSSL': AuthenticationError, // You must use HTTPS to access the API
                     'OptionsMustBeArray': BadRequest, // The options parameter must be an array.
                     'OrderNotFound': OrderNotFound, // The order specified was not found
-                    'RateLimit': DDoSProtection, // Requests were made too frequently. See Rate Limits below.
+                    'RateLimit': RateLimitExceeded, // Requests were made too frequently. See Rate Limits below.
                     'System': ExchangeError, // We are experiencing technical issues
                     'UnsupportedOption': BadRequest, // This order execution option is not supported.
                 },
