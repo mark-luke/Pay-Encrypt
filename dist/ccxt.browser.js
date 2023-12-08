@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.2'
+const version = '1.29.3'
 
 Exchange.ccxtVersion = version
 
@@ -34332,8 +34332,8 @@ module.exports = class bybit extends Exchange {
         return this.milliseconds () - this.options['timeDifference'];
     }
 
-    async loadTimeDifference () {
-        const serverTime = await this.fetchTime ();
+    async loadTimeDifference (params = {}) {
+        const serverTime = await this.fetchTime (params);
         const after = this.milliseconds ();
         this.options['timeDifference'] = after - serverTime;
         return this.options['timeDifference'];
