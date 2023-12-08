@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.21'
+const version = '1.25.22'
 
 Exchange.ccxtVersion = version
 
@@ -45615,6 +45615,7 @@ module.exports = class coss extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -46432,6 +46433,7 @@ module.exports = class crex24 extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -48137,6 +48139,7 @@ module.exports = class deribit extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -49595,6 +49598,7 @@ module.exports = class digifinex extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -50748,6 +50752,7 @@ module.exports = class dsx extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'symbol': symbol,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -52356,6 +52361,7 @@ module.exports = class exmo extends Exchange {
         };
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -52907,6 +52913,20 @@ module.exports = class exx extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "fees": 0,
+        //         "total_amount": 1,
+        //         "trade_amount": 0,
+        //         "price": 30,
+        //         "currency": “eth_hsr",
+        //         "id": "13878",
+        //         "trade_money": 0,
+        //         "type": "buy",
+        //         "trade_date": 1509728897772,
+        //         "status": 0
+        //     }
+        //
         const symbol = market['symbol'];
         const timestamp = parseInt (order['trade_date']);
         const price = this.safeFloat (order, 'price');
@@ -52931,6 +52951,7 @@ module.exports = class exx extends Exchange {
         }
         return {
             'id': this.safeString (order, 'id'),
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -53586,6 +53607,22 @@ module.exports = class fcoin extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "id": "string",
+        //         "symbol": "string",
+        //         "type": "limit",
+        //         "side": "buy",
+        //         "price": "string",
+        //         "amount": "string",
+        //         "state": "submitted",
+        //         "executed_value": "string",
+        //         "fill_fees": "string",
+        //         "filled_amount": "string",
+        //         "created_at": 0,
+        //         "source": "web"
+        //     }
+        //
         const id = this.safeString (order, 'id');
         const side = this.safeString (order, 'side');
         const status = this.parseOrderStatus (this.safeString (order, 'state'));
@@ -53634,6 +53671,7 @@ module.exports = class fcoin extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -56515,6 +56553,7 @@ module.exports = class gateio extends Exchange {
         }
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': lastTradeTimestamp,
