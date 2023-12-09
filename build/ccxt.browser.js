@@ -45,7 +45,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.17.368'
+const version = '1.17.369'
 
 Exchange.ccxtVersion = version
 
@@ -54029,6 +54029,7 @@ module.exports = class therock extends Exchange {
         await this.loadMarkets ();
         return await this.privateDeleteFundsFundIdOrdersId (this.extend ({
             'id': id,
+            'fund_id': this.marketId (symbol),
         }, params));
     }
 
@@ -122071,21 +122072,21 @@ module.exports = {
 
 },{"bn.js":480,"eth-lib/lib/hash":283,"number-to-bn":346,"underscore":431,"utf8":435}],484:[function(require,module,exports){
 module.exports={
-  "_from": "web3",
+  "_from": "web3@^1.0.0-beta.36",
   "_id": "web3@1.0.0-beta.36",
   "_inBundle": false,
   "_integrity": "sha512-fZDunw1V0AQS27r5pUN3eOVP7u8YAvyo6vOapdgVRolAu5LgaweP7jncYyLINqIX9ZgWdS5A090bt+ymgaYHsw==",
   "_location": "/web3",
   "_phantomChildren": {},
   "_requested": {
-    "type": "tag",
+    "type": "range",
     "registry": true,
-    "raw": "web3",
+    "raw": "web3@^1.0.0-beta.36",
     "name": "web3",
     "escapedName": "web3",
-    "rawSpec": "",
+    "rawSpec": "^1.0.0-beta.36",
     "saveSpec": null,
-    "fetchSpec": "latest"
+    "fetchSpec": "^1.0.0-beta.36"
   },
   "_requiredBy": [
     "#USER",
@@ -122093,7 +122094,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/web3/-/web3-1.0.0-beta.36.tgz",
   "_shasum": "2954da9e431124c88396025510d840ba731c8373",
-  "_spec": "web3",
+  "_spec": "web3@^1.0.0-beta.36",
   "_where": "/home/travis/build/ccxt/ccxt",
   "author": {
     "name": "ethereum.org"
