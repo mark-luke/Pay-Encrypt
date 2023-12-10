@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1270'
+const version = '1.18.1271'
 
 Exchange.ccxtVersion = version
 
@@ -68455,8 +68455,8 @@ module.exports = class negociecoins extends Exchange {
             },
             'fees': {
                 'trading': {
-                    'maker': 0.003,
-                    'taker': 0.004,
+                    'maker': 0.005,
+                    'taker': 0.005,
                 },
                 'funding': {
                     'withdraw': {
