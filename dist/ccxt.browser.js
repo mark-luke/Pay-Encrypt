@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.98'
+const version = '1.19.99'
 
 Exchange.ccxtVersion = version
 
@@ -106203,7 +106203,7 @@ module.exports = class upbit extends Exchange {
             headers = {
                 'Authorization': 'Bearer ' + jwt,
             };
-            if (method !== 'GET') {
+            if ((method !== 'GET') && (method !== 'DELETE')) {
                 body = this.json (params);
                 headers['Content-Type'] = 'application/json';
             }
