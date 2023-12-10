@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.15'
+const version = '1.25.16'
 
 Exchange.ccxtVersion = version
 
@@ -19498,7 +19498,7 @@ module.exports = class bitmax extends Exchange {
             'currency': this.safeString (order, 'feeAsset'),
         };
         const average = this.safeFloat (order, 'avgPrice');
-        const clientOrderId = this.safeString (order, 'coid');
+        const clientOrderId = id;
         return {
             'info': order,
             'id': id,
@@ -57167,8 +57167,10 @@ module.exports = class gemini extends Exchange {
         }
         const id = this.safeString (order, 'order_id');
         const side = this.safeStringLower (order, 'side');
+        const clientOrderId = this.safeString (order, 'client_order_id');
         return {
             'id': id,
+            'clientOrderId': clientOrderId,
             'info': order,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -73030,6 +73032,7 @@ module.exports = class livecoin extends Exchange {
         return {
             'info': order,
             'id': order['id'],
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
