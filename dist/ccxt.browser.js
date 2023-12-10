@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.86'
+const version = '1.35.87'
 
 Exchange.ccxtVersion = version
 
@@ -80818,10 +80818,17 @@ module.exports = class kucoin extends Exchange {
         const response = await this.publicGetCurrencies (params);
         //
         //     {
-        //         precision: 10,
-        //         name: 'KCS',
-        //         fullName: 'KCS shares',
-        //         currency: 'KCS'
+        //       "currency": "OMG",
+        //       "name": "OMG",
+        //       "fullName": "OmiseGO",
+        //       "precision": 8,
+        //       "confirms": 12,
+        //       "withdrawalMinSize": "4",
+        //       "withdrawalMinFee": "1.25",
+        //       "isWithdrawEnabled": false,
+        //       "isDepositEnabled": false,
+        //       "isMarginEnabled": false,
+        //       "isDebitEnabled": false
         //     }
         //
         const responseData = response['data'];
@@ -80834,6 +80841,7 @@ module.exports = class kucoin extends Exchange {
             const precision = this.safeInteger (entry, 'precision');
             const isWithdrawEnabled = this.safeValue (entry, 'isWithdrawEnabled', false);
             const isDepositEnabled = this.safeValue (entry, 'isDepositEnabled', false);
+            const fee = this.safeFloat (entry, 'withdrawalMinFee');
             const active = (isWithdrawEnabled && isDepositEnabled);
             result[code] = {
                 'id': id,
@@ -80842,7 +80850,7 @@ module.exports = class kucoin extends Exchange {
                 'precision': precision,
                 'info': entry,
                 'active': active,
-                'fee': undefined,
+                'fee': fee,
                 'limits': this.limits,
             };
         }
