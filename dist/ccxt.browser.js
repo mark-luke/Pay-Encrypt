@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.43'
+const version = '1.20.44'
 
 Exchange.ccxtVersion = version
 
@@ -8316,6 +8316,9 @@ module.exports = class bigone extends Exchange {
                 },
                 'broad': {
                 },
+            },
+            'commonCurrencies': {
+                'ONE': 'BigONE Token',
             },
         });
     }
@@ -17290,6 +17293,9 @@ module.exports = class bitmart extends Exchange {
                     // {"message":"Required Long parameter 'to' is not present"}
                     'is not present': BadRequest,
                 },
+            },
+            'commonCurrencies': {
+                'ONE': 'Menlo One',
             },
         });
     }
@@ -40277,6 +40283,8 @@ module.exports = class coinmarketcap extends Exchange {
             // https://github.com/ccxt/ccxt/issues/3365
             // https://github.com/ccxt/ccxt/issues/2873
             'Themis': 'Themis', // conflict with GET (Guaranteed Entrance Token, GET Protocol)
+            'Menlo One': 'Menlo One', // conflict with Harmony (ONE)
+            'BigONE Token': 'BigONE Token', // conflict with Harmony (ONE)
         };
         return this.safeValue (currencies, name, base);
     }
@@ -57595,6 +57603,9 @@ module.exports = class idex extends Exchange {
                 'privateKey': true,
                 'apiKey': false,
                 'secret': false,
+            },
+            'commonCurrencies': {
+                'ONE': 'Menlo One',
             },
         });
     }
