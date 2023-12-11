@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.57'
+const version = '1.25.58'
 
 Exchange.ccxtVersion = version
 
@@ -55616,14 +55616,16 @@ module.exports = class ftx extends Exchange {
             } else {
                 const base = this.safeCurrencyCode (this.safeString (ticker, 'baseCurrency'));
                 const quote = this.safeCurrencyCode (this.safeString (ticker, 'quoteCurrency'));
-                symbol = base + '/' + quote;
+                if ((base !== undefined) && (quote !== undefined)) {
+                    symbol = base + '/' + quote;
+                }
             }
         }
         if ((symbol === undefined) && (market !== undefined)) {
             symbol = market['symbol'];
         }
         const last = this.safeFloat (ticker, 'last');
-        const timestamp = this.milliseconds ();
+        const timestamp = this.safeTimestamp (ticker, 'time', this.milliseconds ());
         return {
             'symbol': symbol,
             'timestamp': timestamp,
