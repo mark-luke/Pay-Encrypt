@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.11'
+const version = '1.32.12'
 
 Exchange.ccxtVersion = version
 
@@ -86880,7 +86880,7 @@ module.exports = class okex extends Exchange {
         //
         const statuses = {
             '-3': 'pending',
-            '-2': 'pending',
+            '-2': 'canceled',
             '-1': 'failed',
             '0': 'pending',
             '1': 'pending',
