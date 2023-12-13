@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.67'
+const version = '1.22.68'
 
 Exchange.ccxtVersion = version
 
@@ -53115,7 +53115,11 @@ module.exports = class gemini extends Exchange {
                     'https://docs.gemini.com/rest-api',
                     'https://docs.sandbox.gemini.com',
                 ],
-                'test': 'https://api.sandbox.gemini.com',
+                'test': {
+                    'public': 'https://api.sandbox.gemini.com',
+                    'private': 'https://api.sandbox.gemini.com',
+                    'web': 'https://docs.sandbox.gemini.com',
+                },
                 'fees': [
                     'https://gemini.com/api-fee-schedule',
                     'https://gemini.com/trading-fees',
@@ -103024,7 +103028,7 @@ module.exports = class topq extends bw {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, BadRequest, AuthenticationError, InvalidOrder, InsufficientFunds, OrderNotFound, PermissionDenied } = require ('./base/errors');
+const { ExchangeError, BadRequest, AuthenticationError, InvalidOrder, InsufficientFunds, OrderNotFound, PermissionDenied, AddressPending } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -104415,7 +104419,8 @@ module.exports = class upbit extends Exchange {
         const request = {
             'currency': currency['id'],
         };
-        const response = await this.fetchDepositAddress (code, this.extend (request, params));
+        // https://github.com/ccxt/ccxt/issues/6452
+        const response = await this.privatePostDepositsGenerateCoinAddress (code, this.extend (request, params));
         //
         // https://docs.upbit.com/v1.0/reference#%EC%9E%85%EA%B8%88-%EC%A3%BC%EC%86%8C-%EC%83%9D%EC%84%B1-%EC%9A%94%EC%B2%AD
         // can be any of the two responses:
@@ -104432,13 +104437,9 @@ module.exports = class upbit extends Exchange {
         //     }
         //
         const message = this.safeString (response, 'message');
+        // https://github.com/ccxt/ccxt/issues/6452
         if (message !== undefined) {
-            return {
-                'currency': code,
-                'address': undefined,
-                'tag': undefined,
-                'info': response,
-            };
+            throw new AddressPending (this.id + ' is generating ' + code + ' deposit address, call fetchDepositAddress or createDepositAddress one more time later to retrieve the generated address');
         }
         return this.parseDepositAddress (response);
     }
