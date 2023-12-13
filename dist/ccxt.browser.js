@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.17'
+const version = '1.27.18'
 
 Exchange.ccxtVersion = version
 
@@ -33588,8 +33588,8 @@ module.exports = class bybit extends Exchange {
                 },
                 'privateLinear': {
                     'get': [
-                        'order-list',
-                        'order-search',
+                        'order/list',
+                        'order/search',
                         'stop-order/list',
                         'stop-order/search',
                         'position/list',
