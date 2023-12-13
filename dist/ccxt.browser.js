@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.94'
+const version = '1.23.95'
 
 Exchange.ccxtVersion = version
 
@@ -45018,6 +45018,7 @@ module.exports = class deribit extends Exchange {
             'has': {
                 'CORS': true,
                 'editOrder': true,
+                'fetchBalance': true,
                 'fetchOrder': true,
                 'fetchOrders': false,
                 'fetchOpenOrders': true,
@@ -45033,6 +45034,9 @@ module.exports = class deribit extends Exchange {
                 'withdraw': true,
                 'fetchTime': true,
                 'fetchStatus': true,
+                'fetchDeposits': true,
+                'fetchWithdrawals': true,
+                'fetchTransactions': false,
             },
             'timeframes': {
                 '1m': '1',
