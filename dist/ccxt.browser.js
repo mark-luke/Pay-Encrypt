@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.56'
+const version = '1.33.57'
 
 Exchange.ccxtVersion = version
 
@@ -50407,8 +50407,11 @@ module.exports = class coinmate extends Exchange {
         const timestamp = this.safeInteger (order, 'timestamp');
         const side = this.safeStringLower (order, 'type');
         const price = this.safeFloat (order, 'price');
-        const amount = this.safeFloat2 (order, 'originalAmount', 'amount');
-        const remaining = this.safeFloat (order, 'remainingAmount', amount);
+        const amount = this.safeFloat (order, 'originalAmount');
+        let remaining = this.safeFloat (order, 'remainingAmount');
+        if (remaining === undefined) {
+            remaining = this.safeFloat (order, 'amount');
+        }
         let status = this.parseOrderStatus (this.safeString (order, 'status'));
         const type = this.parseOrderType (this.safeString (order, 'orderTradeType'));
         let filled = undefined;
