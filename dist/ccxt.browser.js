@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.7'
+const version = '1.24.8'
 
 Exchange.ccxtVersion = version
 
@@ -22882,7 +22882,20 @@ module.exports = class bitstamp extends Exchange {
         } else {
             this.checkRequiredCredentials ();
             const authVersion = this.safeValue (this.options, 'auth', 'v2');
-            if (authVersion === 'v2') {
+            if ((authVersion === 'v1') || (api === 'v1')) {
+                const nonce = this.nonce ().toString ();
+                const auth = nonce + this.uid + this.apiKey;
+                const signature = this.encode (this.hmac (this.encode (auth), this.encode (this.secret)));
+                query = this.extend ({
+                    'key': this.apiKey,
+                    'signature': signature.toUpperCase (),
+                    'nonce': nonce,
+                }, query);
+                body = this.urlencode (query);
+                headers = {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                };
+            } else {
                 const xAuth = 'BITSTAMP ' + this.apiKey;
                 const xAuthNonce = this.uuid ();
                 const xAuthTimestamp = this.milliseconds ().toString ();
@@ -22905,19 +22918,6 @@ module.exports = class bitstamp extends Exchange {
                 const auth = xAuth + method + url.replace ('https://', '') + contentType + xAuthNonce + xAuthTimestamp + xAuthVersion + authBody;
                 const signature = this.encode (this.hmac (this.encode (auth), this.encode (this.secret)));
                 headers['X-Auth-Signature'] = signature;
-            } else {
-                const nonce = this.nonce ().toString ();
-                const auth = nonce + this.uid + this.apiKey;
-                const signature = this.encode (this.hmac (this.encode (auth), this.encode (this.secret)));
-                query = this.extend ({
-                    'key': this.apiKey,
-                    'signature': signature.toUpperCase (),
-                    'nonce': nonce,
-                }, query);
-                body = this.urlencode (query);
-                headers = {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                };
             }
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
