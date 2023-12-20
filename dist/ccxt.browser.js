@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.28'
+const version = '1.20.29'
 
 Exchange.ccxtVersion = version
 
@@ -43364,6 +43364,7 @@ module.exports = class coss extends Exchange {
             headers = {
                 'Signature': this.hmac (this.encode (request), this.encode (this.secret)),
                 'Authorization': this.apiKey,
+                'X-Requested-With': 'XMLHttpRequest',
             };
         } else {
             if (Object.keys (params).length) {
