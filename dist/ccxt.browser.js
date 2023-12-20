@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.67'
+const version = '1.31.68'
 
 Exchange.ccxtVersion = version
 
@@ -11349,9 +11349,15 @@ module.exports = class bit2c extends Exchange {
             'countries': [ 'IL' ], // Israel
             'rateLimit': 3000,
             'has': {
+                'cancelOrder': true,
                 'CORS': false,
-                'fetchOpenOrders': true,
+                'createOrder': true,
+                'fetchBalance': true,
                 'fetchMyTrades': true,
+                'fetchOpenOrders': true,
+                'fetchOrderBook': true,
+                'fetchTicker': true,
+                'fetchTrades': true,
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/27766119-3593220e-5ece-11e7-8b3a-5a041f6bcc3f.jpg',
