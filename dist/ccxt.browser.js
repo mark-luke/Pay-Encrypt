@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1170'
+const version = '1.18.1171'
 
 Exchange.ccxtVersion = version
 
@@ -10831,7 +10831,7 @@ module.exports = class bitbank extends Exchange {
                 },
                 'funding': {
                     'withdraw': {
-                        // 'JPY': amount => amount > 30000 ? 756 : 540,
+                        // 'JPY': (amount > 30000) ? 756 : 540,
                         'BTC': 0.001,
                         'LTC': 0.001,
                         'XRP': 0.15,
