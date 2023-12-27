@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.56'
+const version = '1.28.57'
 
 Exchange.ccxtVersion = version
 
@@ -82825,6 +82825,11 @@ module.exports = class poloniex extends Exchange {
             'rate': this.priceToPrecision (symbol, price),
             'amount': amount,
         };
+        const clientOrderId = this.safeString (params, 'clientOrderId');
+        if (clientOrderId !== undefined) {
+            request['clientOrderId'] = clientOrderId;
+            params = this.omit (params, 'clientOrderId');
+        }
         // remember the timestamp before issuing the request
         const timestamp = this.milliseconds ();
         const response = await this[method] (this.extend (request, params));
@@ -82899,9 +82904,15 @@ module.exports = class poloniex extends Exchange {
         await this.loadMarkets ();
         let response = undefined;
         try {
-            response = await this.privatePostCancelOrder (this.extend ({
-                'orderNumber': id,
-            }, params));
+            const request = {};
+            const clientOrderId = this.safeValue (params, 'clientOrderId');
+            if (clientOrderId === undefined) {
+                request['orderNumber'] = id;
+            } else {
+                request['clientOrderId'] = clientOrderId;
+            }
+            params = this.omit (params, 'clientOrderId');
+            response = await this.privatePostCancelOrder (this.extend (request, params));
         } catch (e) {
             if (e instanceof CancelPending) {
                 // A request to cancel the order has been sent already.
