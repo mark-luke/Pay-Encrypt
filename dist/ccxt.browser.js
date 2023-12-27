@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.17'
+const version = '1.25.18'
 
 Exchange.ccxtVersion = version
 
@@ -816,6 +816,7 @@ module.exports = class acx extends Exchange {
         const id = this.safeString (order, 'id');
         return {
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -1931,6 +1932,7 @@ module.exports = class adara extends Exchange {
         const result = {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -3191,6 +3193,7 @@ module.exports = class anxpro extends Exchange {
         const cost = executedAverageRate * filled;
         return {
             'id': this.safeString (order, 'orderId'),
+            'clientOrderId': undefined,
             'symbol': symbol,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -3283,6 +3286,7 @@ module.exports = class anxpro extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'symbol': symbol,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -6873,6 +6877,7 @@ module.exports = class bcex extends Exchange {
         const result = {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -7749,6 +7754,7 @@ module.exports = class bibox extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -8739,6 +8745,7 @@ module.exports = class bigone extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -11603,6 +11610,7 @@ module.exports = class bit2c extends Exchange {
         const status = this.safeString (order, 'status');
         return {
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -12057,6 +12065,7 @@ module.exports = class bitbank extends Exchange {
         const side = this.safeStringLower (order, 'side');
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -12602,6 +12611,7 @@ module.exports = class bitbay extends Exchange {
         }
         return {
             'id': this.safeString (order, 'id'),
+            'clientOrderId': undefined,
             'info': order,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -14371,6 +14381,7 @@ module.exports = class bitfinex extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
