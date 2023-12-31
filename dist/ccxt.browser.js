@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.11'
+const version = '1.30.12'
 
 Exchange.ccxtVersion = version
 
@@ -119154,6 +119154,8 @@ module.exports = class wavesexchange extends Exchange {
             },
             'commonCurrencies': {
                 'BITCOIN CASH': 'BCH',
+                'BITCOIN SV': 'BSV',
+                'BANCOR': 'BNT',
                 'LITECOIN': 'LTC',
                 'MONERO': 'XMR',
                 'TIDEX': 'TDX',
