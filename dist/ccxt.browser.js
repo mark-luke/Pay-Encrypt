@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.16'
+const version = '1.19.17'
 
 Exchange.ccxtVersion = version
 
@@ -50612,6 +50612,7 @@ module.exports = class ftx extends Exchange {
                         'orders/history', // ?market={market}
                         'orders/{order_id}',
                         'orders/by_client_id/{client_order_id}',
+                        'conditional_orders', // ?market={market}
                         'fills', // ?market={market}
                         'funding_payments',
                         'lt/balances',
@@ -50630,6 +50631,7 @@ module.exports = class ftx extends Exchange {
                         'orders/{order_id}',
                         'orders/by_client_id/{client_order_id}',
                         'orders',
+                        'conditional_orders/{order_id}',
                     ],
                 },
             },
