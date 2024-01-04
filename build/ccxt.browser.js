@@ -45,7 +45,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.17.372'
+const version = '1.17.373'
 
 Exchange.ccxtVersion = version
 
@@ -15416,7 +15416,6 @@ module.exports = class bittrex extends Exchange {
             if (response['result'])
                 return this.parseOHLCVs (response['result'], market, timeframe, since, limit);
         }
-        throw new ExchangeError (this.id + ' returned an empty or unrecognized response: ' + this.json (response));
     }
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
