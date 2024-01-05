@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1297'
+const version = '1.18.1298'
 
 Exchange.ccxtVersion = version
 
@@ -102034,6 +102034,7 @@ module.exports = class yobit extends Exchange {
                 'CPC': 'Capricoin',
                 'CS': 'CryptoSpots',
                 'DCT': 'Discount',
+                'DFT': 'DraftCoin',
                 'DGD': 'DarkGoldCoin',
                 'DIRT': 'DIRTY',
                 'DROP': 'FaucetCoin',
