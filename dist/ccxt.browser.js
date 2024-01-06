@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.58'
+const version = '1.34.59'
 
 Exchange.ccxtVersion = version
 
@@ -10850,7 +10850,7 @@ module.exports = class bit2c extends Exchange {
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'key': this.apiKey,
-                'sign': this.decode (signature),
+                'sign': signature,
             };
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
@@ -19144,7 +19144,7 @@ module.exports = class bitget extends Exchange {
             const signature = this.hmac (this.encode (auth), this.encode (this.secret), 'sha256', 'base64');
             headers = {
                 'ACCESS-KEY': this.apiKey,
-                'ACCESS-SIGN': this.decode (signature),
+                'ACCESS-SIGN': signature,
                 'ACCESS-TIMESTAMP': timestamp,
                 'ACCESS-PASSPHRASE': this.password,
             };
@@ -24155,7 +24155,7 @@ module.exports = class bitmax extends Exchange {
             headers = {
                 'x-auth-key': this.apiKey,
                 'x-auth-timestamp': timestamp,
-                'x-auth-signature': this.decode (hmac),
+                'x-auth-signature': hmac,
             };
             if (method === 'GET') {
                 if (Object.keys (query).length) {
@@ -34338,7 +34338,7 @@ module.exports = class bl3p extends Exchange {
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Rest-Key': this.apiKey,
-                'Rest-Sign': this.decode (signature),
+                'Rest-Sign': signature,
             };
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
@@ -37781,7 +37781,7 @@ module.exports = class btcmarkets extends Exchange {
                 'Content-Type': 'application/json',
                 'BM-AUTH-APIKEY': this.apiKey,
                 'BM-AUTH-TIMESTAMP': nonce,
-                'BM-AUTH-SIGNATURE': this.decode (signature),
+                'BM-AUTH-SIGNATURE': signature,
             };
         } else if (api === 'public') {
             if (Object.keys (query).length) {
@@ -47570,7 +47570,7 @@ module.exports = class coinbasepro extends Exchange {
             const signature = this.hmac (this.encode (what), secret, 'sha256', 'base64');
             headers = {
                 'CB-ACCESS-KEY': this.apiKey,
-                'CB-ACCESS-SIGN': this.decode (signature),
+                'CB-ACCESS-SIGN': signature,
                 'CB-ACCESS-TIMESTAMP': nonce,
                 'CB-ACCESS-PASSPHRASE': this.password,
                 'Content-Type': 'application/json',
@@ -60472,7 +60472,7 @@ module.exports = class dsx extends Exchange {
             body = this.urlencode (this.extend ({
                 'nonce': nonce,
             }, query));
-            const signature = this.decode (this.hmac (this.encode (body), this.encode (this.secret), 'sha512', 'base64'));
+            const signature = this.hmac (this.encode (body), this.encode (this.secret), 'sha512', 'base64');
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Key': this.apiKey,
@@ -61679,8 +61679,7 @@ module.exports = class eterbase extends Exchange {
                 message += "\ndigest" + ':' + ' ' + digest;  // eslint-disable-line quotes
                 headersCSV += ' ' + 'digest';
             }
-            const signature64 = this.hmac (this.encode (message), this.encode (this.secret), 'sha256', 'base64');
-            const signature = this.decode (signature64);
+            const signature = this.hmac (this.encode (message), this.encode (this.secret), 'sha256', 'base64');
             const authorizationHeader = 'hmac username="' + this.apiKey + '",algorithm="hmac-sha256",headers="' + headersCSV + '",' + 'signature="' + signature + '"';
             httpHeaders = {
                 'Date': date,
@@ -79243,7 +79242,7 @@ module.exports = class itbit extends Exchange {
             const binhash = this.binaryConcat (binaryUrl, hash);
             const signature = this.hmac (binhash, this.encode (this.secret), 'sha512', 'base64');
             headers = {
-                'Authorization': this.apiKey + ':' + this.decode (signature),
+                'Authorization': this.apiKey + ':' + signature,
                 'Content-Type': 'application/json',
                 'X-Auth-Timestamp': timestamp,
                 'X-Auth-Nonce': nonce,
@@ -80902,7 +80901,7 @@ module.exports = class kraken extends Exchange {
             const signature = this.hmac (binhash, secret, 'sha512', 'base64');
             headers = {
                 'API-Key': this.apiKey,
-                'API-Sign': this.decode (signature),
+                'API-Sign': signature,
                 'Content-Type': 'application/x-www-form-urlencoded',
             };
         } else {
@@ -82768,14 +82767,14 @@ module.exports = class kucoin extends Exchange {
             }, headers);
             const payload = timestamp + method + endpoint + endpart;
             const signature = this.hmac (this.encode (payload), this.encode (this.secret), 'sha256', 'base64');
-            headers['KC-API-SIGN'] = this.decode (signature);
+            headers['KC-API-SIGN'] = signature;
             const partner = this.safeValue (this.options, 'partner', {});
             const partnerId = this.safeString (partner, 'id');
             const partnerSecret = this.safeString (partner, 'secret');
             if ((partnerId !== undefined) && (partnerSecret !== undefined)) {
                 const partnerPayload = timestamp + partnerId + this.apiKey;
                 const partnerSignature = this.hmac (this.encode (partnerPayload), this.encode (partnerSecret), 'sha256', 'base64');
-                headers['KC-API-PARTNER-SIGN'] = this.decode (partnerSignature);
+                headers['KC-API-PARTNER-SIGN'] = partnerSignature;
                 headers['KC-API-PARTNER'] = partnerId;
             }
         }
@@ -94028,7 +94027,7 @@ module.exports = class okex extends Exchange {
                 headers['Content-Type'] = 'application/json';
             }
             const signature = this.hmac (this.encode (auth), this.encode (this.secret), 'sha256', 'base64');
-            headers['OK-ACCESS-SIGN'] = this.decode (signature);
+            headers['OK-ACCESS-SIGN'] = signature;
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
     }
@@ -100999,7 +100998,7 @@ module.exports = class qtrade extends Exchange {
             if (typeof key !== 'string') {
                 key = key.toString ();
             }
-            const signature = 'HMAC-SHA256 ' + key + ':' + this.decode (hash);
+            const signature = 'HMAC-SHA256 ' + key + ':' + hash;
             headers = {
                 'Authorization': signature,
                 'HMAC-Timestamp': timestamp,
@@ -132182,7 +132181,7 @@ module.exports = class xbtce extends Exchange {
                 auth += body;
             }
             const signature = this.hmac (this.encode (auth), this.encode (this.secret), 'sha256', 'base64');
-            const credentials = this.uid + ':' + this.apiKey + ':' + nonce + ':' + this.decode (signature);
+            const credentials = this.uid + ':' + this.apiKey + ':' + nonce + ':' + signature;
             headers['Authorization'] = 'HMAC ' + credentials;
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
