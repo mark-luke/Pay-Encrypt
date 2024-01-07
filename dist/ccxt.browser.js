@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.66'
+const version = '1.30.67'
 
 Exchange.ccxtVersion = version
 
@@ -55702,7 +55702,7 @@ module.exports = class eterbase extends Exchange {
             }
             const signature64 = this.hmac (this.encode (message), this.encode (this.secret), 'sha256', 'base64');
             const signature = this.decode (signature64);
-            const authorizationHeader = 'hmac username="' + this.apiKey + '",algorithm="hmac-sha256",headers="' + headersCSV + '",signature="' + signature + '"';
+            const authorizationHeader = 'hmac username="' + this.apiKey + '",algorithm="hmac-sha256",headers="' + headersCSV + '",' + 'signature="' + signature + '"';
             httpHeaders = {
                 'Date': date,
                 'Authorization': authorizationHeader,
