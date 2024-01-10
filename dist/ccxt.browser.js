@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.88'
+const version = '1.19.89'
 
 Exchange.ccxtVersion = version
 
@@ -9880,7 +9880,7 @@ module.exports = class binance extends Exchange {
             'symbol': market['id'],
         };
         if (limit !== undefined) {
-            request['limit'] = limit; // default = maximum = 100
+            request['limit'] = limit; // default 100, max 5000, see https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#order-book
         }
         const response = await this.publicGetDepth (this.extend (request, params));
         const orderbook = this.parseOrderBook (response);
@@ -18127,7 +18127,7 @@ module.exports = class bitmax extends Exchange {
         await this.loadMarkets ();
         const market = this.market (symbol);
         const request = {
-            'symbol': market['symbol'],
+            'symbol': market['id'],
         };
         if (limit !== undefined) {
             request['n'] = limit; // default = maximum = 100
@@ -18219,7 +18219,7 @@ module.exports = class bitmax extends Exchange {
         await this.loadMarkets ();
         const market = this.market (symbol);
         const request = {
-            'symbol': market['symbol'],
+            'symbol': market['id'],
         };
         const response = await this.publicGetTicker24hr (this.extend (request, params));
         return this.parseTicker (response, market);
@@ -18263,7 +18263,7 @@ module.exports = class bitmax extends Exchange {
         await this.loadMarkets ();
         const market = this.market (symbol);
         const request = {
-            'symbol': market['symbol'],
+            'symbol': market['id'],
             'interval': this.timeframes[timeframe],
         };
         // if since and limit are not specified
