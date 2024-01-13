@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.68'
+const version = '1.25.69'
 
 Exchange.ccxtVersion = version
 
@@ -41390,7 +41390,7 @@ module.exports = class coinex extends Exchange {
         const code = this.safeCurrencyCode (currencyId, currency);
         const timestamp = this.safeTimestamp (transaction, 'create_time');
         const type = ('coin_withdraw_id' in transaction) ? 'withdraw' : 'deposit';
-        const status = this.parseTransactionStatus (this.safeString (transaction, 'status'), type);
+        const status = this.parseTransactionStatus (this.safeString (transaction, 'status'));
         const amount = this.safeFloat (transaction, 'amount');
         let feeCost = this.safeFloat (transaction, 'tx_fee');
         if (type === 'deposit') {
