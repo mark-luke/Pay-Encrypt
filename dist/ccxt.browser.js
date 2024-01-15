@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.37'
+const version = '1.26.38'
 
 Exchange.ccxtVersion = version
 
@@ -64280,7 +64280,7 @@ module.exports = class indodax extends Exchange {
 
     async fetchOrder (id, symbol = undefined, params = {}) {
         if (symbol === undefined) {
-            throw new ExchangeError (this.id + ' fetchOrder requires a symbol');
+            throw new ArgumentsRequired (this.id + ' fetchOrder requires a symbol');
         }
         await this.loadMarkets ();
         const market = this.market (symbol);
@@ -64327,7 +64327,7 @@ module.exports = class indodax extends Exchange {
 
     async fetchClosedOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         if (symbol === undefined) {
-            throw new ExchangeError (this.id + ' fetchOrders requires a symbol');
+            throw new ArgumentsRequired (this.id + ' fetchOrders requires a symbol argument');
         }
         await this.loadMarkets ();
         const request = {};
@@ -64376,7 +64376,7 @@ module.exports = class indodax extends Exchange {
         }
         const side = this.safeValue (params, 'side');
         if (side === undefined) {
-            throw new ExchangeError (this.id + ' cancelOrder requires an extra "side" param');
+            throw new ArgumentsRequired (this.id + ' cancelOrder requires an extra "side" param');
         }
         await this.loadMarkets ();
         const market = this.market (symbol);
