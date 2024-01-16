@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.19'
+const version = '1.35.20'
 
 Exchange.ccxtVersion = version
 
@@ -76558,6 +76558,7 @@ module.exports = class idex2 extends Exchange {
             this.numberToBE (typeEnum, 1),
             this.numberToBE (sideEnum, 1),
             this.stringToBinary (this.encode (amountString)),
+            this.numberToBE (0, 1),
         ];
         if (type === 'limit') {
             const encodedPrice = this.stringToBinary (this.encode (priceString));
