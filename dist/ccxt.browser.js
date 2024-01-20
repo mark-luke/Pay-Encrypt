@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.96'
+const version = '1.23.97'
 
 Exchange.ccxtVersion = version
 
@@ -45652,8 +45652,8 @@ module.exports = class deribit extends Exchange {
             'symbol': symbol,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
-            'high': this.safeFloat (stats, 'high'),
-            'low': this.safeFloat (stats, 'low'),
+            'high': this.safeFloat2 (stats, 'high', 'max_price'),
+            'low': this.safeFloat2 (stats, 'low', 'min_price'),
             'bid': this.safeFloat2 (ticker, 'best_bid_price', 'bid_price'),
             'bidVolume': this.safeFloat (ticker, 'best_bid_amount'),
             'ask': this.safeFloat2 (ticker, 'best_ask_price', 'ask_price'),
@@ -45707,7 +45707,8 @@ module.exports = class deribit extends Exchange {
         //         testnet: false
         //     }
         //
-        return this.parseTicker (response['result'], market);
+        const result = this.safeValue (response, 'result');
+        return this.parseTicker (result, market);
     }
 
     async fetchTickers (symbols = undefined, params = {}) {
