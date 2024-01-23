@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.79'
+const version = '1.27.80'
 
 Exchange.ccxtVersion = version
 
@@ -50827,7 +50827,7 @@ module.exports = class eterbase extends Exchange {
     describe () {
         return this.deepExtend (super.describe (), {
             'id': 'eterbase',
-            'name': 'ETERBASE',
+            'name': 'Eterbase',
             'countries': [ 'SK' ],
             'rateLimit': 500,
             'version': 'v1',
