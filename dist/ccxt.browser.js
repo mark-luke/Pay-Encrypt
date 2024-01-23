@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.83'
+const version = '1.25.84'
 
 Exchange.ccxtVersion = version
 
@@ -6794,23 +6794,27 @@ function numberToString (x) { // avoids scientific notation for too large and to
 
     if (typeof x === 'string') return x
 
+    const s = x.toString ()
     if (Math.abs (x) < 1.0) {
-        const s = x.toString ()
         const e = parseInt (s.split ('e-')[1])
         const neg = (s[0] === '-')
         if (e) {
             x *= Math.pow (10, e - 1)
             x = (neg ? '-' : '') + '0.' + (new Array (e)).join ('0') + x.toString ().substring (neg ? 3 : 2)
+            return x
         }
     } else {
-        let e = parseInt (x.toString ().split ('+')[1])
-        if (e > 20) {
-            e -= 20
-            x /= Math.pow (10, e)
-            x += (new Array (e + 1)).join ('0')
+        const parts = s.split ('e')
+        if (parts[1]) {
+            let e = parseInt (parts[1])
+            const m = parts[0].split ('.')
+            if (m[1]) {
+                e -= m[1].length
+            }
+            return m[0] + m[1] + (new Array (e + 1)).join ('0')
         }
     }
-    return x.toString ()
+    return s;
 }
 
 //-----------------------------------------------------------------------------
