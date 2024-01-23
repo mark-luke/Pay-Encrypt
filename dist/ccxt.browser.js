@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.9'
+const version = '1.20.10'
 
 Exchange.ccxtVersion = version
 
@@ -35808,14 +35808,10 @@ module.exports = class coinbase extends Exchange {
         //      ]
         //    }
         //
-        const exceptions = this.exceptions;
         let errorCode = this.safeString (response, 'error');
         if (errorCode !== undefined) {
-            if (errorCode in exceptions) {
-                throw new exceptions[errorCode] (feedback);
-            } else {
-                throw new ExchangeError (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions, errorCode, feedback);
+            throw new ExchangeError (feedback);
         }
         const errors = this.safeValue (response, 'errors');
         if (errors !== undefined) {
@@ -35824,11 +35820,8 @@ module.exports = class coinbase extends Exchange {
                 if (numErrors > 0) {
                     errorCode = this.safeString (errors[0], 'id');
                     if (errorCode !== undefined) {
-                        if (errorCode in exceptions) {
-                            throw new exceptions[errorCode] (feedback);
-                        } else {
-                            throw new ExchangeError (feedback);
-                        }
+                        this.throwExactlyMatchedException (this.exceptions, errorCode, feedback);
+                        throw new ExchangeError (feedback);
                     }
                 }
             }
@@ -37656,11 +37649,9 @@ module.exports = class coinegg extends Exchange {
         const errorCode = this.safeString (response, 'code');
         const errorMessages = this.errorMessages;
         const message = this.safeString (errorMessages, errorCode, 'Unknown Error');
-        if (errorCode in this.exceptions) {
-            throw new this.exceptions[errorCode] (this.id + ' ' + message);
-        } else {
-            throw new ExchangeError (this.id + ' ' + message);
-        }
+        const feedback = this.id + ' ' + message;
+        this.throwExactlyMatchedException (this.exceptions, errorCode, feedback);
+        throw new ExchangeError (this.id + ' ' + message);
     }
 };
 
@@ -41948,14 +41939,10 @@ module.exports = class coinone extends Exchange {
                 //
                 //    {  "errorCode": "405",  "status": "maintenance",  "result": "error"}
                 //
-                const code = this.safeString (response, 'errorCode');
-                const feedback = this.id + ' ' + this.json (response);
-                const exceptions = this.exceptions;
-                if (code in exceptions) {
-                    throw new exceptions[code] (feedback);
-                } else {
-                    throw new ExchangeError (feedback);
-                }
+                const errorCode = this.safeString (response, 'errorCode');
+                const feedback = this.id + ' ' + body;
+                this.throwExactlyMatchedException (this.exceptions, errorCode, feedback);
+                throw new ExchangeError (feedback);
             }
         } else {
             throw new ExchangeError (this.id + ' ' + body);
@@ -45400,7 +45387,7 @@ module.exports = class crex24 extends Exchange {
             return; // no error
         }
         const message = this.safeString (response, 'errorDescription');
-        const feedback = this.id + ' ' + this.json (response);
+        const feedback = this.id + ' ' + body;
         this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
         this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
         if (code === 400) {
@@ -46121,10 +46108,7 @@ module.exports = class deribit extends Exchange {
         const error = this.safeString (response, 'error');
         if ((error !== undefined) && (error !== '0')) {
             const feedback = this.id + ' ' + body;
-            const exceptions = this.exceptions;
-            if (error in exceptions) {
-                throw new exceptions[error] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions, error, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
     }
@@ -48550,7 +48534,7 @@ module.exports = class dsx extends Exchange {
             if (!success) {
                 const code = this.safeString (response, 'code');
                 const message = this.safeString (response, 'error');
-                const feedback = this.id + ' ' + this.json (response);
+                const feedback = this.id + ' ' + body;
                 this.throwExactlyMatchedException (this.exceptions['exact'], code, feedback);
                 this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
                 this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
@@ -49954,13 +49938,9 @@ module.exports = class exmo extends Exchange {
                     const numSubParts = errorSubParts.length;
                     code = (numSubParts > 1) ? errorSubParts[1] : errorSubParts[0];
                 }
-                const feedback = this.id + ' ' + this.json (response);
-                const exceptions = this.exceptions;
-                if (code in exceptions) {
-                    throw new exceptions[code] (feedback);
-                } else {
-                    throw new ExchangeError (feedback);
-                }
+                const feedback = this.id + ' ' + body;
+                this.throwExactlyMatchedException (this.exceptions, code, feedback);
+                throw new ExchangeError (feedback);
             }
         }
     }
@@ -50376,15 +50356,13 @@ module.exports = class exx extends Exchange {
         //
         const code = this.safeString (response, 'code');
         const message = this.safeString (response, 'message');
-        const feedback = this.id + ' ' + this.json (response);
+        const feedback = this.id + ' ' + body;
         if (code === '100') {
             return;
         }
         if (code !== undefined) {
-            const exceptions = this.exceptions;
-            if (code in exceptions) {
-                throw new exceptions[code] (feedback);
-            } else if (code === '308') {
+            this.throwExactlyMatchedException (this.exceptions, code, feedback);
+            if (code === '308') {
                 // this is returned by the exchange when there are no open orders
                 // {"code":308,"message":"Not Found Transaction Record"}
                 return;
@@ -51106,10 +51084,7 @@ module.exports = class fcoin extends Exchange {
         const status = this.safeString (response, 'status');
         if (status !== '0' && status !== 'ok') {
             const feedback = this.id + ' ' + body;
-            if (status in this.exceptions) {
-                const exceptions = this.exceptions;
-                throw new exceptions[status] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions, status, feedback);
             throw new ExchangeError (feedback);
         }
     }
@@ -53027,7 +53002,7 @@ module.exports = class ftx extends Exchange {
         //
         const success = this.safeValue (response, 'success');
         if (!success) {
-            const feedback = this.id + ' ' + this.json (response);
+            const feedback = this.id + ' ' + body;
             const error = this.safeString (response, 'error');
             this.throwExactlyMatchedException (this.exceptions['exact'], error, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], error, feedback);
@@ -54000,13 +53975,10 @@ module.exports = class gateio extends Exchange {
             return;
         }
         const errorCode = this.safeString (response, 'code');
+        const message = this.safeString (response, 'message', body);
         if (errorCode !== undefined) {
-            const exceptions = this.exceptions;
-            if (errorCode in exceptions) {
-                const message = this.safeString (response, 'message', body);
-                const feedback = this.safeString (this.errorCodeNames, errorCode, message);
-                throw new exceptions[errorCode] (feedback);
-            }
+            const feedback = this.safeString (this.errorCodeNames, errorCode, message);
+            this.throwExactlyMatchedException (this.exceptions['exact'], errorCode, feedback);
         }
     }
 };
