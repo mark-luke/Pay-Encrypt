@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.11'
+const version = '1.27.12'
 
 Exchange.ccxtVersion = version
 
@@ -77768,8 +77768,18 @@ module.exports = class okex extends Exchange {
             'instrument_id': market['id'],
             'granularity': this.timeframes[timeframe],
         };
+        const duration = this.parseTimeframe (timeframe);
         if (since !== undefined) {
+            if (limit !== undefined) {
+                request['end'] = this.iso8601 (this.sum (since, limit * duration * 1000));
+            }
             request['start'] = this.iso8601 (since);
+        } else {
+            const now = this.milliseconds ();
+            if (limit !== undefined) {
+                request['start'] = this.iso8601 (now - limit * duration * 1000);
+                request['end'] = this.iso8601 (now);
+            }
         }
         const response = await this[method] (this.extend (request, params));
         //
