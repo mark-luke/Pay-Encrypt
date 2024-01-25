@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1319'
+const version = '1.18.1320'
 
 Exchange.ccxtVersion = version
 
@@ -102959,13 +102959,20 @@ module.exports = class whitebit extends Exchange {
         if (response !== undefined) {
             const success = this.safeValue (response, 'success');
             if (!success) {
-                const message = response['message'];
-                if (message) {
-                    throw new ExchangeError (message);
-                } else {
-                    const feedback = this.id + ' ' + this.json (response);
-                    throw new ExchangeError (feedback);
+                const feedback = this.id + ' ' + body;
+                const message = this.safeValue (response, 'message');
+                if (typeof message === 'string') {
+                    const exact = this.safeValue (this.exceptions, 'exact', {});
+                    if (message in exact) {
+                        throw new exact[message] (feedback);
+                    }
+                    const broad = this.safeValue (this.exceptions, 'broad', {});
+                    const broadKey = this.findBroadlyMatchedKey (broad, message);
+                    if (broadKey !== undefined) {
+                        throw new broad[broadKey] (feedback);
+                    }
                 }
+                throw new ExchangeError (feedback);
             }
         }
     }
