@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.1'
+const version = '1.28.2'
 
 Exchange.ccxtVersion = version
 
@@ -77002,6 +77002,7 @@ module.exports = class lykke extends Exchange {
             'Cancelled': 'canceled',
             'Rejected': 'rejected',
             'Replaced': 'canceled',
+            'Placed': 'open',
         };
         return this.safeString (statuses, status, status);
     }
