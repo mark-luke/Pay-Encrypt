@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.76'
+const version = '1.21.77'
 
 Exchange.ccxtVersion = version
 
@@ -10460,6 +10460,18 @@ module.exports = class binance extends Exchange {
             'type': uppercaseType,
             'side': side.toUpperCase (),
         };
+        if (type === 'market') {
+            const quoteOrderQty = this.safeFloat (params, 'quoteOrderQty');
+            if (quoteOrderQty !== undefined) {
+                request['quoteOrderQty'] = this.costToPrecision (symbol, quoteOrderQty);
+            } else if (price !== undefined) {
+                request['quoteOrderQty'] = this.costToPrecision (symbol, amount * price);
+            } else {
+                request['quantity'] = this.amountToPrecision (symbol, amount);
+            }
+        } else {
+            request['quantity'] = this.amountToPrecision (symbol, amount);
+        }
         if (market['spot']) {
             request['newOrderRespType'] = this.safeValue (this.options['newOrderRespType'], type, 'RESULT'); // 'ACK' for order id, 'RESULT' for full order or 'FULL' for order with fills
         }
