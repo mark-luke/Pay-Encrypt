@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.23'
+const version = '1.29.24'
 
 Exchange.ccxtVersion = version
 
@@ -69498,7 +69498,7 @@ module.exports = class indodax extends Exchange {
                 'fetchCurrencies': false,
                 'withdraw': true,
             },
-            'version': '1.8', // as of 9 April 2018
+            'version': '2.0', // as of 9 April 2018
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/37443283-2fddd0e4-281c-11e8-9741-b4f1419001b5.jpg',
                 'api': {
@@ -69512,6 +69512,8 @@ module.exports = class indodax extends Exchange {
             'api': {
                 'public': {
                     'get': [
+                        'server_time',
+                        'pairs',
                         '{pair}/ticker',
                         '{pair}/trades',
                         '{pair}/depth',
@@ -69627,7 +69629,35 @@ module.exports = class indodax extends Exchange {
                     'Minimum order': InvalidOrder,
                 },
             },
+            // exchange-specific options
+            'options': {
+                'recvWindow': 5 * 1000, // default 5 sec
+                'timeDifference': 0, // the difference between system clock and exchange clock
+                'adjustForTimeDifference': false, // controls the adjustment logic upon instantiation
+            },
         });
+    }
+
+    nonce () {
+        return this.milliseconds () - this.options['timeDifference'];
+    }
+
+    async fetchTime (params = {}) {
+        const response = await this.publicGetServerTime (params);
+        //
+        //     {
+        //         "timezone": "UTC",
+        //         "server_time": 1571205969552
+        //     }
+        //
+        return this.safeInteger (response, 'server_time');
+    }
+
+    async loadTimeDifference (params = {}) {
+        const serverTime = await this.fetchTime (params);
+        const after = this.milliseconds ();
+        this.options['timeDifference'] = after - serverTime;
+        return this.options['timeDifference'];
     }
 
     async fetchBalance (params = {}) {
@@ -69997,7 +70027,8 @@ module.exports = class indodax extends Exchange {
             this.checkRequiredCredentials ();
             body = this.urlencode (this.extend ({
                 'method': path,
-                'nonce': this.nonce (),
+                'timestamp': this.nonce (),
+                'recvWindow': this.options['recvWindow'],
             }, params));
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded',
