@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.65'
+const version = '1.35.66'
 
 Exchange.ccxtVersion = version
 
@@ -51229,25 +51229,8 @@ module.exports = class coinmate extends Exchange {
         //         "tradeType":"BUY"
         //     }
         //
-        let symbol = undefined;
         const marketId = this.safeString (trade, 'currencyPair');
-        let quote = undefined;
-        if (marketId !== undefined) {
-            if (marketId in this.markets_by_id[marketId]) {
-                market = this.markets_by_id[marketId];
-                quote = market['quote'];
-            } else {
-                const [ baseId, quoteId ] = marketId.split ('_');
-                const base = this.safeCurrencyCode (baseId);
-                quote = this.safeCurrencyCode (quoteId);
-                symbol = base + '/' + quote;
-            }
-        }
-        if (symbol === undefined) {
-            if (market !== undefined) {
-                symbol = market['symbol'];
-            }
-        }
+        market = this.safeMarket (marketId, market, '_');
         const price = this.safeFloat (trade, 'price');
         const amount = this.safeFloat (trade, 'amount');
         let cost = undefined;
@@ -51266,7 +51249,7 @@ module.exports = class coinmate extends Exchange {
         if (feeCost !== undefined) {
             fee = {
                 'cost': feeCost,
-                'currency': quote,
+                'currency': market['quote'],
             };
         }
         let takerOrMaker = this.safeString (trade, 'feeType');
@@ -51276,7 +51259,7 @@ module.exports = class coinmate extends Exchange {
             'info': trade,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
-            'symbol': symbol,
+            'symbol': market['symbol'],
             'type': type,
             'side': side,
             'order': orderId,
@@ -51423,21 +51406,8 @@ module.exports = class coinmate extends Exchange {
             }
         }
         const average = this.safeFloat (order, 'avgPrice');
-        let symbol = undefined;
         const marketId = this.safeString (order, 'currencyPair');
-        if (marketId !== undefined) {
-            if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[marketId];
-            } else {
-                const [ baseId, quoteId ] = marketId.split ('_');
-                const base = this.safeCurrencyCode (baseId);
-                const quote = this.safeCurrencyCode (quoteId);
-                symbol = base + '/' + quote;
-            }
-        }
-        if ((symbol === undefined) && (market !== undefined)) {
-            symbol = market['symbol'];
-        }
+        const symbol = this.safeSymbol (marketId, market, '_');
         const clientOrderId = this.safeString (order, 'clientOrderId');
         return {
             'id': id,
