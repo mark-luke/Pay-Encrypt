@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.71'
+const version = '1.23.72'
 
 Exchange.ccxtVersion = version
 
@@ -58219,6 +58219,7 @@ module.exports = class huobipro extends Exchange {
             'accounts': undefined,
             'accountsById': undefined,
             'hostname': 'api.huobi.pro',
+            'pro': true,
             'has': {
                 'CORS': false,
                 'fetchTickers': true,
@@ -58248,7 +58249,7 @@ module.exports = class huobipro extends Exchange {
                 '1y': '1year',
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27766569-15aa7b9a-5edd-11e7-9e7f-44791f4ee49c.jpg',
+                'logo': 'https://user-images.githubusercontent.com/1294454/76137448-22748a80-604e-11ea-8069-6e389271911d.jpg',
                 'api': {
                     'market': 'https://{hostname}',
                     'public': 'https://{hostname}',
