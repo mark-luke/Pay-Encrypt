@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1222'
+const version = '1.18.1223'
 
 Exchange.ccxtVersion = version
 
@@ -30705,6 +30705,7 @@ module.exports = class coinbase extends Exchange {
                 'fetchOrders': false,
                 'fetchTicker': true,
                 'fetchTickers': false,
+                'fetchTime': true,
                 'fetchBidsAsks': false,
                 'fetchTrades': false,
                 'withdraw': false,
@@ -70918,6 +70919,7 @@ module.exports = class okex3 extends Exchange {
                 'fetchCurrencies': false, // see below
                 'fetchDeposits': true,
                 'fetchWithdrawals': true,
+                'fetchTime': true,
                 'fetchTransactions': false,
                 'fetchMyTrades': false, // they don't have it
                 'fetchDepositAddress': true,
@@ -94639,6 +94641,7 @@ module.exports = class stronghold extends Exchange {
                 'fetchCurrencies': true,
                 'fetchOrderBook': true,
                 'fetchOpenOrders': true,
+                'fetchTime': true,
                 'fetchTrades': true,
                 'fetchMyTrades': true,
                 'fetchDepositAddress': false,
