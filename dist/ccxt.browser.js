@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.52'
+const version = '1.33.53'
 
 Exchange.ccxtVersion = version
 
@@ -2604,10 +2604,12 @@ module.exports = class Exchange {
     }
 
     purgeCachedOrders (before) {
-        const orders = Object
-            .values (this.orders)
-            .filter ((order) => (order.status === 'open') || (order.timestamp >= before))
-        this.orders = indexBy (orders, 'id')
+        if (this.orders) {
+            const orders = Object
+                .values (this.orders)
+                .filter ((order) => (order.status === 'open') || (order.timestamp >= before))
+            this.orders = indexBy (orders, 'id')
+        }
         return this.orders
     }
 
