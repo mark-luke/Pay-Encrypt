@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.19'
+const version = '1.33.20'
 
 Exchange.ccxtVersion = version
 
@@ -75094,7 +75094,7 @@ module.exports = class indodax extends Exchange {
         const result = [];
         for (let i = 0; i < response.length; i++) {
             const market = response[i];
-            const id = this.safeString (market, 'id');
+            const id = this.safeString (market, 'ticker_id');
             const baseId = this.safeString (market, 'traded_currency');
             const quoteId = this.safeString (market, 'base_currency');
             const base = this.safeCurrencyCode (baseId);
