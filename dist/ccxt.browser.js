@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.40'
+const version = '1.31.41'
 
 Exchange.ccxtVersion = version
 
@@ -37693,12 +37693,16 @@ module.exports = class bybit extends Exchange {
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
         await this.loadMarkets ();
         const market = this.market (symbol);
+        let qty = this.amountToPrecision (symbol, amount);
+        if (market['linear']) {
+            qty = parseInt (qty);
+        }
         const request = {
             // orders ---------------------------------------------------------
             'side': this.capitalize (side),
             'symbol': market['id'],
             'order_type': this.capitalize (type),
-            'qty': this.amountToPrecision (symbol, amount), // order quantity in USD, integer only
+            'qty': qty, // order quantity in USD, integer only
             // 'price': this.priceToPrecision (symbol, price), // required for limit orders
             'time_in_force': 'GoodTillCancel', // ImmediateOrCancel, FillOrKill, PostOnly
             // 'take_profit': 123.45, // take profit price, only take effect upon opening the position
