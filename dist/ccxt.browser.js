@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.94'
+const version = '1.27.95'
 
 Exchange.ccxtVersion = version
 
@@ -14124,7 +14124,7 @@ module.exports = class bitfinex extends Exchange {
             const quote = this.safeCurrencyCode (quoteId);
             const symbol = base + '/' + quote;
             const precision = {
-                'price': market['price_precision'],
+                'price': this.safeInteger (market, 'price_precision'),
                 'amount': undefined,
             };
             const limits = {
@@ -14601,18 +14601,23 @@ module.exports = class bitfinex extends Exchange {
     }
 
     async fetchTransactions (code = undefined, since = undefined, limit = undefined, params = {}) {
-        if (code === undefined) {
-            throw new ArgumentsRequired (this.id + ' fetchTransactions() requires a currency `code` argument');
-        }
         await this.loadMarkets ();
-        const currency = this.currency (code);
-        const request = {
-            'currency': currency['id'],
-        };
-        if (since !== undefined) {
-            request['since'] = parseInt (since / 1000);
+        let currencyId = this.safeString (params, 'currency');
+        const query = this.omit (params, 'currency');
+        let currency = undefined;
+        if (currencyId === undefined) {
+            if (code === undefined) {
+                throw new ArgumentsRequired (this.id + ' fetchTransactions() requires a currency `code` argument or a `currency` parameter');
+            } else {
+                currency = this.currency (code);
+                currencyId = currency['id'];
+            }
         }
-        const response = await this.privatePostHistoryMovements (this.extend (request, params));
+        query['currency'] = currencyId;
+        if (since !== undefined) {
+            query['since'] = parseInt (since / 1000);
+        }
+        const response = await this.privatePostHistoryMovements (this.extend (query, params));
         //
         //     [
         //         {
@@ -52603,15 +52608,16 @@ module.exports = class exmo extends Exchange {
         const response = await this.publicGetPairSettings (params);
         //
         //     {
-        //         "EXM_ETH": {
-        //         "min_quantity": "1",
-        //         "max_quantity": "1000",
-        //         "min_price": "1",
-        //         "max_price": "1000",
-        //         "max_amount": "1000",
-        //         "min_amount": "1",
-        //         "commission_taker_percent": "0.2",
-        //         "commission_maker_percent": "0.2"
+        //         "BTC_USD":{
+        //             "min_quantity":"0.0001",
+        //             "max_quantity":"1000",
+        //             "min_price":"1",
+        //             "max_price":"30000",
+        //             "max_amount":"500000",
+        //             "min_amount":"1",
+        //             "price_precision":8,
+        //             "commission_taker_percent":"0.4",
+        //             "commission_maker_percent":"0.4"
         //         },
         //     }
         //
@@ -52652,7 +52658,7 @@ module.exports = class exmo extends Exchange {
                 },
                 'precision': {
                     'amount': 8,
-                    'price': 8,
+                    'price': this.safeInteger (market, 'price_precision'),
                 },
                 'info': market,
             });
