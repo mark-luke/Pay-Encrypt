@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.30'
+const version = '1.19.31'
 
 Exchange.ccxtVersion = version
 
@@ -103941,7 +103941,7 @@ module.exports = class virwox extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, DDoSProtection } = require ('./base/errors');
+const { ExchangeError, DDoSProtection, BadSymbol } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -104042,6 +104042,13 @@ module.exports = class whitebit extends Exchange {
             },
             'options': {
                 'fetchTradesMethod': 'fetchTradesV1',
+            },
+            'exceptions': {
+                'exact': {
+                },
+                'broad': {
+                    'Market is not available': BadSymbol, // {"success":false,"message":{"market":["Market is not available"]},"result":[]}
+                },
             },
         });
     }
@@ -104554,11 +104561,11 @@ module.exports = class whitebit extends Exchange {
                     if (message in exact) {
                         throw new exact[message] (feedback);
                     }
-                    const broad = this.safeValue (this.exceptions, 'broad', {});
-                    const broadKey = this.findBroadlyMatchedKey (broad, message);
-                    if (broadKey !== undefined) {
-                        throw new broad[broadKey] (feedback);
-                    }
+                }
+                const broad = this.safeValue (this.exceptions, 'broad', {});
+                const broadKey = this.findBroadlyMatchedKey (broad, body);
+                if (broadKey !== undefined) {
+                    throw new broad[broadKey] (feedback);
                 }
                 throw new ExchangeError (feedback);
             }
