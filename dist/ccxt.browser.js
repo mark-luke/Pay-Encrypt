@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.48'
+const version = '1.29.49'
 
 Exchange.ccxtVersion = version
 
@@ -90053,7 +90053,8 @@ module.exports = class rightbtc extends Exchange {
             'timeSymbol': this.timeframes[timeframe],
         };
         const response = await this.publicGetCandlestickTimeSymbolTradingPair (this.extend (request, params));
-        return this.parseOHLCVs (response['result'], market, timeframe, since, limit);
+        const result = this.safeValue (response, 'result', []);
+        return this.parseOHLCVs (result, market);
     }
 
     async fetchBalance (params = {}) {
@@ -109747,8 +109748,8 @@ module.exports = class stex extends Exchange {
         //         ]
         //     }
         //
-        const ohlcvs = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (ohlcvs, market, timeframe, since, limit);
+        const data = this.safeValue (response, 'data', []);
+        return this.parseOHLCVs (data, market);
     }
 
     parseTrade (trade, market = undefined) {
@@ -111885,6 +111886,19 @@ module.exports = class theocean extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+        //
+        //     {
+        //         "market_id":"ETH-BTC",
+        //         "open":"0.02811",
+        //         "close":"0.02811",
+        //         "low":"0.02811",
+        //         "high":"0.02811",
+        //         "base_volume":"0.0005",
+        //         "quote_volume":"0.000014055",
+        //         "start_time":"2018-11-30T18:19:00.000Z",
+        //         "end_time":"2018-11-30T18:20:00.000Z"
+        //     }
+        //
         const baseDecimals = this.safeInteger (this.options['decimals'], market['base'], 18);
         return [
             this.safeTimestamp (ohlcv, 'startTime'),
@@ -111910,25 +111924,25 @@ module.exports = class theocean extends Exchange {
         };
         const response = await this.publicGetCandlesticks (this.extend (request, params));
         //
-        //   [
-        //     {
-        //         "high": "100.52",
-        //         "low": "97.23",
-        //         "open": "98.45",
-        //         "close": "99.23",
-        //         "baseVolume": "2400000000000000000000",
-        //         "quoteVolume": "1200000000000000000000",
-        //         "startTime": "1512929323784"
-        //     },
-        //     {
-        //         "high": "100.52",
-        //         "low": "97.23",
-        //         "open": "98.45",
-        //         "close": "99.23",
-        //         "volume": "2400000000000000000000",
-        //         "startTime": "1512929198980"
-        //     }
-        //   ]
+        //     [
+        //         {
+        //             "high": "100.52",
+        //             "low": "97.23",
+        //             "open": "98.45",
+        //             "close": "99.23",
+        //             "baseVolume": "2400000000000000000000",
+        //             "quoteVolume": "1200000000000000000000",
+        //             "startTime": "1512929323784"
+        //         },
+        //         {
+        //             "high": "100.52",
+        //             "low": "97.23",
+        //             "open": "98.45",
+        //             "close": "99.23",
+        //             "volume": "2400000000000000000000",
+        //             "startTime": "1512929198980"
+        //         }
+        //     ]
         //
         return this.parseOHLCVs (response, market);
     }
@@ -114157,8 +114171,18 @@ module.exports = class tidebit extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         1498530360,
+        //         2700.0,
+        //         2700.0,
+        //         2700.0,
+        //         2700.0,
+        //         0.01
+        //     ]
+        //
         return [
-            this.asfeTimestamp (ohlcv, 0),
+            this.safeTimestamp (ohlcv, 0),
             this.safeFloat (ohlcv, 1),
             this.safeFloat (ohlcv, 2),
             this.safeFloat (ohlcv, 3),
@@ -114184,10 +114208,17 @@ module.exports = class tidebit extends Exchange {
             request['timestamp'] = 1800000;
         }
         const response = await this.publicGetK (this.extend (request, params));
+        //
+        //     [
+        //         [1498530360,2700.0,2700.0,2700.0,2700.0,0.01],
+        //         [1498530420,2700.0,2700.0,2700.0,2700.0,0],
+        //         [1498530480,2700.0,2700.0,2700.0,2700.0,0],
+        //     ]
+        //
         if (response === 'null') {
             return [];
         }
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        return this.parseOHLCVs (response, market);
     }
 
     parseOrderStatus (status) {
@@ -115673,7 +115704,7 @@ module.exports = class timex extends Exchange {
         //         },
         //     ]
         //
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        return this.parseOHLCVs (response, market);
     }
 
     async fetchBalance (params = {}) {
@@ -117295,17 +117326,19 @@ module.exports = class upbit extends Exchange {
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1d', since = undefined, limit = undefined) {
         //
-        //       {                  market: "BTC-ETH",
-        //            candle_date_time_utc: "2018-11-22T13:47:00",
-        //            candle_date_time_kst: "2018-11-22T22:47:00",
-        //                   opening_price:  0.02915963,
-        //                      high_price:  0.02915963,
-        //                       low_price:  0.02915448,
-        //                     trade_price:  0.02915448,
-        //                       timestamp:  1542894473674,
-        //          candle_acc_trade_price:  0.0981629437535248,
-        //         candle_acc_trade_volume:  3.36693173,
-        //                            unit:  1                     },
+        //     {
+        //         market: "BTC-ETH",
+        //         candle_date_time_utc: "2018-11-22T13:47:00",
+        //         candle_date_time_kst: "2018-11-22T22:47:00",
+        //         opening_price: 0.02915963,
+        //         high_price: 0.02915963,
+        //         low_price: 0.02915448,
+        //         trade_price: 0.02915448,
+        //         timestamp: 1542894473674,
+        //         candle_acc_trade_price: 0.0981629437535248,
+        //         candle_acc_trade_volume: 3.36693173,
+        //         unit: 1
+        //     }
         //
         return [
             this.parse8601 (this.safeString (ohlcv, 'candle_date_time_utc')),
@@ -117342,30 +117375,36 @@ module.exports = class upbit extends Exchange {
         }
         const response = await this[method] (this.extend (request, params));
         //
-        //     [ {                  market: "BTC-ETH",
-        //            candle_date_time_utc: "2018-11-22T13:47:00",
-        //            candle_date_time_kst: "2018-11-22T22:47:00",
-        //                   opening_price:  0.02915963,
-        //                      high_price:  0.02915963,
-        //                       low_price:  0.02915448,
-        //                     trade_price:  0.02915448,
-        //                       timestamp:  1542894473674,
-        //          candle_acc_trade_price:  0.0981629437535248,
-        //         candle_acc_trade_volume:  3.36693173,
-        //                            unit:  1                     },
-        //       {                  market: "BTC-ETH",
-        //            candle_date_time_utc: "2018-11-22T10:06:00",
-        //            candle_date_time_kst: "2018-11-22T19:06:00",
-        //                   opening_price:  0.0294,
-        //                      high_price:  0.02940882,
-        //                       low_price:  0.02934283,
-        //                     trade_price:  0.02937354,
-        //                       timestamp:  1542881219276,
-        //          candle_acc_trade_price:  0.0762597110943884,
-        //         candle_acc_trade_volume:  2.5949617,
-        //                            unit:  1                     }  ]
+        //     [
+        //         {
+        //             market: "BTC-ETH",
+        //             candle_date_time_utc: "2018-11-22T13:47:00",
+        //             candle_date_time_kst: "2018-11-22T22:47:00",
+        //             opening_price: 0.02915963,
+        //             high_price: 0.02915963,
+        //             low_price: 0.02915448,
+        //             trade_price: 0.02915448,
+        //             timestamp: 1542894473674,
+        //             candle_acc_trade_price: 0.0981629437535248,
+        //             candle_acc_trade_volume: 3.36693173,
+        //             unit: 1
+        //         },
+        //         {
+        //             market: "BTC-ETH",
+        //             candle_date_time_utc: "2018-11-22T10:06:00",
+        //             candle_date_time_kst: "2018-11-22T19:06:00",
+        //             opening_price: 0.0294,
+        //             high_price: 0.02940882,
+        //             low_price: 0.02934283,
+        //             trade_price: 0.02937354,
+        //             timestamp: 1542881219276,
+        //             candle_acc_trade_price: 0.0762597110943884,
+        //             candle_acc_trade_volume: 2.5949617,
+        //             unit: 1
+        //         }
+        //     ]
         //
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        return this.parseOHLCVs (response, market);
     }
 
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
@@ -118040,7 +118079,7 @@ module.exports = class upbit extends Exchange {
             return; // fallback to default error handler
         }
         //
-        //   { 'error': { 'message': "Missing request parameter error. Check the required parameters!", 'name':  400 } },
+        //   { 'error': { 'message': "Missing request parameter error. Check the required parameters!", 'name': 400 } },
         //   { 'error': { 'message': "side is missing, side does not have a valid value", 'name': "validation_error" } },
         //   { 'error': { 'message': "개인정보 제 3자 제공 동의가 필요합니다.", 'name': "thirdparty_agreement_required" } },
         //   { 'error': { 'message': "권한이 부족합니다.", 'name': "out_of_scope" } },
@@ -118875,11 +118914,33 @@ module.exports = class whitebit extends Exchange {
             request['limit'] = limit; // default == max == 500
         }
         const response = await this.publicV1GetKline (this.extend (request, params));
-        const result = this.safeValue (response, 'result');
-        return this.parseOHLCVs (result, market, timeframe, since, limit);
+        //
+        //     {
+        //         "success":true,
+        //         "message":"",
+        //         "result":[
+        //             [1591488000,"0.025025","0.025025","0.025029","0.025023","6.181","0.154686629"],
+        //             [1591488060,"0.025028","0.025033","0.025035","0.025026","8.067","0.201921167"],
+        //             [1591488120,"0.025034","0.02505","0.02505","0.025034","20.089","0.503114696"],
+        //         ]
+        //     }
+        //
+        const result = this.safeValue (response, 'result', []);
+        return this.parseOHLCVs (result, market);
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         1591488000,
+        //         "0.025025",
+        //         "0.025025",
+        //         "0.025029",
+        //         "0.025023",
+        //         "6.181",
+        //         "0.154686629"
+        //     ]
+        //
         return [
             this.safeTimestamp (ohlcv, 0), // timestamp
             this.safeFloat (ohlcv, 1), // open
@@ -119225,7 +119286,7 @@ module.exports = class xbtce extends Exchange {
         //         'timestamp': since,
         //         'count': limit,
         //     }, params));
-        //     return this.parseOHLCVs (response['Bars'], market, timeframe, since, limit);
+        //     return this.parseOHLCVs (response['Bars'], market);
         throw new NotSupported (this.id + ' fetchOHLCV is disabled by the exchange');
     }
 
@@ -120825,7 +120886,7 @@ module.exports = class zb extends Exchange {
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/32859187-cd5214f0-ca5e-11e7-967d-96568e2e2bd1.jpg',
                 'api': {
-                    'public': 'http://api.zb.cn/data', // no https for public API
+                    'public': 'https://api.zb.cn/data', // no https for public API
                     'private': 'https://trade.zb.cn/api',
                 },
                 'www': 'https://www.zb.com',
@@ -121105,7 +121166,7 @@ module.exports = class zb extends Exchange {
         }
         const response = await this.publicGetKline (this.extend (request, params));
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, timeframe, since, limit);
+        return this.parseOHLCVs (data, market);
     }
 
     parseTrade (trade, market = undefined) {
