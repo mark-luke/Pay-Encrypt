@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.37'
+const version = '1.32.38'
 
 Exchange.ccxtVersion = version
 
@@ -25168,6 +25168,7 @@ module.exports = class bittrex extends Exchange {
                 'v3': {
                     'get': [
                         'account',
+                        'account/volume',
                         'addresses',
                         'addresses/{currencySymbol}',
                         'balances',
@@ -25181,6 +25182,7 @@ module.exports = class bittrex extends Exchange {
                         'orders/closed',
                         'orders/open',
                         'orders/{orderId}',
+                        'orders/{orderId}/executions',
                         'ping',
                         'subaccounts/{subaccountId}',
                         'subaccounts',
@@ -25188,16 +25190,26 @@ module.exports = class bittrex extends Exchange {
                         'withdrawals/closed',
                         'withdrawals/ByTxId/{txId}',
                         'withdrawals/{withdrawalId}',
+                        'withdrawals/whitelistAddresses',
+                        'conditional-orders/{conditionalOrderId}',
+                        'conditional-orders/closed',
+                        'conditional-orders/open',
+                        'transfers/sent',
+                        'transfers/received',
+                        'transfers/{transferId}',
                     ],
                     'post': [
                         'addresses',
                         'orders',
                         'subaccounts',
                         'withdrawals',
+                        'conditional-orders',
+                        'transfers',
                     ],
                     'delete': [
                         'orders/{orderId}',
                         'withdrawals/{withdrawalId}',
+                        'conditional-orders/{conditionalOrderId}',
                     ],
                 },
                 'v3public': {
