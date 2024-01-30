@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.40'
+const version = '1.29.41'
 
 Exchange.ccxtVersion = version
 
@@ -2488,7 +2488,7 @@ module.exports = class aofex extends Exchange {
         //
         const result = this.safeValue (response, 'result', {});
         const data = this.safeValue (result, 'data', []);
-        return this.parseOHLCVs (data, market, timeframe, since, limit);
+        return this.parseOHLCVs (data, market);
     }
 
     async fetchBalance (params = {}) {
@@ -7359,6 +7359,16 @@ module.exports = class bibox extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     {
+        //         "time":1591448220000,
+        //         "open":"0.02507029",
+        //         "high":"0.02507029",
+        //         "low":"0.02506349",
+        //         "close":"0.02506349",
+        //         "vol":"5.92000000"
+        //     }
+        //
         return [
             this.safeInteger (ohlcv, 'time'),
             this.safeFloat (ohlcv, 'open'),
@@ -7379,7 +7389,19 @@ module.exports = class bibox extends Exchange {
             'size': limit,
         };
         const response = await this.publicGetMdata (this.extend (request, params));
-        return this.parseOHLCVs (response['result'], market, timeframe, since, limit);
+        //
+        //     {
+        //         "result":[
+        //             {"time":1591448220000,"open":"0.02507029","high":"0.02507029","low":"0.02506349","close":"0.02506349","vol":"5.92000000"},
+        //             {"time":1591448280000,"open":"0.02506449","high":"0.02506975","low":"0.02506108","close":"0.02506843","vol":"5.72000000"},
+        //             {"time":1591448340000,"open":"0.02506698","high":"0.02506698","low":"0.02506452","close":"0.02506519","vol":"4.86000000"},
+        //         ],
+        //         "cmd":"kline",
+        //         "ver":"1.1"
+        //     }
+        //
+        const result = this.safeValue (response, 'result', []);
+        return this.parseOHLCVs (result, market);
     }
 
     async fetchCurrencies (params = {}) {
@@ -8608,8 +8630,8 @@ module.exports = class bigone extends Exchange {
         //         ]
         //     }
         //
-        const ohlcvs = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (ohlcvs, market, timeframe, since, limit);
+        const data = this.safeValue (response, 'data', []);
+        return this.parseOHLCVs (data, market);
     }
 
     async fetchBalance (params = {}) {
@@ -10015,6 +10037,22 @@ module.exports = class binance extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         1591478520000,
+        //         "0.02501300",
+        //         "0.02501800",
+        //         "0.02500000",
+        //         "0.02500000",
+        //         "22.19000000",
+        //         1591478579999,
+        //         "0.55490906",
+        //         40,
+        //         "10.92900000",
+        //         "0.27336462",
+        //         "0"
+        //     ]
+        //
         return [
             this.safeInteger (ohlcv, 0),
             this.safeFloat (ohlcv, 1),
@@ -10040,7 +10078,14 @@ module.exports = class binance extends Exchange {
         }
         const method = market['spot'] ? 'publicGetKlines' : 'fapiPublicGetKlines';
         const response = await this[method] (this.extend (request, params));
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        //
+        //     [
+        //         [1591478520000,"0.02501300","0.02501800","0.02500000","0.02500000","22.19000000",1591478579999,"0.55490906",40,"10.92900000","0.27336462","0"],
+        //         [1591478580000,"0.02499600","0.02500900","0.02499400","0.02500300","21.34700000",1591478639999,"0.53370468",24,"7.53800000","0.18850725","0"],
+        //         [1591478640000,"0.02500800","0.02501100","0.02500300","0.02500800","154.14200000",1591478699999,"3.85405839",97,"5.32300000","0.13312641","0"],
+        //     ]
+        //
+        return this.parseOHLCVs (response, market);
     }
 
     parseTrade (trade, market = undefined) {
@@ -12082,6 +12127,16 @@ module.exports = class bitbank extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         "0.02501786",
+        //         "0.02501786",
+        //         "0.02501786",
+        //         "0.02501786",
+        //         "0.0000",
+        //         1591488000000
+        //     ]
+        //
         return [
             this.safeInteger (ohlcv, 5),
             this.safeFloat (ohlcv, 0),
@@ -12104,8 +12159,29 @@ module.exports = class bitbank extends Exchange {
             'yyyymmdd': date.join (''),
         };
         const response = await this.publicGetPairCandlestickCandletypeYyyymmdd (this.extend (request, params));
-        const ohlcv = this.safeValue (response['data']['candlestick'][0], 'ohlcv');
-        return this.parseOHLCVs (ohlcv, market, timeframe, since, limit);
+        //
+        //     {
+        //         "success":1,
+        //         "data":{
+        //             "candlestick":[
+        //                 {
+        //                     "type":"5min",
+        //                     "ohlcv":[
+        //                         ["0.02501786","0.02501786","0.02501786","0.02501786","0.0000",1591488000000],
+        //                         ["0.02501747","0.02501953","0.02501747","0.02501953","0.3017",1591488300000],
+        //                         ["0.02501762","0.02501762","0.02500392","0.02500392","0.1500",1591488600000],
+        //                     ]
+        //                 }
+        //             ],
+        //             "timestamp":1591508668190
+        //         }
+        //     }
+        //
+        const data = this.safeValue (response, 'data', {});
+        const candlestick = this.safeValue (data, 'candlestick', []);
+        const first = this.safeValue (candlestick, 0, {});
+        const ohlcv = this.safeValue (first, 'ohlcv', []);
+        return this.parseOHLCVs (ohlcv, market);
     }
 
     async fetchBalance (params = {}) {
