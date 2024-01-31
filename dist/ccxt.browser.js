@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.73'
+const version = '1.24.74'
 
 Exchange.ccxtVersion = version
 
@@ -6360,7 +6360,7 @@ module.exports = class bcex extends Exchange {
                 'fetchTradingLimits': true,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/43362240-21c26622-92ee-11e8-9464-5801ec526d77.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/77231516-851c6900-6bac-11ea-8fd6-ee5c23eddbd4.jpg',
                 'api': 'https://www.bcex.top',
                 'www': 'https://www.bcex.top',
                 'doc': 'https://github.com/BCEX-TECHNOLOGY-LIMITED/API_Docs/wiki/Interface',
@@ -6406,8 +6406,8 @@ module.exports = class bcex extends Exchange {
                 'trading': {
                     'tierBased': false,
                     'percentage': true,
-                    'buy': 0.0,
-                    'sell': 0.2 / 100,
+                    'maker': 0.1 / 100,
+                    'taker': 0.2 / 100,
                 },
                 'funding': {
                     'tierBased': false,
@@ -7001,18 +7001,6 @@ module.exports = class bcex extends Exchange {
                 }
             }
         }
-    }
-
-    calculateFee (symbol, type, side, amount, price, takerOrMaker = 'taker', params = {}) {
-        const market = this.markets[symbol];
-        const rate = market[side];
-        const cost = parseFloat (this.costToPrecision (symbol, amount * price));
-        return {
-            'type': takerOrMaker,
-            'currency': market['quote'],
-            'rate': rate,
-            'cost': parseFloat (this.feeToPrecision (symbol, rate * cost)),
-        };
     }
 };
 
