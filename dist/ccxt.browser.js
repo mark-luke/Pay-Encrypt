@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1262'
+const version = '1.18.1263'
 
 Exchange.ccxtVersion = version
 
@@ -9813,6 +9813,9 @@ module.exports = class binance extends Exchange {
         const request = {
             'symbol': market['id'],
         };
+        if (since !== undefined) {
+            request['startTime'] = since;
+        }
         if (limit !== undefined) {
             request['limit'] = limit;
         }
