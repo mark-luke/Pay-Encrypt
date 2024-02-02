@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.49'
+const version = '1.33.50'
 
 Exchange.ccxtVersion = version
 
@@ -2066,12 +2066,11 @@ module.exports = class Exchange {
         this.balance      = {}
         this.orderbooks   = {}
         this.tickers      = {}
-        this.orders       = {}
+        this.orders       = undefined
         this.trades       = {}
         this.transactions = {}
         this.ohlcvs       = {}
         this.myTrades     = undefined
-        this.ordersCache  = undefined  // used in pro
 
         this.requiresWeb3 = false
         this.requiresEddsa = false
@@ -60657,6 +60656,7 @@ module.exports = class exmo extends Exchange {
                     'API rate limit exceeded': RateLimitExceeded, // {"result":false,"error":"API rate limit exceeded for 99.33.55.224. Retry after 60 sec.","history":[],"begin":1579392000,"end":1579478400}
                 },
             },
+            'orders': {}, // orders cache / emulation
         });
     }
 
@@ -69291,6 +69291,7 @@ module.exports = class hitbtc extends Exchange {
                 '20002': OrderNotFound, // canceling non-existent order
                 '20001': InsufficientFunds, // {"error":{"code":20001,"message":"Insufficient funds","description":"Check that the funds are sufficient, given commissions"}}
             },
+            'orders': {}, // orders cache / emulation
         });
     }
 
@@ -92937,6 +92938,7 @@ module.exports = class poloniex extends Exchange {
                     'is either completed or does not exist': InvalidOrder, // {"error":"Order 587957810791 is either completed or does not exist."}
                 },
             },
+            'orders': {}, // orders cache / emulation
         });
     }
 
@@ -121875,6 +121877,7 @@ module.exports = class tidex extends Exchange {
             'options': {
                 'fetchTickersMaxLength': 2048,
             },
+            'orders': {}, // orders cache / emulation
         });
     }
 
@@ -130225,6 +130228,7 @@ module.exports = class yobit extends Exchange {
                     'Rate Limited': RateLimitExceeded,
                 },
             },
+            'orders': {}, // orders cache / emulation
         });
     }
 
