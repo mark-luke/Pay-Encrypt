@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.26'
+const version = '1.35.27'
 
 Exchange.ccxtVersion = version
 
@@ -91128,7 +91128,7 @@ module.exports = class okex extends Exchange {
             const name = this.safeString (currency, 'name');
             const canDeposit = this.safeInteger (currency, 'can_deposit');
             const canWithdraw = this.safeInteger (currency, 'can_withdraw');
-            const active = canDeposit && canWithdraw;
+            const active = (canDeposit && canWithdraw) ? true : false;
             result[code] = {
                 'id': id,
                 'code': code,
