@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.64'
+const version = '1.25.65'
 
 Exchange.ccxtVersion = version
 
@@ -54414,6 +54414,7 @@ module.exports = class ftx extends Exchange {
             'countries': [ 'HK' ],
             'rateLimit': 100,
             'certified': true,
+            'pro': true,
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/67149189-df896480-f2b0-11e9-8816-41593e17f9ec.jpg',
                 'www': 'https://ftx.com',
