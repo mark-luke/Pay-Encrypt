@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.88'
+const version = '1.20.89'
 
 Exchange.ccxtVersion = version
 
@@ -1383,7 +1383,7 @@ module.exports = class adara extends Exchange {
             } else if (id.indexOf ('OSID') >= 0) {
                 asks.push (this.parseBidAsk (bidask['attributes'], priceKey, amountKey));
             } else {
-                throw ExchangeError (this.id + ' parseOrderBook encountered an unrecognized bidask format: ' + this.json (bidask));
+                throw new ExchangeError (this.id + ' parseOrderBook encountered an unrecognized bidask format: ' + this.json (bidask));
             }
         }
         return {
@@ -2137,7 +2137,7 @@ module.exports = class adara extends Exchange {
         if (id in ordersById) {
             return ordersById[id];
         }
-        throw OrderNotFound (this.id + ' fetchOrder could not find order id ' + id.toString ());
+        throw new OrderNotFound (this.id + ' fetchOrder could not find order id ' + id.toString ());
     }
 
     nonce () {
