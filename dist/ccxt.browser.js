@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.24'
+const version = '1.28.25'
 
 Exchange.ccxtVersion = version
 
@@ -57125,7 +57125,7 @@ module.exports = class gateio extends Exchange {
         if (!coins) {
             throw new ExchangeError (this.id + ' fetchCurrencies got an unrecognized response');
         }
-        const result = [];
+        const result = {};
         for (let i = 0; i < coins.length; i++) {
             const coin = coins[i];
             const ids = Object.keys (coin);
