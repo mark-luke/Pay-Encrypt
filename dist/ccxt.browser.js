@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1263'
+const version = '1.18.1264'
 
 Exchange.ccxtVersion = version
 
@@ -16184,7 +16184,7 @@ module.exports = class bitlish extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { AuthenticationError, ArgumentsRequired, ExchangeError, InvalidOrder, BadRequest, OrderNotFound } = require ('./base/errors');
+const { AuthenticationError, ArgumentsRequired, ExchangeError, InvalidOrder, BadRequest, OrderNotFound, DDoSProtection } = require ('./base/errors');
 //  ---------------------------------------------------------------------------
 
 module.exports = class bitmart extends Exchange {
@@ -16314,6 +16314,7 @@ module.exports = class bitmart extends Exchange {
                 'exact': {
                     'Place order error': InvalidOrder, // {"message":"Place order error"}
                     'Not found': OrderNotFound, // {"message":"Not found"}
+                    'Visit too often, please try again later': DDoSProtection, // {"code":-30,"msg":"Visit too often, please try again later","subMsg":"","data":{}}
                 },
                 'broad': {
                     'Maximum price is': InvalidOrder, // {"message":"Maximum price is 0.112695"}
@@ -17067,7 +17068,7 @@ module.exports = class bitmart extends Exchange {
         //     {"message":"Place order error"}
         //
         const feedback = this.id + ' ' + body;
-        const message = this.safeString (response, 'message');
+        const message = this.safeString2 (response, 'message', 'msg');
         if (message !== undefined) {
             const exact = this.exceptions['exact'];
             if (message in exact) {
@@ -31726,7 +31727,7 @@ module.exports = class coinbasepro extends Exchange {
         const id = this.safeString (trade, 'trade_id');
         let side = (trade['side'] === 'buy') ? 'sell' : 'buy';
         const orderId = this.safeString (trade, 'order_id');
-        // GDAX returns inverted side to fetchMyTrades vs fetchTrades
+        // Coinbase Pro returns inverted side to fetchMyTrades vs fetchTrades
         if (orderId !== undefined) {
             side = (trade['side'] === 'buy') ? 'buy' : 'sell';
         }
@@ -32006,7 +32007,7 @@ module.exports = class coinbasepro extends Exchange {
             // deposit from a payment_method, like a bank account
             method += 'PaymentMethod';
         } else if ('coinbase_account_id' in params) {
-            // deposit into GDAX account from a Coinbase account
+            // deposit into Coinbase Pro account from a Coinbase account
             method += 'CoinbaseAccount';
         } else {
             // deposit methodotherwise we did not receive a supported deposit location
@@ -61324,7 +61325,7 @@ module.exports = class lbank extends Exchange {
                 'api': 'https://api.lbank.info',
                 'www': 'https://www.lbank.info',
                 'doc': 'https://github.com/LBank-exchange/lbank-official-api-docs',
-                'fees': 'https://lbankinfo.zendesk.com/hc/zh-cn/articles/115002295114--%E8%B4%B9%E7%8E%87%E8%AF%B4%E6%98%8E',
+                'fees': 'https://lbankinfo.zendesk.com/hc/en-gb/articles/360012072873-Trading-Fees',
                 'referral': 'https://www.lbex.io/invite?icode=7QCY',
             },
             'api': {
