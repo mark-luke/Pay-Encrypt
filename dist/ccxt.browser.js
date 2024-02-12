@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1177'
+const version = '1.18.1178'
 
 Exchange.ccxtVersion = version
 
@@ -59065,6 +59065,9 @@ module.exports = class kucoin extends Exchange {
                 'version': 'v1',
                 'symbolSeparator': '-',
                 'fetchMyTradesMethod': 'private_get_fills',
+                'fetchBalance': {
+                    'type': 'trade', // or 'main'
+                },
             },
         });
     }
@@ -60244,7 +60247,8 @@ module.exports = class kucoin extends Exchange {
             }
             params = this.omit (params, 'type');
         } else {
-            type = 'trade';
+            const options = this.safeValue (this.options, 'fetchBalance', {});
+            type = this.safeString (options, 'type', 'trade');
         }
         const response = await this.privateGetAccounts (this.extend (request, params));
         //
@@ -60256,7 +60260,7 @@ module.exports = class kucoin extends Exchange {
         //             {"balance":"0.01562641","available":"0.01562641","holds":"0","currency":"NEO","id":"5c6a4f1199a1d8165a99edb1","type":"trade"},
         //         ]
         //     }
-        // /
+        //
         const data = this.safeValue (response, 'data', []);
         const result = { 'info': response };
         for (let i = 0; i < data.length; i++) {
