@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.13'
+const version = '1.32.14'
 
 Exchange.ccxtVersion = version
 
@@ -55441,6 +55441,7 @@ module.exports = class dsx extends Exchange {
                     'data unavailable': ExchangeNotAvailable,
                     'external service unavailable': ExchangeNotAvailable,
                     'nonce is invalid': InvalidNonce, // {"success":0,"error":"Parameter: nonce is invalid"}
+                    'Incorrect volume': InvalidOrder, // {"success": 0,"error":"Order was rejected. Incorrect volume."}
                 },
             },
             'options': {
