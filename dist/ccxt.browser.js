@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.50'
+const version = '1.26.51'
 
 Exchange.ccxtVersion = version
 
@@ -78756,9 +78756,9 @@ module.exports = class paymium extends Exchange {
 
     async cancelOrder (id, symbol = undefined, params = {}) {
         const request = {
-            'UUID': id,
+            'uuid': id,
         };
-        return await this.privateDeleteUserOrdersUUIDCancel (this.extend (request, params));
+        return await this.privateDeleteUserOrdersUuidCancel (this.extend (request, params));
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
