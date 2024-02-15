@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1287'
+const version = '1.18.1288'
 
 Exchange.ccxtVersion = version
 
@@ -5677,6 +5677,7 @@ module.exports =
 'use strict';
 
 const { ROUND_UP, ROUND_DOWN } = require ('./number')
+const { NotSupported } = require ('./../errors')
 
 //-------------------------------------------------------------------------
 // converts timeframe to seconds
@@ -5684,7 +5685,7 @@ const parseTimeframe = (timeframe) => {
 
     const amount = timeframe.slice (0, -1)
     const unit = timeframe.slice (-1)
-    let scale = 60 // 1m by default
+    let scale = undefined;
 
     if (unit === 'y') {
         scale = 60 * 60 * 24 * 365
@@ -5696,6 +5697,10 @@ const parseTimeframe = (timeframe) => {
         scale = 60 * 60 * 24
     } else if (unit === 'h') {
         scale = 60 * 60
+    } else if (unit === 'm') {
+        scale = 60
+    } else {
+        throw new NotSupported ('timeframe unit ' + unit + ' is not supported')
     }
 
     return amount * scale
@@ -5799,7 +5804,7 @@ module.exports = {
 
 /*  ------------------------------------------------------------------------ */
 
-},{"./number":16}],16:[function(require,module,exports){
+},{"./../errors":10,"./number":16}],16:[function(require,module,exports){
 'use strict'
 
 /*  ------------------------------------------------------------------------
