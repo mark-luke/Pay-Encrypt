@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1119'
+const version = '1.18.1121'
 
 Exchange.ccxtVersion = version
 
@@ -3245,28 +3245,6 @@ module.exports = class Exchange {
         return this.market (symbol).symbol || symbol
     }
 
-    extractParams (string) {
-        const re = /{([\w-]+)}/g
-        const matches = []
-        let match = re.exec (string)
-        while (match) {
-            matches.push (match[1])
-            match = re.exec (string)
-        }
-        return matches
-    }
-
-    implodeParams (string, params) {
-        if (!Array.isArray (params)) {
-            for (let property in params) {
-                if (!Array.isArray (params[property])) {
-                    string = string.replace ('{' + property + '}', params[property])
-                }
-            }
-        }
-        return string
-    }
-
     url (path, params = {}) {
         let result = this.implodeParams (path, params);
         const query = this.omit (params, this.extractParams (path))
@@ -4493,6 +4471,30 @@ const buildOHLCVC = (trades, timeframe = '1m', since = -Infinity, limit = Infini
     return ohlcvs;
 }
 
+const extractParams = (string) => {
+    const re = /{([\w-]+)}/g
+    const matches = []
+    let match = re.exec (string)
+    while (match) {
+        matches.push (match[1])
+        match = re.exec (string)
+    }
+    return matches
+}
+
+const implodeParams = (string, params) => {
+    if (!Array.isArray (params)) {
+        const keys = Object.keys (params)
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i]
+            if (!Array.isArray (params[key])) {
+                string = string.replace ('{' + key + '}', params[key])
+            }
+        }
+    }
+    return string
+}
+
 /*  ------------------------------------------------------------------------ */
 
 module.exports = {
@@ -4515,7 +4517,10 @@ module.exports = {
     roundTimeframe,
     buildOHLCVC,
     ROUND_UP,
-    ROUND_DOWN
+    ROUND_DOWN,
+
+    implodeParams,
+    extractParams
 }
 
 /*  ------------------------------------------------------------------------ */
@@ -33166,10 +33171,9 @@ module.exports = class coinfloor extends Exchange {
                 },
             },
             'markets': {
-                'BTC/GBP': { 'id': 'XBT/GBP', 'symbol': 'BTC/GBP', 'base': 'BTC', 'quote': 'GBP', 'baseId': 'XBT', 'quoteId': 'GBP' },
-                'BTC/EUR': { 'id': 'XBT/EUR', 'symbol': 'BTC/EUR', 'base': 'BTC', 'quote': 'EUR', 'baseId': 'XBT', 'quoteId': 'EUR' },
-                'BCH/GBP': { 'id': 'BCH/GBP', 'symbol': 'BCH/GBP', 'base': 'BCH', 'quote': 'GBP', 'baseId': 'BCH', 'quoteId': 'GBP' },
-                'ETH/GBP': { 'id': 'ETH/GBP', 'symbol': 'ETH/GBP', 'base': 'ETH', 'quote': 'GBP', 'baseId': 'ETH', 'quoteId': 'GBP' },
+                'BTC/GBP': { 'id': 'XBT/GBP', 'symbol': 'BTC/GBP', 'base': 'BTC', 'quote': 'GBP', 'baseId': 'XBT', 'quoteId': 'GBP', 'precision': { 'price': 0, 'amount': 4 }},
+                'BTC/EUR': { 'id': 'XBT/EUR', 'symbol': 'BTC/EUR', 'base': 'BTC', 'quote': 'EUR', 'baseId': 'XBT', 'quoteId': 'EUR', 'precision': { 'price': 0, 'amount': 4 }},
+                'ETH/GBP': { 'id': 'ETH/GBP', 'symbol': 'ETH/GBP', 'base': 'ETH', 'quote': 'GBP', 'baseId': 'ETH', 'quoteId': 'GBP', 'precision': { 'price': 0, 'amount': 4 }},
             },
         });
     }
