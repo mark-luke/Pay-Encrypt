@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.90'
+const version = '1.25.91'
 
 Exchange.ccxtVersion = version
 
@@ -27213,6 +27213,9 @@ module.exports = class bleutrade extends Exchange {
                     ],
                 },
                 'v3Private': {
+                    'get': [
+                        'statement',
+                    ],
                     'post': [
                         'getbalance',
                         'getbalances',
