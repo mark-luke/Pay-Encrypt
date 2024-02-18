@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.99'
+const version = '1.29.1'
 
 Exchange.ccxtVersion = version
 
@@ -25189,7 +25189,7 @@ module.exports = class bitvavo extends Exchange {
             'countries': [ 'NL' ], // Netherlands
             'rateLimit': 500,
             'version': 'v2',
-            'certified': false,
+            'certified': true,
             'pro': true,
             'has': {
                 'CORS': false,
