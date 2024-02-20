@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.53'
+const version = '1.35.54'
 
 Exchange.ccxtVersion = version
 
@@ -131713,19 +131713,10 @@ module.exports = class whitebit extends Exchange {
         const result = {};
         for (let i = 0; i < marketIds.length; i++) {
             const marketId = marketIds[i];
-            let market = undefined;
-            let symbol = marketId;
-            if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[marketId];
-                symbol = market['symbol'];
-            } else {
-                const [ baseId, quoteId ] = marketId.split ('_');
-                const base = this.safeCurrencyCode (baseId);
-                const quote = this.safeCurrencyCode (quoteId);
-                symbol = base + '/' + quote;
-            }
+            const market = this.safeMarket (marketId);
             const ticker = this.parseTicker (data[marketId], market);
-            result[symbol] = this.extend (ticker, { 'symbol': symbol });
+            const symbol = ticker['symbol'];
+            result[symbol] = ticker;
         }
         return this.filterByArray (result, 'symbol', symbols);
     }
