@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1129'
+const version = '1.18.1130'
 
 Exchange.ccxtVersion = version
 
@@ -43141,6 +43141,9 @@ module.exports = class dsx extends Exchange {
             // 'endId': 321, // Decimal, ID of the last order of the selection
             // 'order': 'ASC', // String, Order in which orders shown. Possible values are "ASC" — from first to last, "DESC" — from last to first.
         };
+        if (limit !== undefined) {
+            request['count'] = limit;
+        }
         const response = await this.privatePostHistoryOrders (this.extend (request, params));
         //
         //     {
