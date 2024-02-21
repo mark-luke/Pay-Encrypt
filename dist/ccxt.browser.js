@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.99'
+const version = '1.31.100'
 
 Exchange.ccxtVersion = version
 
@@ -34391,9 +34391,16 @@ module.exports = class btcturk extends Exchange {
             'countries': [ 'TR' ], // Turkey
             'rateLimit': 1000,
             'has': {
+                'cancelOrder': true,
                 'CORS': true,
-                'fetchTickers': true,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchMarkets': true,
                 'fetchOHLCV': true,
+                'fetchOrderBook': true,
+                'fetchTicker': true,
+                'fetchTickers': true,
+                'fetchTrades': true,
             },
             'timeframes': {
                 '1d': '1d',
