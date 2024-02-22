@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.63'
+const version = '1.25.64'
 
 Exchange.ccxtVersion = version
 
@@ -78276,10 +78276,12 @@ module.exports = class okex extends Exchange {
         if (message !== undefined) {
             this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
-        }
-        this.throwExactlyMatchedException (this.exceptions['exact'], errorCode, feedback);
-        if (message !== undefined) {
-            throw new ExchangeError (feedback); // unknown message
+            this.throwExactlyMatchedException (this.exceptions['exact'], errorCode, feedback);
+            const nonEmptyMessage = (message !== '');
+            const nonZeroErrorCode = (errorCode !== undefined) && (errorCode !== '0');
+            if (nonZeroErrorCode || nonEmptyMessage) {
+                throw new ExchangeError (feedback); // unknown message
+            }
         }
     }
 };
