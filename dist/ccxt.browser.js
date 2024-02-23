@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.80'
+const version = '1.29.81'
 
 Exchange.ccxtVersion = version
 
@@ -354,7 +354,7 @@ module.exports = class _1btcxe extends Exchange {
         };
         const response = await this.publicGetHistoricalPrices (this.extend (request, params));
         const ohlcvs = this.toArray (this.omit (response['historical-prices'], 'request_currency'));
-        return this.parseOHLCVs (ohlcvs, market, since, limit);
+        return this.parseOHLCVs (ohlcvs, market, timeframe, since, limit);
     }
 
     parseTrade (trade, market = undefined) {
@@ -793,7 +793,7 @@ module.exports = class acx extends Exchange {
             request['timestamp'] = parseInt (since / 1000);
         }
         const response = await this.publicGetK (this.extend (request, params));
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     parseOrderStatus (status) {
@@ -7401,7 +7401,7 @@ module.exports = class bibox extends Exchange {
         //     }
         //
         const result = this.safeValue (response, 'result', []);
-        return this.parseOHLCVs (result, market, since, limit);
+        return this.parseOHLCVs (result, market, timeframe, since, limit);
     }
 
     async fetchCurrencies (params = {}) {
@@ -8631,7 +8631,7 @@ module.exports = class bigone extends Exchange {
         //     }
         //
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     async fetchBalance (params = {}) {
@@ -10086,7 +10086,7 @@ module.exports = class binance extends Exchange {
         //         [1591478640000,"0.02500800","0.02501100","0.02500300","0.02500800","154.14200000",1591478699999,"3.85405839",97,"5.32300000","0.13312641","0"],
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     parseTrade (trade, market = undefined) {
@@ -12217,7 +12217,7 @@ module.exports = class bitbank extends Exchange {
         const candlestick = this.safeValue (data, 'candlestick', []);
         const first = this.safeValue (candlestick, 0, {});
         const ohlcv = this.safeValue (first, 'ohlcv', []);
-        return this.parseOHLCVs (ohlcv, market, since, limit);
+        return this.parseOHLCVs (ohlcv, market, timeframe, since, limit);
     }
 
     async fetchBalance (params = {}) {
@@ -13421,7 +13421,7 @@ module.exports = class bitbay extends Exchange {
         //     }
         //
         const items = this.safeValue (response, 'items', []);
-        return this.parseOHLCVs (items, market, since, limit);
+        return this.parseOHLCVs (items, market, timeframe, since, limit);
     }
 
     parseTrade (trade, market = undefined) {
@@ -14779,7 +14779,7 @@ module.exports = class bitfinex extends Exchange {
         //         [1457550240000,0.0255,0.0253,0.0255,0.0252,3.2640000000000002],
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     getCurrencyName (code) {
@@ -15734,7 +15734,7 @@ module.exports = class bitfinex2 extends bitfinex {
         //         [1591504620000,0.025062,0.025062,0.025062,0.025062,0.5],
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     parseOrderStatus (status) {
@@ -17170,7 +17170,7 @@ module.exports = class bitforex extends Exchange {
         //     }
         //
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -18880,7 +18880,7 @@ module.exports = class bitmart extends Exchange {
         //         }
         //     ]
         //
-        return this.parseOHLCVs (response, market);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async fetchBalance (params = {}) {
@@ -20062,7 +20062,7 @@ module.exports = class bitmax extends Exchange {
         //     }
         //
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     parseTrade (trade, market = undefined) {
@@ -21887,7 +21887,7 @@ module.exports = class bitmex extends Exchange {
         //         {"timestamp":"2015-09-25T13:40:00.000Z","symbol":"XBTUSD","open":237.45,"high":237.45,"low":237.45,"close":237.45,"trades":0,"volume":0,"vwap":null,"lastSize":null,"turnover":0,"homeNotional":0,"foreignNotional":0}
         //     ]
         //
-        const result = this.parseOHLCVs (response, market);
+        const result = this.parseOHLCVs (response, market, timeframe, since, limit);
         if (fetchOHLCVOpenTimestamp) {
             // bitmex returns the candle's close timestamp - https://github.com/ccxt/ccxt/issues/4446
             // we can emulate the open timestamp by shifting all the timestamps one place
@@ -24477,7 +24477,6 @@ module.exports = class bittrex extends Exchange {
                     'public': 'https://{hostname}/api',
                     'account': 'https://{hostname}/api',
                     'market': 'https://{hostname}/api',
-                    'v2': 'https://{hostname}/api/v2.0/pub',
                     'v3': 'https://api.bittrex.com/v3',
                     'v3public': 'https://api.bittrex.com/v3',
                 },
@@ -24540,17 +24539,6 @@ module.exports = class bittrex extends Exchange {
                         'markets/{marketSymbol}/ticker',
                         'markets/{marketSymbol}/candles',
                         'markets/{marketSymbol}/candles/{candleInterval}/historical/{year}/{month}/{day}',
-                    ],
-                },
-                'v2': {
-                    'get': [
-                        'currencies/GetBTCPrice',
-                        'currencies/GetWalletHealth',
-                        'general/GetLatestAlert',
-                        'market/GetTicks',
-                        'market/GetLatestTick',
-                        'Markets/GetMarketSummaries',
-                        'market/GetLatestTick',
                     ],
                 },
                 'public': {
@@ -24639,6 +24627,7 @@ module.exports = class bittrex extends Exchange {
             'exceptions': {
                 'exact': {
                     'BAD_REQUEST': BadRequest, // {"code":"BAD_REQUEST","detail":"Refer to the data field for specific field validation failures.","data":{"invalidRequestParameter":"day"}}
+                    'STARTDATE_OUT_OF_RANGE': BadRequest, // {"code":"STARTDATE_OUT_OF_RANGE"}
                     // 'Call to Cancel was throttled. Try again in 60 seconds.': DDoSProtection,
                     // 'Call to GetBalances was throttled. Try again in 60 seconds.': DDoSProtection,
                     'APISIGN_NOT_PROVIDED': AuthenticationError,
@@ -24740,9 +24729,9 @@ module.exports = class bittrex extends Exchange {
             const market = response[i];
             const baseId = this.safeString (market, 'baseCurrencySymbol');
             const quoteId = this.safeString (market, 'quoteCurrencySymbol');
-            // bittrex v2 uses inverted pairs, v3 uses regular pairs
-            // we use v3 for fetchMarkets and v2 throughout the rest of this implementation
-            // therefore we swap the base ←→ quote here to be v2-compatible
+            // bittrex v1 uses inverted pairs, v3 uses regular pairs
+            // we use v3 for fetchMarkets and v1 throughout the rest of this implementation
+            // therefore we swap the base ←→ quote here to be v1-compatible
             // https://github.com/ccxt/ccxt/issues/5634
             // const id = this.safeString (market, 'symbol');
             const id = quoteId + this.options['symbolSeparator'] + baseId;
@@ -25086,15 +25075,19 @@ module.exports = class bittrex extends Exchange {
         };
         let method = 'v3publicGetMarketsMarketSymbolCandles';
         if (since !== undefined) {
-            method = 'v3publicGetMarketsMarketSymbolCandlesCandleIntervalHistoricalYearMonthDay';
-            const date = this.ymd (since);
-            const parts = date.split ('-');
-            const year = this.safeInteger (parts, 0);
-            const month = this.safeInteger (parts, 1);
-            const day = this.safeInteger (parts, 2);
-            request['year'] = year;
-            request['month'] = month;
-            request['day'] = day;
+            const now = this.milliseconds ();
+            const difference = Math.abs (now - since);
+            if (difference > 86400000) {
+                method = 'v3publicGetMarketsMarketSymbolCandlesCandleIntervalHistoricalYearMonthDay';
+                const date = this.ymd (since);
+                const parts = date.split ('-');
+                const year = this.safeInteger (parts, 0);
+                const month = this.safeInteger (parts, 1);
+                const day = this.safeInteger (parts, 2);
+                request['year'] = year;
+                request['month'] = month;
+                request['day'] = day;
+            }
         }
         const response = await this[method] (this.extend (request, params));
         //
@@ -25104,7 +25097,7 @@ module.exports = class bittrex extends Exchange {
         //         {"startsAt":"2020-06-12T02:45:00Z","open":"0.02490753","high":"0.02493143","low":"0.02490753","close":"0.02493143","volume":"0.17769640","quoteVolume":"0.00442663"}
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -25387,7 +25380,7 @@ module.exports = class bittrex extends Exchange {
         if (feeCost === undefined) {
             if (type === 'deposit') {
                 // according to https://support.bittrex.com/hc/en-us/articles/115000199651-What-fees-does-Bittrex-charge-
-                feeCost = 0; // FIXME: remove hardcoded value that may change any time
+                feeCost = 0;
             }
         }
         return {
@@ -25762,7 +25755,7 @@ module.exports = class bittrex extends Exchange {
             market = this.market (symbol);
             // because of this line we will have to rethink the entire v3
             // in other words, markets define all the rest of the API
-            // and v3 market ids are reversed in comparison to v2
+            // and v3 market ids are reversed in comparison to v1
             // v3 has to be a completely separate implementation
             // otherwise we will have to shuffle symbols and currencies everywhere
             // which is prone to errors, as was shown here
@@ -25836,7 +25829,7 @@ module.exports = class bittrex extends Exchange {
         let url = this.implodeParams (this.urls['api'][api], {
             'hostname': this.hostname,
         }) + '/';
-        if (api !== 'v2' && api !== 'v3' && api !== 'v3public') {
+        if (api !== 'v3' && api !== 'v3public') {
             url += this.version + '/';
         }
         if (api === 'public') {
@@ -25848,11 +25841,6 @@ module.exports = class bittrex extends Exchange {
         } else if (api === 'v3public') {
             url += this.implodeParams (path, params);
             params = this.omit (params, this.extractParams (path));
-            if (Object.keys (params).length) {
-                url += '?' + this.urlencode (params);
-            }
-        } else if (api === 'v2') {
-            url += path;
             if (Object.keys (params).length) {
                 url += '?' + this.urlencode (params);
             }
@@ -26735,7 +26723,7 @@ module.exports = class bitvavo extends Exchange {
         //         [1590383520000,"8090.3","8092.7","8090.3","8092.5","0.04001286"],
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async fetchBalance (params = {}) {
@@ -28213,7 +28201,7 @@ module.exports = class bitz extends Exchange {
         //
         const data = this.safeValue (response, 'data', {});
         const bars = this.safeValue (data, 'bars', []);
-        return this.parseOHLCVs (bars, market, since, limit);
+        return this.parseOHLCVs (bars, market, timeframe, since, limit);
     }
 
     parseOrderStatus (status) {
@@ -29334,7 +29322,7 @@ module.exports = class bleutrade extends Exchange {
         };
         const response = await this.v3PublicGetGetcandles (this.extend (request, params));
         const result = this.safeValue (response, 'result', []);
-        return this.parseOHLCVs (result, market, since, limit);
+        return this.parseOHLCVs (result, market, timeframe, since, limit);
     }
 
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
@@ -30713,7 +30701,7 @@ module.exports = class btcalpha extends Exchange {
         //         {"time":1591295400,"open":0.024721,"close":0.024717,"low":0.024711,"high":0.02473,"volume":65.071}
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async fetchBalance (params = {}) {
@@ -31711,7 +31699,7 @@ module.exports = class btcmarkets extends Exchange {
         //     }
         //
         const ticks = this.safeValue (response, 'ticks', []);
-        return this.parseOHLCVs (ticks, market, since, limit);
+        return this.parseOHLCVs (ticks, market, timeframe, since, limit);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -32827,7 +32815,7 @@ module.exports = class btcturk extends Exchange {
             request['last'] = limit;
         }
         const response = await this.publicGetOhlcdata (this.extend (request, params));
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
@@ -34293,7 +34281,7 @@ module.exports = class bw extends Exchange {
         //     }
         //
         const data = this.safeValue (response, 'datas', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     async fetchBalance (params = {}) {
@@ -35656,7 +35644,7 @@ module.exports = class bybit extends Exchange {
         //     }
         //
         const result = this.safeValue (response, 'result', {});
-        return this.parseOHLCVs (result, market, since, limit);
+        return this.parseOHLCVs (result, market, timeframe, since, limit);
     }
 
     parseTrade (trade, market = undefined) {
@@ -37494,7 +37482,7 @@ module.exports = class bytetrade extends Exchange {
         //         [1591505880000,"242.72","242.73","242.61","242.72","0.4141"],
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     parseTrade (trade, market = undefined) {
@@ -41465,7 +41453,7 @@ module.exports = class coinbasepro extends Exchange {
         //         [1591514040,0.02505,0.02507,0.02505,0.02507,0.19918178]
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async fetchTime (params = {}) {
@@ -43253,7 +43241,7 @@ module.exports = class coinex extends Exchange {
         //     }
         //
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     async fetchBalance (params = {}) {
@@ -47564,7 +47552,7 @@ module.exports = class coss extends Exchange {
         //     }
         //
         const series = this.safeValue (response, 'series', []);
-        return this.parseOHLCVs (series, market, since, limit);
+        return this.parseOHLCVs (series, market, timeframe, since, limit);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -48760,7 +48748,7 @@ module.exports = class crex24 extends Exchange {
         //         }
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     parseOrderStatus (status) {
@@ -50085,7 +50073,7 @@ module.exports = class currencycom extends Exchange {
         //         [1590971160000,"0.02455","0.02456","0.02453","0.02454",286],
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     parseTrade (trade, market = undefined) {
@@ -51359,7 +51347,7 @@ module.exports = class deribit extends Exchange {
         //
         const result = this.safeValue (response, 'result', {});
         const ohlcvs = this.convertTradingViewToOHLCV (result, 'ticks', 'open', 'high', 'low', 'close', 'volume', true);
-        return this.parseOHLCVs (ohlcvs, market, since, limit);
+        return this.parseOHLCVs (ohlcvs, market, timeframe, since, limit);
     }
 
     parseTrade (trade, market = undefined) {
@@ -52931,7 +52919,7 @@ module.exports = class digifinex extends Exchange {
         //     }
         //
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
@@ -54087,7 +54075,7 @@ module.exports = class dsx extends Exchange {
         //     }
         //
         const candles = this.safeValue (response, market['id'], []);
-        return this.parseOHLCVs (candles, market, since, limit);
+        return this.parseOHLCVs (candles, market, timeframe, since, limit);
     }
 
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
@@ -55347,7 +55335,7 @@ module.exports = class eterbase extends Exchange {
         //         {"time":1588808400000,"open":0.022044,"high":0.022044,"low":0.022044,"close":0.022044,"volume":3.9615545499999993},
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async fetchBalance (params = {}) {
@@ -56598,7 +56586,7 @@ module.exports = class exmo extends Exchange {
         //     }
         //
         const candles = this.safeValue (response, 'candles', []);
-        return this.parseOHLCVs (candles, market, since, limit);
+        return this.parseOHLCVs (candles, market, timeframe, since, limit);
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
@@ -58641,7 +58629,7 @@ module.exports = class fcoin extends Exchange {
         }
         const response = await this.marketGetCandlesTimeframeSymbol (this.extend (request, params));
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     nonce () {
@@ -59854,7 +59842,7 @@ module.exports = class ftx extends Exchange {
         //     }
         //
         const result = this.safeValue (response, 'result', []);
-        return this.parseOHLCVs (result, market, since, limit);
+        return this.parseOHLCVs (result, market, timeframe, since, limit);
     }
 
     parseTrade (trade, market = undefined) {
@@ -61358,7 +61346,7 @@ module.exports = class gateio extends Exchange {
         //     }
         //
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     parseTicker (ticker, market = undefined) {
@@ -62659,7 +62647,7 @@ module.exports = class gemini extends Exchange {
         //         [1591514400000,0.02503,0.02503,0.02503,0.02503,0],
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 };
 
@@ -63464,7 +63452,7 @@ module.exports = class hbtc extends Exchange {
         //         [1587906360000,"0.1761","0.1848","0.1761","0.1848","53",0,"9.7944",1,"0","0"],
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async fetchMyTrades (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -66454,7 +66442,7 @@ module.exports = class hollaex extends Exchange {
         //         },
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     parseOHLCV (response, market = undefined, timeframe = '1h', since = undefined, limit = undefined) {
@@ -67816,7 +67804,7 @@ module.exports = class huobipro extends Exchange {
         //     }
         //
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     async fetchAccounts (params = {}) {
@@ -72214,7 +72202,7 @@ module.exports = class kkex extends Exchange {
         //         ]
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     parseOrderStatus (status) {
@@ -73083,7 +73071,7 @@ module.exports = class kraken extends Exchange {
         //     }
         const result = this.safeValue (response, 'result', {});
         const ohlcvs = this.safeValue (result, market['id'], []);
-        return this.parseOHLCVs (ohlcvs, market, since, limit);
+        return this.parseOHLCVs (ohlcvs, market, timeframe, since, limit);
     }
 
     parseLedgerEntryType (type) {
@@ -74805,7 +74793,7 @@ module.exports = class kucoin extends Exchange {
         //     }
         //
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     async createDepositAddress (code, params = {}) {
@@ -77768,7 +77756,7 @@ module.exports = class lbank extends Exchange {
         //         [1590969720,0.02445973,0.02452067,0.02445909,0.02446151,266.16920000],
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async fetchBalance (params = {}) {
@@ -81516,7 +81504,7 @@ module.exports = class mercado extends Exchange {
         }
         const response = await this.v4PublicGetCoinCandle (this.extend (request, params));
         const candles = this.safeValue (response, 'candles', []);
-        return this.parseOHLCVs (candles, market, since, limit);
+        return this.parseOHLCVs (candles, market, timeframe, since, limit);
     }
 
     async fetchOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -83962,7 +83950,7 @@ module.exports = class okex extends Exchange {
         //         ]
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     parseAccountBalance (response) {
@@ -86309,7 +86297,7 @@ module.exports = class poloniex extends Exchange {
         //         {"date":1590914100,"high":0.02498596,"low":0.02488503,"open":0.02493033,"close":0.02497896,"volume":0.21196348,"quoteVolume":8.50291888,"weightedAverage":0.02492832},
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async fetchMarkets (params = {}) {
@@ -88351,7 +88339,7 @@ module.exports = class probit extends Exchange {
         //     }
         //
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
@@ -89204,7 +89192,7 @@ module.exports = class qtrade extends Exchange {
         //
         const data = this.safeValue (response, 'data', {});
         const ohlcvs = this.safeValue (data, 'slices', []);
-        return this.parseOHLCVs (ohlcvs, market, since, limit);
+        return this.parseOHLCVs (ohlcvs, market, timeframe, since, limit);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -90821,7 +90809,7 @@ module.exports = class rightbtc extends Exchange {
         };
         const response = await this.publicGetCandlestickTimeSymbolTradingPair (this.extend (request, params));
         const result = this.safeValue (response, 'result', []);
-        return this.parseOHLCVs (result, market, since, limit);
+        return this.parseOHLCVs (result, market, timeframe, since, limit);
     }
 
     async fetchBalance (params = {}) {
@@ -110516,7 +110504,7 @@ module.exports = class stex extends Exchange {
         //     }
         //
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     parseTrade (trade, market = undefined) {
@@ -112711,7 +112699,7 @@ module.exports = class theocean extends Exchange {
         //         }
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async fetchBalanceByCode (code, params = {}) {
@@ -114985,7 +114973,7 @@ module.exports = class tidebit extends Exchange {
         if (response === 'null') {
             return [];
         }
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     parseOrderStatus (status) {
@@ -116471,7 +116459,7 @@ module.exports = class timex extends Exchange {
         //         },
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async fetchBalance (params = {}) {
@@ -118171,7 +118159,7 @@ module.exports = class upbit extends Exchange {
         //         }
         //     ]
         //
-        return this.parseOHLCVs (response, market, since, limit);
+        return this.parseOHLCVs (response, market, timeframe, since, limit);
     }
 
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
@@ -119693,7 +119681,7 @@ module.exports = class whitebit extends Exchange {
         //     }
         //
         const result = this.safeValue (response, 'result', []);
-        return this.parseOHLCVs (result, market, since, limit);
+        return this.parseOHLCVs (result, market, timeframe, since, limit);
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
@@ -120053,7 +120041,7 @@ module.exports = class xbtce extends Exchange {
         //         'timestamp': since,
         //         'count': limit,
         //     }, params));
-        //     return this.parseOHLCVs (response['Bars'], market, since, limit);
+        //     return this.parseOHLCVs (response['Bars'], market, timeframe, since, limit);
         throw new NotSupported (this.id + ' fetchOHLCV is disabled by the exchange');
     }
 
@@ -121933,7 +121921,7 @@ module.exports = class zb extends Exchange {
         }
         const response = await this.publicGetKline (this.extend (request, params));
         const data = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (data, market, since, limit);
+        return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
     parseTrade (trade, market = undefined) {
