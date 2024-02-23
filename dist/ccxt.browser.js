@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.35'
+const version = '1.20.36'
 
 Exchange.ccxtVersion = version
 
@@ -33503,7 +33503,7 @@ module.exports = class cex extends Exchange {
             for (let i = 0; i < order['vtx'].length; i++) {
                 const item = order['vtx'][i];
                 const tradeSide = this.safeString (item, 'type');
-                if (item['type'] === 'cancel') {
+                if (tradeSide === 'cancel') {
                     // looks like this might represent the cancelled part of an order
                     //   { id: '4426729543',
                     //     type: 'cancel',
@@ -33524,7 +33524,8 @@ module.exports = class cex extends Exchange {
                     //     ds: 0 }
                     continue;
                 }
-                if (!item['price']) {
+                const tradePrice = this.safeFloat (item, 'price');
+                if (tradePrice === undefined) {
                     // this represents the order
                     //   {
                     //     "a": "0.47000000",
@@ -33546,10 +33547,8 @@ module.exports = class cex extends Exchange {
                     //     "balance": "1432.93000000" }
                     continue;
                 }
-                // if (item['type'] === 'costsNothing')
-                //     console.log (item);
                 // todo: deal with these
-                if (item['type'] === 'costsNothing') {
+                if (tradeSide === 'costsNothing') {
                     continue;
                 }
                 // --
@@ -33628,10 +33627,8 @@ module.exports = class cex extends Exchange {
                 //     "symbol2": "BTC",
                 //     "fee_amount": "0.03"
                 //   }
-                const tradeTime = this.safeString (item, 'time');
-                const tradeTimestamp = this.parse8601 (tradeTime);
+                const tradeTimestamp = this.parse8601 (this.safeString (item, 'time'));
                 const tradeAmount = this.safeFloat (item, 'amount');
-                const tradePrice = this.safeFloat (item, 'price');
                 const feeCost = this.safeFloat (item, 'fee_amount');
                 let absTradeAmount = (tradeAmount < 0) ? -tradeAmount : tradeAmount;
                 let tradeCost = undefined;
