@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.67'
+const version = '1.28.68'
 
 Exchange.ccxtVersion = version
 
@@ -51617,7 +51617,7 @@ module.exports = class eterbase extends Exchange {
         let average = undefined;
         if (cost !== undefined) {
             if (filled) {
-                average = Math.round (cost / filled, market.precision.qty);
+                average = cost / filled;
             }
         }
         return {
