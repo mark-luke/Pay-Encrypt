@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.32'
+const version = '1.22.33'
 
 Exchange.ccxtVersion = version
 
@@ -52305,7 +52305,7 @@ module.exports = class gateio extends Exchange {
         for (let i = 0; i < markets.length; i++) {
             const market = markets[i];
             const keys = Object.keys (market);
-            const id = keys[0];
+            const id = this.safeString (keys, 0);
             const details = market[id];
             // all of their symbols are separated with an underscore
             // but not boe_eth_eth (BOE_ETH/ETH) which has two underscores
