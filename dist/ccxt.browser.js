@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1331'
+const version = '1.18.1332'
 
 Exchange.ccxtVersion = version
 
@@ -12779,6 +12779,7 @@ module.exports = class bitfinex extends Exchange {
             'commonCurrencies': {
                 'ABS': 'ABYSS',
                 'AIO': 'AION',
+                'ALG': 'ALGO', // https://github.com/ccxt/ccxt/issues/6034
                 'AMP': 'AMPL',
                 'ATM': 'ATMI',
                 'ATO': 'ATOM', // https://github.com/ccxt/ccxt/issues/5118
@@ -12898,7 +12899,11 @@ module.exports = class bitfinex extends Exchange {
                     'USD': 'wire',
                     'USDC': 'udc', // https://github.com/ccxt/ccxt/issues/5833
                     'UTK': 'utk',
-                    'USDT': 'tetheruso', // undocumented
+                    'USDT': 'tetheruso', // Tether on Omni
+                    // 'USDT': 'tetheruse', // Tether on ERC20
+                    // 'USDT': 'tetherusl', // Tether on Liquid
+                    // 'USDT': 'tetherusx', // Tether on Tron
+                    // 'USDT': 'tetheruss', // Tether on EOS
                     'VEE': 'vee',
                     'WAX': 'wax',
                     'XLM': 'xlm',
