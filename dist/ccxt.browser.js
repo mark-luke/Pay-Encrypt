@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.19'
+const version = '1.22.20'
 
 Exchange.ccxtVersion = version
 
@@ -3424,7 +3424,7 @@ module.exports = class anxpro extends Exchange {
 (function (Buffer){
 "use strict";
 
-/*  ------------------------------------------------------------------------ */
+// ----------------------------------------------------------------------------
 
 const functions = require ('./functions')
 
@@ -3835,7 +3835,7 @@ module.exports = class Exchange {
     }
 
     setSandboxMode (enabled) {
-        if (!!enabled) {
+        if (!!enabled) { // eslint-disable-line no-extra-boolean-cast
             if ('test' in this.urls) {
                 if (typeof this.urls['api'] === 'string') {
                     this.urls['api_backup'] = this.urls['api']
@@ -36655,13 +36655,34 @@ module.exports = class coinbasepro extends Exchange {
     }
 
     parseTrade (trade, market = undefined) {
+        //
+        //     {
+        //         type: 'match',
+        //         trade_id: 82047307,
+        //         maker_order_id: '0f358725-2134-435e-be11-753912a326e0',
+        //         taker_order_id: '252b7002-87a3-425c-ac73-f5b9e23f3caf',
+        //         side: 'sell',
+        //         size: '0.00513192',
+        //         price: '9314.78',
+        //         product_id: 'BTC-USD',
+        //         sequence: 12038915443,
+        //         time: '2020-01-31T20:03:41.158814Z'
+        //     }
+        //
         const timestamp = this.parse8601 (this.safeString2 (trade, 'time', 'created_at'));
         let symbol = undefined;
-        if (market === undefined) {
-            const marketId = this.safeString (trade, 'product_id');
-            market = this.safeValue (this.markets_by_id, marketId);
+        const marketId = this.safeString (trade, 'product_id');
+        if (marketId !== undefined) {
+            if (marketId in this.markets_by_id) {
+                market = this.markets_by_id[marketId];
+            } else {
+                const [ baseId, quoteId ] = marketId.split ('-');
+                const base = this.safeCurrencyCode (baseId);
+                const quote = this.safeCurrencyCode (quoteId);
+                symbol = base + '/' + quote;
+            }
         }
-        if (market) {
+        if ((symbol === undefined) && (market !== undefined)) {
             symbol = market['symbol'];
         }
         let feeRate = undefined;
