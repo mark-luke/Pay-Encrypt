@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1168'
+const version = '1.18.1169'
 
 Exchange.ccxtVersion = version
 
@@ -29162,7 +29162,7 @@ module.exports = class cex extends Exchange {
                 const tradeAmount = this.safeFloat (item, 'amount');
                 const tradePrice = this.safeFloat (item, 'price');
                 const feeCost = this.safeFloat (item, 'fee_amount');
-                let absTradeAmount = tradeAmount < 0 ? -tradeAmount : tradeAmount;
+                let absTradeAmount = (tradeAmount < 0) ? -tradeAmount : tradeAmount;
                 let tradeCost = undefined;
                 if (tradeSide === 'sell') {
                     tradeCost = absTradeAmount;
@@ -34948,8 +34948,8 @@ module.exports = class coinfloor extends Exchange {
                 };
             }
             return [
-                this.extend (result, { 'currency': base, 'amount': Math.abs (baseAmount), 'direction': baseAmount > 0 ? 'in' : 'out' }),
-                this.extend (result, { 'currency': quote, 'amount': Math.abs (quoteAmount), 'direction': quoteAmount > 0 ? 'in' : 'out', 'fee': fee }),
+                this.extend (result, { 'currency': base, 'amount': Math.abs (baseAmount), 'direction': (baseAmount > 0) ? 'in' : 'out' }),
+                this.extend (result, { 'currency': quote, 'amount': Math.abs (quoteAmount), 'direction': (quoteAmount > 0) ? 'in' : 'out', 'fee': fee }),
             ];
             //
             // if fee is base or quote depending on buy/sell side
@@ -34957,15 +34957,15 @@ module.exports = class coinfloor extends Exchange {
             //     const baseFee = (baseAmount > 0) ? { 'currency': base, 'cost': feeCost } : undefined;
             //     const quoteFee = (quoteAmount > 0) ? { 'currency': quote, 'cost': feeCost } : undefined;
             //     return [
-            //         this.extend (result, { 'currency': base, 'amount': baseAmount, 'direction': baseAmount > 0 ? 'in' : 'out', 'fee': baseFee }),
-            //         this.extend (result, { 'currency': quote, 'amount': quoteAmount, 'direction': quoteAmount > 0 ? 'in' : 'out', 'fee': quoteFee }),
+            //         this.extend (result, { 'currency': base, 'amount': baseAmount, 'direction': (baseAmount > 0) ? 'in' : 'out', 'fee': baseFee }),
+            //         this.extend (result, { 'currency': quote, 'amount': quoteAmount, 'direction': (quoteAmount > 0) ? 'in' : 'out', 'fee': quoteFee }),
             //     ];
             //
             // fee as the 3rd item
             //
             //     return [
-            //         this.extend (result, { 'currency': base, 'amount': baseAmount, 'direction': baseAmount > 0 ? 'in' : 'out' }),
-            //         this.extend (result, { 'currency': quote, 'amount': quoteAmount, 'direction': quoteAmount > 0 ? 'in' : 'out' }),
+            //         this.extend (result, { 'currency': base, 'amount': baseAmount, 'direction': (baseAmount > 0) ? 'in' : 'out' }),
+            //         this.extend (result, { 'currency': quote, 'amount': quoteAmount, 'direction': (quoteAmount > 0) ? 'in' : 'out' }),
             //         this.extend (result, { 'currency': feeCurrency, 'amount': feeCost, 'direction': 'out', 'type': 'fee' }),
             //     ];
             //
@@ -34973,8 +34973,8 @@ module.exports = class coinfloor extends Exchange {
             //
             // it's a regular transaction (deposit or withdrawal)
             //
-            const amount = baseAmount === 0 ? quoteAmount : baseAmount;
-            const code = baseAmount === 0 ? quote : base;
+            const amount = (baseAmount === 0) ? quoteAmount : baseAmount;
+            const code = (baseAmount === 0) ? quote : base;
             const direction = (amount > 0) ? 'in' : 'out';
             if (feeCost !== undefined) {
                 fee = {
@@ -49209,7 +49209,6 @@ module.exports = class gdax extends Exchange {
                     payload = body;
                 }
             }
-            // let payload = (body) ? body : '';
             const what = nonce + method + request + payload;
             const secret = this.base64ToBinary (this.secret);
             const signature = this.hmac (this.encode (what), secret, 'sha256', 'base64');
@@ -55157,7 +55156,7 @@ module.exports = class idex extends Exchange {
             'cost': feeCost,
         };
         if (feeCost !== undefined && amount !== undefined) {
-            const feeCurrencyAmount = feeCurrency === 'ETH' ? cost : amount;
+            const feeCurrencyAmount = (feeCurrency === 'ETH') ? cost : amount;
             fee['rate'] = feeCost / feeCurrencyAmount;
         }
         const orderId = this.safeString (trade, 'orderHash');
@@ -59964,7 +59963,7 @@ module.exports = class kucoin extends Exchange {
             }
             txid = txidParts[0];
         }
-        let type = txid === undefined ? 'withdrawal' : 'deposit';
+        let type = (txid === undefined) ? 'withdrawal' : 'deposit';
         const rawStatus = this.safeString (transaction, 'status');
         const status = this.parseTransactionStatus (rawStatus);
         let fee = undefined;
@@ -60320,7 +60319,7 @@ module.exports = class kucoin extends Exchange {
         let endpoint = '/api/' + version + '/' + this.implodeParams (path, params);
         const query = this.omit (params, this.extractParams (path));
         let endpart = '';
-        headers = headers !== undefined ? headers : {};
+        headers = (headers !== undefined) ? headers : {};
         if (Object.keys (query).length) {
             if (method !== 'GET') {
                 body = this.json (query);
@@ -64466,7 +64465,7 @@ module.exports = class luno extends Exchange {
                 takerOrMaker = 'taker';
             }
         } else {
-            side = (trade['is_buy']) ? 'buy' : 'sell';
+            side = trade['is_buy'] ? 'buy' : 'sell';
         }
         const feeBase = this.safeFloat (trade, 'fee_base');
         const feeCounter = this.safeFloat (trade, 'fee_counter');
@@ -70055,7 +70054,6 @@ module.exports = class okcoinusd extends Exchange {
         const method = market['future'] ? 'publicGetFutureKline' : 'publicGetKline';
         const request = this.createRequest (market, {
             'type': this.timeframes[timeframe],
-            // 'since': since === undefined ? this.milliseconds () - 86400000 : since,  // default last 24h
         });
         if (since !== undefined) {
             request['since'] = parseInt ((this.milliseconds () - 86400000) / 1000); // default last 24h
