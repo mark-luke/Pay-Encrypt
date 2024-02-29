@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.98'
+const version = '1.24.99'
 
 Exchange.ccxtVersion = version
 
@@ -43767,8 +43767,10 @@ module.exports = class coinmate extends Exchange {
         if ((symbol === undefined) && (market !== undefined)) {
             symbol = market['symbol'];
         }
+        const clientOrderId = this.safeString (order, 'clientOrderId');
         return {
             'id': id,
+            'clientOrderId': clientOrderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -57378,7 +57380,7 @@ module.exports = class gemini extends Exchange {
 // ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { BadSymbol, ExchangeError, InsufficientFunds, OrderNotFound, InvalidOrder } = require ('./base/errors');
+const { BadSymbol, ExchangeError, InsufficientFunds, OrderNotFound, InvalidOrder, NullResponse } = require ('./base/errors');
 
 // ---------------------------------------------------------------------------
 
@@ -58290,7 +58292,11 @@ module.exports = class hitbtc extends Exchange {
             request['symbols'] = market['id'];
         }
         const response = await this.tradingGetOrdersActive (this.extend (request, params));
-        return this.parseOrders (response['orders'], market, since, limit);
+        const orders = this.safeValue (response, 'orders');
+        if (orders === undefined) {
+            throw new NullResponse (this.id + ' fetchOpenOrders() received a null response from the exchange: ' + this.json (response));
+        }
+        return this.parseOrders (orders, market, since, limit);
     }
 
     async fetchClosedOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -58307,7 +58313,11 @@ module.exports = class hitbtc extends Exchange {
             request['symbols'] = market['id'];
         }
         const response = await this.tradingGetOrdersRecent (this.extend (request, params));
-        return this.parseOrders (response['orders'], market, since, limit);
+        const orders = this.safeValue (response, 'orders');
+        if (orders === undefined) {
+            throw new NullResponse (this.id + ' fetchClosedOrders() received a null response from the exchange: ' + this.json (response));
+        }
+        return this.parseOrders (orders, market, since, limit);
     }
 
     async fetchOrderTrades (id, symbol = undefined, since = undefined, limit = undefined, params = {}) {
