@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.93'
+const version = '1.34.94'
 
 Exchange.ccxtVersion = version
 
@@ -101231,6 +101231,7 @@ module.exports = class ripio extends Exchange {
                     'Invalid order type': InvalidOrder, // {"status_code":400,"errors":{"order_type":["Invalid order type. Valid options: ['MARKET', 'LIMIT']"]},"message":"An error has occurred, please check the form."}
                     'not found': OrderNotFound, // {"status_code":404,"errors":{"order":["Order 286e560e-b8a2-464b-8b84-15a7e2a67eab not found."]},"message":"An error has occurred, please check the form."}
                     'Your balance is not enough': InsufficientFunds, // {"status_code":400,"errors":{"non_field_errors":["Your balance is not enough for this order: You have 0 BTC but you need 1 BTC"]},"message":"An error has occurred, please check the form."}
+                    'Total must be at least': InvalidOrder, // {"status_code":400,"errors":{"non_field_errors":["Total must be at least 10."]},"message":"An error has occurred, please check the form."}
                 },
             },
         });
@@ -101864,8 +101865,7 @@ module.exports = class ripio extends Exchange {
         const type = this.safeStringLower (order, 'order_type');
         const side = this.safeStringLower (order, 'side');
         const status = this.parseOrderStatus (this.safeString (order, 'status'));
-        const timestamp = this.safeTimestamp (order, 'timestamp');
-        const average = this.safeFloat (order, 'created_at');
+        const timestamp = this.safeTimestamp (order, 'created_at');
         const filled = this.safeFloat (order, 'filled');
         let remaining = undefined;
         if (filled !== undefined) {
@@ -101904,7 +101904,7 @@ module.exports = class ripio extends Exchange {
             'price': price,
             'amount': amount,
             'cost': cost,
-            'average': average,
+            'average': undefined,
             'filled': filled,
             'remaining': remaining,
             'status': status,
