@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.68'
+const version = '1.30.69'
 
 Exchange.ccxtVersion = version
 
@@ -18108,6 +18108,7 @@ module.exports = class bitmart extends Exchange {
                     'Not found': OrderNotFound, // {"message":"Not found"}
                     'Visit too often, please try again later': DDoSProtection, // {"code":-30,"msg":"Visit too often, please try again later","subMsg":"","data":{}}
                     'Unknown symbol': BadSymbol, // {"message":"Unknown symbol"}
+                    'Unauthorized': AuthenticationError,
                 },
                 'broad': {
                     'Invalid limit. limit must be in the range': InvalidOrder,
