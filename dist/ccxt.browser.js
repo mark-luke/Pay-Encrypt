@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1113'
+const version = '1.18.1114'
 
 Exchange.ccxtVersion = version
 
@@ -24161,7 +24161,7 @@ module.exports = class btcchina extends Exchange {
         const request = this.createMarketRequest (market);
         if (market['plus']) {
             const now = this.milliseconds ();
-            request['start_time'] = now - 86400 * 1000;
+            request['start_time'] = now - 86400000;
             request['end_time'] = now;
         } else {
             method += 's'; // trades vs trade
