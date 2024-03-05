@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.90'
+const version = '1.29.5'
 
 Exchange.ccxtVersion = version
 
@@ -3584,6 +3584,7 @@ module.exports = class Exchange {
         this.trades       = {}
         this.transactions = {}
         this.ohlcvs       = {}
+        this.myTrades     = undefined
 
         this.requiresWeb3 = false
         this.precision = {}
@@ -9522,7 +9523,7 @@ module.exports = class binance extends Exchange {
                 'fetchTradesMethod': 'publicGetAggTrades', // publicGetTrades, publicGetHistoricalTrades
                 'fetchTickersMethod': 'publicGetTicker24hr',
                 'defaultTimeInForce': 'GTC', // 'GTC' = Good To Cancel (default), 'IOC' = Immediate Or Cancel
-                'defaultType': 'spot', // 'spot', 'future'
+                'defaultType': 'spot', // 'spot', 'future', 'margin'
                 'hasAlreadyAuthenticatedSuccessfully': false,
                 'warnOnFetchOpenOrdersWithoutSymbol': true,
                 'recvWindow': 5 * 1000, // 5 sec, binance default
@@ -9572,8 +9573,8 @@ module.exports = class binance extends Exchange {
         return this.safeInteger (response, 'serverTime');
     }
 
-    async loadTimeDifference () {
-        const serverTime = await this.fetchTime ();
+    async loadTimeDifference (params = {}) {
+        const serverTime = await this.fetchTime (params);
         const after = this.milliseconds ();
         this.options['timeDifference'] = after - serverTime;
         return this.options['timeDifference'];
@@ -9681,7 +9682,8 @@ module.exports = class binance extends Exchange {
             const base = this.safeCurrencyCode (baseId);
             const quote = this.safeCurrencyCode (quoteId);
             const symbol = base + '/' + quote;
-            const filters = this.indexBy (market['filters'], 'filterType');
+            const filters = this.safeValue (market, 'filters', []);
+            const filtersByType = this.indexBy (filters, 'filterType');
             const precision = {
                 'base': this.safeInteger (market, 'baseAssetPrecision'),
                 'quote': this.safeInteger (market, 'quotePrecision'),
@@ -9721,8 +9723,8 @@ module.exports = class binance extends Exchange {
                     },
                 },
             };
-            if ('PRICE_FILTER' in filters) {
-                const filter = filters['PRICE_FILTER'];
+            if ('PRICE_FILTER' in filtersByType) {
+                const filter = this.safeValue (filtersByType, 'PRICE_FILTER', {});
                 // PRICE_FILTER reports zero values for maxPrice
                 // since they updated filter types in November 2018
                 // https://github.com/ccxt/ccxt/issues/4286
@@ -9737,8 +9739,8 @@ module.exports = class binance extends Exchange {
                 }
                 entry['precision']['price'] = this.precisionFromString (filter['tickSize']);
             }
-            if ('LOT_SIZE' in filters) {
-                const filter = this.safeValue (filters, 'LOT_SIZE', {});
+            if ('LOT_SIZE' in filtersByType) {
+                const filter = this.safeValue (filtersByType, 'LOT_SIZE', {});
                 const stepSize = this.safeString (filter, 'stepSize');
                 entry['precision']['amount'] = this.precisionFromString (stepSize);
                 entry['limits']['amount'] = {
@@ -9746,15 +9748,16 @@ module.exports = class binance extends Exchange {
                     'max': this.safeFloat (filter, 'maxQty'),
                 };
             }
-            if ('MARKET_LOT_SIZE' in filters) {
-                const filter = this.safeValue (filters, 'MARKET_LOT_SIZE', {});
+            if ('MARKET_LOT_SIZE' in filtersByType) {
+                const filter = this.safeValue (filtersByType, 'MARKET_LOT_SIZE', {});
                 entry['limits']['market'] = {
                     'min': this.safeFloat (filter, 'minQty'),
                     'max': this.safeFloat (filter, 'maxQty'),
                 };
             }
-            if ('MIN_NOTIONAL' in filters) {
-                entry['limits']['cost']['min'] = this.safeFloat (filters['MIN_NOTIONAL'], 'minNotional');
+            if ('MIN_NOTIONAL' in filtersByType) {
+                const filter = this.safeValue (filtersByType, 'MIN_NOTIONAL', {});
+                entry['limits']['cost']['min'] = this.safeFloat (filter, 'minNotional');
             }
             result.push (entry);
         }
@@ -25188,7 +25191,7 @@ module.exports = class bitvavo extends Exchange {
             'countries': [ 'NL' ], // Netherlands
             'rateLimit': 500,
             'version': 'v2',
-            'certified': false,
+            'certified': true,
             'pro': true,
             'has': {
                 'CORS': false,
@@ -25759,6 +25762,22 @@ module.exports = class bitvavo extends Exchange {
         //         "settled":true
         //     }
         //
+        // watchMyTrades (private)
+        //
+        //     {
+        //         event: 'fill',
+        //         timestamp: 1590964470132,
+        //         market: 'ETH-EUR',
+        //         orderId: '85d082e1-eda4-4209-9580-248281a29a9a',
+        //         fillId: '861d2da5-aa93-475c-8d9a-dce431bd4211',
+        //         side: 'sell',
+        //         amount: '0.1',
+        //         price: '211.46',
+        //         taker: true,
+        //         fee: '0.056',
+        //         feeCurrency: 'EUR'
+        //     }
+        //
         const price = this.safeFloat (trade, 'price');
         const amount = this.safeFloat (trade, 'amount');
         let cost = undefined;
@@ -25767,7 +25786,7 @@ module.exports = class bitvavo extends Exchange {
         }
         const timestamp = this.safeInteger (trade, 'timestamp');
         const side = this.safeString (trade, 'side');
-        const id = this.safeString (trade, 'id');
+        const id = this.safeString2 (trade, 'id', 'fillId');
         const marketId = this.safeInteger (trade, 'market');
         let symbol = undefined;
         if (marketId !== undefined) {
@@ -26316,7 +26335,7 @@ module.exports = class bitvavo extends Exchange {
         //
         const id = this.safeString (order, 'orderId');
         const timestamp = this.safeInteger (order, 'created');
-        const marketId = this.safeInteger (order, 'market');
+        const marketId = this.safeString (order, 'market');
         let symbol = undefined;
         if (marketId !== undefined) {
             if (marketId in this.markets_by_id) {
@@ -34077,7 +34096,7 @@ module.exports = class bybit extends Exchange {
                 'test': 'https://api-testnet.bybit.com',
                 'logo': 'https://user-images.githubusercontent.com/51840849/76547799-daff5b80-649e-11ea-87fb-3be9bac08954.jpg',
                 'api': 'https://api.bybit.com',
-                'www': 'https://www.bybit.com/',
+                'www': 'https://www.bybit.com',
                 'doc': [
                     'https://bybit-exchange.github.io/docs/inverse/',
                     'https://bybit-exchange.github.io/docs/linear/',
@@ -34315,8 +34334,8 @@ module.exports = class bybit extends Exchange {
         return this.milliseconds () - this.options['timeDifference'];
     }
 
-    async loadTimeDifference () {
-        const serverTime = await this.fetchTime ();
+    async loadTimeDifference (params = {}) {
+        const serverTime = await this.fetchTime (params);
         const after = this.milliseconds ();
         this.options['timeDifference'] = after - serverTime;
         return this.options['timeDifference'];
@@ -34377,7 +34396,11 @@ module.exports = class bybit extends Exchange {
             const quote = this.safeCurrencyCode (quoteId);
             const linear = (quote in linearQuoteCurrencies);
             const inverse = !linear;
-            const symbol = base + '/' + quote;
+            let symbol = base + '/' + quote;
+            const baseQuote = base + quote;
+            if (baseQuote !== id) {
+                symbol = id;
+            }
             const lotSizeFilter = this.safeValue (market, 'lot_size_filter', {});
             const priceFilter = this.safeValue (market, 'price_filter', {});
             const precision = {
@@ -71757,6 +71780,7 @@ module.exports = class kucoin extends Exchange {
             'comment': 'Platform 2.0',
             'has': {
                 'CORS': false,
+                'fetchStatus': true,
                 'fetchTime': true,
                 'fetchMarkets': true,
                 'fetchCurrencies': true,
@@ -71969,6 +71993,7 @@ module.exports = class kucoin extends Exchange {
                 'versions': {
                     'public': {
                         'GET': {
+                            'status': 'v1',
                             'market/orderbook/level{level}': 'v1',
                             'market/orderbook/level2': 'v2',
                             'market/orderbook/level2_20': 'v1',
@@ -71990,8 +72015,8 @@ module.exports = class kucoin extends Exchange {
         return this.milliseconds ();
     }
 
-    async loadTimeDifference () {
-        const response = await this.publicGetTimestamp ();
+    async loadTimeDifference (params = {}) {
+        const response = await this.publicGetTimestamp (params);
         const after = this.milliseconds ();
         const kucoinTime = this.safeInteger (response, 'data');
         this.options['timeDifference'] = parseInt (after - kucoinTime);
@@ -72008,6 +72033,29 @@ module.exports = class kucoin extends Exchange {
         //     }
         //
         return this.safeInteger (response, 'data');
+    }
+
+    async fetchStatus (params = {}) {
+        const response = await this.publicGetStatus (params);
+        //
+        //     {
+        //         "code":"200000",
+        //         "data":{
+        //             "msg":"",
+        //             "status":"open"
+        //         }
+        //     }
+        //
+        const data = this.safeValue (response, 'data', {});
+        let status = this.safeValue (data, 'status');
+        if (status !== undefined) {
+            status = (status === 'open') ? 'ok' : 'maintenance';
+            this.status = this.extend (this.status, {
+                'status': status,
+                'updated': this.milliseconds (),
+            });
+        }
+        return this.status;
     }
 
     async fetchMarkets (params = {}) {
@@ -73579,7 +73627,7 @@ module.exports = class kuna extends acx {
     }
 
     async fetchMarkets (params = {}) {
-        const quotes = [ 'btc', 'eth', 'eurs', 'rub', 'uah', 'usd', 'usdt' ];
+        const quotes = [ 'btc', 'eth', 'eurs', 'rub', 'uah', 'usd', 'usdt', 'gol' ];
         const pricePrecisions = {
             'UAH': 0,
         };
