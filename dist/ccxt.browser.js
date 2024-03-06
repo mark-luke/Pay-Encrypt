@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.23'
+const version = '1.34.24'
 
 Exchange.ccxtVersion = version
 
@@ -130,6 +130,7 @@ const exchanges = {
     'huobiru':                 require ('./js/huobiru.js'),
     'ice3x':                   require ('./js/ice3x.js'),
     'idex':                    require ('./js/idex.js'),
+    'idex2':                   require ('./js/idex2.js'),
     'independentreserve':      require ('./js/independentreserve.js'),
     'indodax':                 require ('./js/indodax.js'),
     'itbit':                   require ('./js/itbit.js'),
@@ -180,7 +181,7 @@ module.exports = Object.assign ({ version, Exchange, 'exchanges': Object.keys (e
 
 //-----------------------------------------------------------------------------
 
-},{"./js/acx.js":3,"./js/aofex.js":4,"./js/base/Exchange":5,"./js/base/errors":7,"./js/base/functions":8,"./js/bcex.js":19,"./js/bequant.js":20,"./js/bibox.js":21,"./js/bigone.js":22,"./js/binance.js":23,"./js/binanceje.js":24,"./js/binanceus.js":25,"./js/bit2c.js":26,"./js/bitbank.js":27,"./js/bitbay.js":28,"./js/bitfinex.js":29,"./js/bitfinex2.js":30,"./js/bitflyer.js":31,"./js/bitforex.js":32,"./js/bitget.js":33,"./js/bithumb.js":34,"./js/bitkk.js":35,"./js/bitmart.js":36,"./js/bitmax.js":37,"./js/bitmex.js":38,"./js/bitpanda.js":39,"./js/bitso.js":40,"./js/bitstamp.js":41,"./js/bitstamp1.js":42,"./js/bittrex.js":43,"./js/bitvavo.js":44,"./js/bitz.js":45,"./js/bl3p.js":46,"./js/bleutrade.js":47,"./js/braziliex.js":48,"./js/btcalpha.js":49,"./js/btcbox.js":50,"./js/btcmarkets.js":51,"./js/btctradeua.js":52,"./js/btcturk.js":53,"./js/buda.js":54,"./js/bw.js":55,"./js/bybit.js":56,"./js/bytetrade.js":57,"./js/cex.js":58,"./js/chilebit.js":59,"./js/coinbase.js":60,"./js/coinbaseprime.js":61,"./js/coinbasepro.js":62,"./js/coincheck.js":63,"./js/coinegg.js":64,"./js/coinex.js":65,"./js/coinfalcon.js":66,"./js/coinfloor.js":67,"./js/coingi.js":68,"./js/coinmarketcap.js":69,"./js/coinmate.js":70,"./js/coinone.js":71,"./js/coinspot.js":72,"./js/coss.js":73,"./js/crex24.js":74,"./js/currencycom.js":75,"./js/deribit.js":76,"./js/digifinex.js":77,"./js/dsx.js":78,"./js/eterbase.js":79,"./js/exmo.js":80,"./js/exx.js":81,"./js/fcoin.js":82,"./js/fcoinjp.js":83,"./js/flowbtc.js":84,"./js/foxbit.js":85,"./js/ftx.js":86,"./js/gateio.js":87,"./js/gemini.js":88,"./js/hbtc.js":89,"./js/hitbtc.js":90,"./js/hollaex.js":91,"./js/huobijp.js":92,"./js/huobipro.js":93,"./js/huobiru.js":94,"./js/ice3x.js":95,"./js/idex.js":96,"./js/independentreserve.js":97,"./js/indodax.js":98,"./js/itbit.js":99,"./js/kraken.js":100,"./js/kucoin.js":101,"./js/kuna.js":102,"./js/lakebtc.js":103,"./js/latoken.js":104,"./js/lbank.js":105,"./js/liquid.js":106,"./js/livecoin.js":107,"./js/luno.js":108,"./js/lykke.js":109,"./js/mercado.js":110,"./js/mixcoins.js":111,"./js/oceanex.js":112,"./js/okcoin.js":113,"./js/okex.js":114,"./js/paymium.js":115,"./js/phemex.js":116,"./js/poloniex.js":117,"./js/probit.js":118,"./js/qtrade.js":119,"./js/rightbtc.js":120,"./js/southxchange.js":121,"./js/stex.js":162,"./js/stronghold.js":163,"./js/surbitcoin.js":164,"./js/therock.js":165,"./js/tidebit.js":166,"./js/tidex.js":167,"./js/timex.js":168,"./js/upbit.js":169,"./js/vaultoro.js":170,"./js/vbtc.js":171,"./js/wavesexchange.js":172,"./js/whitebit.js":173,"./js/xbtce.js":174,"./js/xena.js":175,"./js/yobit.js":176,"./js/zaif.js":177,"./js/zb.js":178}],3:[function(require,module,exports){
+},{"./js/acx.js":3,"./js/aofex.js":4,"./js/base/Exchange":5,"./js/base/errors":7,"./js/base/functions":8,"./js/bcex.js":19,"./js/bequant.js":20,"./js/bibox.js":21,"./js/bigone.js":22,"./js/binance.js":23,"./js/binanceje.js":24,"./js/binanceus.js":25,"./js/bit2c.js":26,"./js/bitbank.js":27,"./js/bitbay.js":28,"./js/bitfinex.js":29,"./js/bitfinex2.js":30,"./js/bitflyer.js":31,"./js/bitforex.js":32,"./js/bitget.js":33,"./js/bithumb.js":34,"./js/bitkk.js":35,"./js/bitmart.js":36,"./js/bitmax.js":37,"./js/bitmex.js":38,"./js/bitpanda.js":39,"./js/bitso.js":40,"./js/bitstamp.js":41,"./js/bitstamp1.js":42,"./js/bittrex.js":43,"./js/bitvavo.js":44,"./js/bitz.js":45,"./js/bl3p.js":46,"./js/bleutrade.js":47,"./js/braziliex.js":48,"./js/btcalpha.js":49,"./js/btcbox.js":50,"./js/btcmarkets.js":51,"./js/btctradeua.js":52,"./js/btcturk.js":53,"./js/buda.js":54,"./js/bw.js":55,"./js/bybit.js":56,"./js/bytetrade.js":57,"./js/cex.js":58,"./js/chilebit.js":59,"./js/coinbase.js":60,"./js/coinbaseprime.js":61,"./js/coinbasepro.js":62,"./js/coincheck.js":63,"./js/coinegg.js":64,"./js/coinex.js":65,"./js/coinfalcon.js":66,"./js/coinfloor.js":67,"./js/coingi.js":68,"./js/coinmarketcap.js":69,"./js/coinmate.js":70,"./js/coinone.js":71,"./js/coinspot.js":72,"./js/coss.js":73,"./js/crex24.js":74,"./js/currencycom.js":75,"./js/deribit.js":76,"./js/digifinex.js":77,"./js/dsx.js":78,"./js/eterbase.js":79,"./js/exmo.js":80,"./js/exx.js":81,"./js/fcoin.js":82,"./js/fcoinjp.js":83,"./js/flowbtc.js":84,"./js/foxbit.js":85,"./js/ftx.js":86,"./js/gateio.js":87,"./js/gemini.js":88,"./js/hbtc.js":89,"./js/hitbtc.js":90,"./js/hollaex.js":91,"./js/huobijp.js":92,"./js/huobipro.js":93,"./js/huobiru.js":94,"./js/ice3x.js":95,"./js/idex.js":96,"./js/idex2.js":97,"./js/independentreserve.js":98,"./js/indodax.js":99,"./js/itbit.js":100,"./js/kraken.js":101,"./js/kucoin.js":102,"./js/kuna.js":103,"./js/lakebtc.js":104,"./js/latoken.js":105,"./js/lbank.js":106,"./js/liquid.js":107,"./js/livecoin.js":108,"./js/luno.js":109,"./js/lykke.js":110,"./js/mercado.js":111,"./js/mixcoins.js":112,"./js/oceanex.js":113,"./js/okcoin.js":114,"./js/okex.js":115,"./js/paymium.js":116,"./js/phemex.js":117,"./js/poloniex.js":118,"./js/probit.js":119,"./js/qtrade.js":120,"./js/rightbtc.js":121,"./js/southxchange.js":122,"./js/stex.js":163,"./js/stronghold.js":164,"./js/surbitcoin.js":165,"./js/therock.js":166,"./js/tidebit.js":167,"./js/tidex.js":168,"./js/timex.js":169,"./js/upbit.js":170,"./js/vaultoro.js":171,"./js/vbtc.js":172,"./js/wavesexchange.js":173,"./js/whitebit.js":174,"./js/xbtce.js":175,"./js/xena.js":176,"./js/yobit.js":177,"./js/zaif.js":178,"./js/zb.js":179}],3:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -1842,7 +1843,7 @@ const { // eslint-disable-line object-curly-newline
     , ExchangeNotAvailable
     , RateLimitExceeded } = require ('./errors')
 
-const { TRUNCATE, ROUND, DECIMAL_PLACES } = functions.precisionConstants
+const { TRUNCATE, ROUND, DECIMAL_PLACES, NO_PADDING } = functions.precisionConstants
 
 const BN = require ('../static_dependencies/BN/bn')
 
@@ -2001,6 +2002,7 @@ module.exports = class Exchange {
                 'BCHSV': 'BSV',
             },
             'precisionMode': DECIMAL_PLACES,
+            'paddingMode': NO_PADDING,
             'limits': {
                 'amount': { 'min': undefined, 'max': undefined },
                 'price': { 'min': undefined, 'max': undefined },
@@ -3075,23 +3077,23 @@ module.exports = class Exchange {
     }
 
     costToPrecision (symbol, cost) {
-        return decimalToPrecision (cost, ROUND, this.markets[symbol].precision.price, this.precisionMode)
+        return decimalToPrecision (cost, ROUND, this.markets[symbol].precision.price, this.precisionMode, this.paddingMode)
     }
 
     priceToPrecision (symbol, price) {
-        return decimalToPrecision (price, ROUND, this.markets[symbol].precision.price, this.precisionMode)
+        return decimalToPrecision (price, ROUND, this.markets[symbol].precision.price, this.precisionMode, this.paddingMode)
     }
 
     amountToPrecision (symbol, amount) {
-        return decimalToPrecision (amount, TRUNCATE, this.markets[symbol].precision.amount, this.precisionMode)
+        return decimalToPrecision (amount, TRUNCATE, this.markets[symbol].precision.amount, this.precisionMode, this.paddingMode)
     }
 
     feeToPrecision (symbol, fee) {
-        return decimalToPrecision (fee, ROUND, this.markets[symbol].precision.price, this.precisionMode)
+        return decimalToPrecision (fee, ROUND, this.markets[symbol].precision.price, this.precisionMode, this.paddingMode)
     }
 
     currencyToPrecision (currency, fee) {
-        return decimalToPrecision (fee, ROUND, this.currencies[currency]['precision'], this.precisionMode);
+        return decimalToPrecision (fee, ROUND, this.currencies[currency]['precision'], this.precisionMode, this.paddingMode);
     }
 
     calculateFee (symbol, type, side, amount, price, takerOrMaker = 'taker', params = {}) {
@@ -3126,7 +3128,7 @@ module.exports = class Exchange {
             if (Number.isInteger (value) || value.match (/^[0-9]+$/)) {
                 encoded.push (this.numberToBE (this.numberToString (value), 32))
             } else {
-                const noPrefix = Exchange.remove0xPrefix (value)
+                const noPrefix = this.remove0xPrefix (value)
                 if (noPrefix.length === 40 && noPrefix.toLowerCase ().match (/^[0-9a-f]+$/)) { // check if it is an address
                     encoded.push (this.base16ToBinary (noPrefix))
                 } else {
@@ -3239,7 +3241,7 @@ module.exports = class Exchange {
         return '0x' + v.toString (16) + signature['r'].slice (-64) + signature['s'].slice (-64) + '03'
     }
 
-    static remove0xPrefix (hexData) {
+    remove0xPrefix (hexData) {
         if (hexData.slice (0, 2) === '0x') {
             return hexData.slice (2)
         } else {
@@ -3249,7 +3251,7 @@ module.exports = class Exchange {
 
     hashMessage (message) {
         // takes a hex encoded message
-        const binaryMessage = this.base16ToBinary (Exchange.remove0xPrefix (message))
+        const binaryMessage = this.base16ToBinary (this.remove0xPrefix (message))
         const prefix = this.stringToBinary ('\x19Ethereum Signed Message:\n' + binaryMessage.sigBytes)
         return '0x' + this.hash (this.binaryConcat (prefix, binaryMessage), 'keccak', 'hex')
     }
@@ -3265,6 +3267,13 @@ module.exports = class Exchange {
 
     signMessage (message, privateKey) {
         return this.signHash (this.hashMessage (message), privateKey.slice (-64))
+    }
+
+    signMessageString (message, privateKey) {
+        // still takes the input as a hex string
+        // same as above but returns a string instead of an object
+        const signature = this.signMessage (message, privateKey)
+        return signature['r'] + this.remove0xPrefix (signature['s']) + this.binaryToBase16 (this.numberToBE (signature['v']));
     }
 
     oath () {
@@ -3292,7 +3301,7 @@ module.exports = class Exchange {
 
 
 }).call(this,require("buffer").Buffer)
-},{"../static_dependencies/BN/bn":122,"./errors":7,"./functions":8,"buffer":184}],6:[function(require,module,exports){
+},{"../static_dependencies/BN/bn":123,"./errors":7,"./functions":8,"buffer":185}],6:[function(require,module,exports){
 'use strict';
 
 const errorHierarchy = {
@@ -3581,7 +3590,7 @@ module.exports = {
 
 /*  ------------------------------------------------------------------------ */
 
-},{"../../static_dependencies/BN/bn.js":122,"../../static_dependencies/crypto-js/crypto-js":123,"./../../static_dependencies/elliptic/lib/elliptic":124,"./../../static_dependencies/node-rsa/NodeRSA":142,"./../errors":7,"./encode":10,"./string":15}],10:[function(require,module,exports){
+},{"../../static_dependencies/BN/bn.js":123,"../../static_dependencies/crypto-js/crypto-js":124,"./../../static_dependencies/elliptic/lib/elliptic":125,"./../../static_dependencies/node-rsa/NodeRSA":143,"./../errors":7,"./encode":10,"./string":15}],10:[function(require,module,exports){
 "use strict";
 
 /*  ------------------------------------------------------------------------ */
@@ -3611,12 +3620,7 @@ module.exports =
         ((object[0] === '{') || (object[0] === '['))
     )
 
-    , stringToBinary (str) {
-        const arr = new Uint8Array (str.length)
-        for (let i = 0; i < str.length; i++) { arr[i] = str.charCodeAt (i); }
-        return CryptoJS.lib.WordArray.create (arr)
-    }
-
+    , stringToBinary: string => CryptoJS.enc.Latin1.parse (string)
     , stringToBase64: string => CryptoJS.enc.Latin1.parse (string).toString (CryptoJS.enc.Base64)
     , utf16ToBase64:  string => CryptoJS.enc.Utf16 .parse (string).toString (CryptoJS.enc.Base64)
     , base64ToBinary: string => CryptoJS.enc.Base64.parse (string)
@@ -3707,7 +3711,7 @@ module.exports['byteArrayToWordArray'] = byteArrayToWordArray
 
 /*  ------------------------------------------------------------------------ */
 
-},{"../../static_dependencies/BN/bn":122,"../../static_dependencies/crypto-js/crypto-js":123,"../../static_dependencies/qs/index":158}],11:[function(require,module,exports){
+},{"../../static_dependencies/BN/bn":123,"../../static_dependencies/crypto-js/crypto-js":124,"../../static_dependencies/qs/index":159}],11:[function(require,module,exports){
 "use strict";
 
 // ----------------------------------------------------------------------------
@@ -4467,7 +4471,7 @@ module.exports = {
     defaultFetch,
 }
 }).call(this,require('_process'))
-},{"../../static_dependencies/fetch-ponyfill/fetch-node":140,"_process":206}],15:[function(require,module,exports){
+},{"../../static_dependencies/fetch-ponyfill/fetch-node":141,"_process":207}],15:[function(require,module,exports){
 "use strict";
 
 /*  ------------------------------------------------------------------------ */
@@ -4565,6 +4569,17 @@ const now = Date.now // TODO: figure out how to utilize performance.now () prope
 const microseconds = () => now () * 1000 // TODO: utilize performance.now for that purpose
 const milliseconds = now
 const seconds      = () => Math.floor (now () / 1000)
+const uuidv1 = () => {
+    const biasSeconds = 12219292800  // seconds from 15th Oct 1572 to Jan 1st 1970
+    const bias = biasSeconds * 10000000  // in hundreds of nanoseconds
+    const time = microseconds () * 10 + bias
+    const timeHex = time.toString (16)
+    const arranged = timeHex.slice (7, 15) + timeHex.slice (3, 7) + '1' + timeHex.slice (0, 3)
+    // these should be random, but we're not making more than 10 requests per microsecond so who cares
+    const clockId = '9696' // a 14 bit number
+    const macAddress = 'ff'.repeat (6)
+    return arranged + clockId + macAddress
+}
 
 /*  ------------------------------------------------------------------------ */
 
@@ -4726,6 +4741,7 @@ module.exports =
         , iso8601
         , parse8601
         , rfc2616
+        , uuidv1
         , parseDate
         , mdy
         , ymd
@@ -20179,7 +20195,7 @@ module.exports = class bitkk extends zb {
     }
 };
 
-},{"./zb.js":178}],36:[function(require,module,exports){
+},{"./zb.js":179}],36:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -43527,7 +43543,7 @@ module.exports = class bytetrade extends Exchange {
         const bytestring = this.binaryConcatArray (allByteStringArray);
         const hash = this.hash (bytestring, 'sha256', 'hex');
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
-        const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
+        const recoveryParam = this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1));
         const mySignature = recoveryParam + signature['r'] + signature['s'];
         const operation = {
             'now': datetime,
@@ -43711,7 +43727,7 @@ module.exports = class bytetrade extends Exchange {
         const bytestring = this.binaryConcatArray (byteStringArray);
         const hash = this.hash (bytestring, 'sha256', 'hex');
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
-        const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
+        const recoveryParam = this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1));
         const mySignature = recoveryParam + signature['r'] + signature['s'];
         const operation = {
             'fee': feeAmount,
@@ -43813,7 +43829,7 @@ module.exports = class bytetrade extends Exchange {
         const bytestring = this.binaryConcatArray (byteStringArray);
         const hash = this.hash (bytestring, 'sha256', 'hex');
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
-        const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
+        const recoveryParam = this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1));
         const mySignature = recoveryParam + signature['r'] + signature['s'];
         const operation = {
             'fee': '300000000000000',
@@ -44119,7 +44135,7 @@ module.exports = class bytetrade extends Exchange {
         const bytestring = this.binaryConcatArray (byteStringArray);
         const hash = this.hash (bytestring, 'sha256', 'hex');
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
-        const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
+        const recoveryParam = this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1));
         const mySignature = recoveryParam + signature['r'] + signature['s'];
         let fatty = undefined;
         let request = undefined;
@@ -76328,6 +76344,1187 @@ module.exports = class idex extends Exchange {
 },{"./base/Exchange":5,"./base/errors":7}],97:[function(require,module,exports){
 'use strict';
 
+// ---------------------------------------------------------------------------
+
+const Exchange = require ('./base/Exchange');
+const { PAD_WITH_ZERO } = require ('./base/functions/number');
+const { InvalidOrder, InsufficientFunds, ExchangeError, ExchangeNotAvailable, DDoSProtection, BadRequest } = require ('./base/errors');
+
+// ---------------------------------------------------------------------------
+
+module.exports = class idex2 extends Exchange {
+    describe () {
+        return this.deepExtend (super.describe (), {
+            'id': 'idex2',
+            'name': 'IDEX',
+            'countries': [ 'US' ],
+            'rateLimit': 1500,
+            'version': 'v2',
+            'certified': false,
+            'requiresWeb3': true,
+            'has': {
+                'cancelOrder': true,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchMarkets': true,
+                'fetchCurrencies': true,
+                'fetchMyTrades': true,
+                'fetchOHLCV': true,
+                'fetchOpenOrders': true,
+                'fetchClosedOrders': true,
+                'fetchOrders': false,
+                'fetchOrder': true,
+                'fetchOrderBook': true,
+                'fetchTicker': true,
+                'fetchTickers': true,
+                'fetchTrades': true,
+                'fetchTransactions': false,
+                'fetchDeposits': true,
+                'fetchWithdrawals': true,
+                'withdraw': true,
+            },
+            'timeframes': {
+                '1m': '1m',
+                '5m': '5m',
+                '15m': '15m',
+                '30m': '30m',
+                '1h': '1h',
+                '6h': '6h',
+                '1d': '1d',
+            },
+            'urls': {
+                'test': {
+                    'public': 'https://api-sandbox.idex.io',
+                    'private': 'https://api-sandbox.idex.io',
+                },
+                'logo': 'https://user-images.githubusercontent.com/1294454/63693236-3415e380-c81c-11e9-8600-ba1634f1407d.jpg',
+                'api': {
+                    'public': 'https://api-sandbox.idex.io',
+                    'private': 'https://api-sandbox.idex.io',
+                },
+                'www': 'https://idex.io',
+                'doc': [
+                    'https://docs.idex.io/',
+                ],
+            },
+            'api': {
+                'public': {
+                    'get': [
+                        'ping',
+                        'time',
+                        'exchange',
+                        'assets',
+                        'markets',
+                        'tickers',
+                        'candles',
+                        'trades',
+                        'orderbook',
+                    ],
+                },
+                'private': {
+                    'get': [
+                        'user',
+                        'wallets',
+                        'balances',
+                        'orders',
+                        'fills',
+                        'deposits',
+                        'withdrawals',
+                    ],
+                    'post': [
+                        'wallets',
+                        'orders',
+                        'orders/test',
+                        'withdrawals',
+                    ],
+                    'delete': [
+                        'orders',
+                    ],
+                },
+            },
+            'options': {},
+            'exceptions': {
+                'INVALID_ORDER_QUANTITY': InvalidOrder,
+                'INSUFFICIENT_FUNDS': InsufficientFunds,
+                'SERVICE_UNAVAILABLE': ExchangeNotAvailable,
+                'EXCEEDED_RATE_LIMIT': DDoSProtection,
+                'INVALID_PARAMETER': BadRequest,
+            },
+            'requiredCredentials': {
+                'walletAddress': true,
+                'privateKey': true,
+                'apiKey': true,
+                'secret': true,
+            },
+            'paddingMode': PAD_WITH_ZERO,
+            'commonCurrencies': {},
+        });
+    }
+
+    async fetchMarkets (params = {}) {
+        // [
+        //   {
+        //     market: 'DIL-ETH',
+        //     status: 'active',
+        //     baseAsset: 'DIL',
+        //     baseAssetPrecision: 8,
+        //     quoteAsset: 'ETH',
+        //     quoteAssetPrecision: 8
+        //   }, ...
+        // ]
+        const response = await this.publicGetMarkets (params);
+        const result = [];
+        for (let i = 0; i < response.length; i++) {
+            const entry = response[i];
+            const marketId = this.safeString (entry, 'market');
+            const baseId = this.safeString (entry, 'baseAsset');
+            const quoteId = this.safeString (entry, 'quoteAsset');
+            const base = this.safeCurrencyCode (baseId);
+            const quote = this.safeCurrencyCode (quoteId);
+            const symbol = base + '/' + quote;
+            const basePrecision = this.safeInteger (entry, 'baseAssetPrecision');
+            const quotePrecision = this.safeInteger (entry, 'quoteAssetPrecision');
+            const status = this.safeString (entry, 'status');
+            const active = status === 'active';
+            const precision = {
+                'amount': basePrecision,
+                'price': quotePrecision,
+            };
+            result.push ({
+                'symbol': symbol,
+                'id': marketId,
+                'base': base,
+                'quote': quote,
+                'baseId': baseId,
+                'quoteId': quoteId,
+                'active': active,
+                'info': entry,
+                'precision': precision,
+                'limits': {
+                    'amount': {
+                        'min': Math.pow (10, -precision['amount']),
+                        'max': undefined,
+                    },
+                    'price': {
+                        'min': undefined,
+                        'max': undefined,
+                    },
+                    'cost': {
+                        'min': undefined,
+                        'max': undefined,
+                    },
+                },
+            });
+        }
+        return result;
+    }
+
+    async fetchTicker (symbol, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'market': market['id'],
+        };
+        // [
+        //   {
+        //     market: 'DIL-ETH',
+        //     time: 1598367493008,
+        //     open: '0.09695361',
+        //     high: '0.10245881',
+        //     low: '0.09572507',
+        //     close: '0.09917079',
+        //     closeQuantity: '0.71320950',
+        //     baseVolume: '309.17380612',
+        //     quoteVolume: '30.57633981',
+        //     percentChange: '2.28',
+        //     numTrades: 205,
+        //     ask: '0.09910476',
+        //     bid: '0.09688340',
+        //     sequence: 3902
+        //   }
+        // ]
+        const response = await this.publicGetTickers (this.extend (request, params));
+        const ticker = this.safeValue (response, 0);
+        return this.parseTicker (ticker, market);
+    }
+
+    async fetchTickers (symbols = undefined, params = {}) {
+        await this.loadMarkets ();
+        // [
+        //   {
+        //     market: 'DIL-ETH',
+        //     time: 1598367493008,
+        //     open: '0.09695361',
+        //     high: '0.10245881',
+        //     low: '0.09572507',
+        //     close: '0.09917079',
+        //     closeQuantity: '0.71320950',
+        //     baseVolume: '309.17380612',
+        //     quoteVolume: '30.57633981',
+        //     percentChange: '2.28',
+        //     numTrades: 205,
+        //     ask: '0.09910476',
+        //     bid: '0.09688340',
+        //     sequence: 3902
+        //   }, ...
+        // ]
+        const response = await this.publicGetTickers (params);
+        return this.parseTickers (response, symbols);
+    }
+
+    parseTickers (rawTickers, symbols = undefined) {
+        const tickers = [];
+        for (let i = 0; i < rawTickers.length; i++) {
+            tickers.push (this.parseTicker (rawTickers[i]));
+        }
+        return this.filterByArray (tickers, 'symbol', symbols);
+    }
+
+    parseTicker (ticker, market = undefined) {
+        // {
+        //   market: 'DIL-ETH',
+        //   time: 1598367493008,
+        //   open: '0.09695361',
+        //   high: '0.10245881',
+        //   low: '0.09572507',
+        //   close: '0.09917079',
+        //   closeQuantity: '0.71320950',
+        //   baseVolume: '309.17380612',
+        //   quoteVolume: '30.57633981',
+        //   percentChange: '2.28',
+        //   numTrades: 205,
+        //   ask: '0.09910476',
+        //   bid: '0.09688340',
+        //   sequence: 3902
+        // }
+        const marketId = this.safeString (ticker, 'market');
+        let symbol = undefined;
+        if (marketId !== undefined) {
+            if (marketId in this.markets_by_id) {
+                market = this.markets_by_id[marketId];
+            } else {
+                const [ baseId, quoteId ] = marketId.split ('-');
+                const base = this.safeCurrencyCode (baseId);
+                const quote = this.safeCurrencyCode (quoteId);
+                symbol = base + '/' + quote;
+            }
+        }
+        if ((symbol === undefined) && (market !== undefined)) {
+            symbol = market['symbol'];
+        }
+        const baseVolume = this.safeFloat (ticker, 'baseVolume');
+        const quoteVolume = this.safeFloat (ticker, 'quoteVolume');
+        const timestamp = this.safeInteger (ticker, 'time');
+        const open = this.safeFloat (ticker, 'open');
+        const high = this.safeFloat (ticker, 'high');
+        const low = this.safeFloat (ticker, 'low');
+        const close = this.safeFloat (ticker, 'close');
+        const ask = this.safeFloat (ticker, 'ask');
+        const bid = this.safeFloat (ticker, 'bid');
+        let percentage = this.safeFloat (ticker, 'percentChange');
+        if (percentage !== undefined) {
+            percentage = 1 + percentage / 100;
+        }
+        let change = undefined;
+        if ((close !== undefined) && (open !== undefined)) {
+            change = close - open;
+        }
+        return {
+            'symbol': symbol,
+            'timestamp': timestamp,
+            'datetime': this.iso8601 (timestamp),
+            'high': high,
+            'low': low,
+            'bid': bid,
+            'bidVolume': undefined,
+            'ask': ask,
+            'askVolume': undefined,
+            'vwap': undefined,
+            'open': open,
+            'close': close,
+            'last': close,
+            'previousClose': undefined,
+            'change': change,
+            'percentage': percentage,
+            'average': undefined,
+            'baseVolume': baseVolume,
+            'quoteVolume': quoteVolume,
+            'info': ticker,
+        };
+    }
+
+    async fetchOHLCV (symbol, timeframe = '1m', since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'market': market['id'],
+            'interval': timeframe,
+        };
+        if (since !== undefined) {
+            request['start'] = since;
+        }
+        if (limit !== undefined) {
+            request['limit'] = limit;
+        }
+        const response = await this.publicGetCandles (this.extend (request, params));
+        if (Array.isArray (response)) {
+            // [
+            //   {
+            //     start: 1598345580000,
+            //     open: '0.09771286',
+            //     high: '0.09771286',
+            //     low: '0.09771286',
+            //     close: '0.09771286',
+            //     volume: '1.45340410',
+            //     sequence: 3853
+            //   }, ...
+            // ]
+            return this.parseOHLCVs (response, market, timeframe, since, limit);
+        } else {
+            //  {"nextTime":1595536440000}
+            return [];
+        }
+    }
+
+    parseOHLCV (ohlcv, market = undefined) {
+        // {
+        //   start: 1598345580000,
+        //   open: '0.09771286',
+        //   high: '0.09771286',
+        //   low: '0.09771286',
+        //   close: '0.09771286',
+        //   volume: '1.45340410',
+        //   sequence: 3853
+        // }
+        const timestamp = this.safeInteger (ohlcv, 'start');
+        const open = this.safeFloat (ohlcv, 'open');
+        const high = this.safeFloat (ohlcv, 'high');
+        const low = this.safeFloat (ohlcv, 'low');
+        const close = this.safeFloat (ohlcv, 'close');
+        const volume = this.safeFloat (ohlcv, 'volume');
+        return [ timestamp, open, high, low, close, volume ];
+    }
+
+    async fetchTrades (symbol, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'market': market['id'],
+        };
+        if (since !== undefined) {
+            request['start'] = since;
+        }
+        if (limit !== undefined) {
+            request['limit'] = limit;
+        }
+        // [
+        //   {
+        //     fillId: 'b5467d00-b13e-3fa9-8216-dd66735550fc',
+        //     price: '0.09771286',
+        //     quantity: '1.45340410',
+        //     quoteQuantity: '0.14201627',
+        //     time: 1598345638994,
+        //     makerSide: 'buy',
+        //     sequence: 3853
+        //   }, ...
+        // ]
+        const response = await this.publicGetTrades (this.extend (request, params));
+        return this.parseTrades (response, market, since, limit);
+    }
+
+    parseTrade (trade, market = undefined) {
+        // public trades
+        // {
+        //   fillId: 'b5467d00-b13e-3fa9-8216-dd66735550fc',
+        //   price: '0.09771286',
+        //   quantity: '1.45340410',
+        //   quoteQuantity: '0.14201627',
+        //   time: 1598345638994,
+        //   makerSide: 'buy',
+        //   sequence: 3853
+        // }
+        // private trades
+        // {
+        //   fillId: '48582d10-b9bb-3c4b-94d3-e67537cf2472',
+        //   price: '0.09905990',
+        //   quantity: '0.40000000',
+        //   quoteQuantity: '0.03962396',
+        //   time: 1598873478762,
+        //   makerSide: 'sell',
+        //   sequence: 5053,
+        //   market: 'DIL-ETH',
+        //   orderId: '7cdc8e90-eb7d-11ea-9e60-4118569f6e63',
+        //   side: 'buy',
+        //   fee: '0.00080000',
+        //   feeAsset: 'DIL',
+        //   gas: '0.00857497',
+        //   liquidity: 'taker',
+        //   txId: '0xeaa02b112c0b8b61bc02fa1776a2b39d6c614e287c1af90df0a2e591da573e65',
+        //   txStatus: 'mined'
+        // }
+        const id = this.safeString (trade, 'fillId');
+        const price = this.safeFloat (trade, 'price');
+        const amount = this.safeFloat (trade, 'quantity');
+        const cost = this.safeFloat (trade, 'quoteQuantity');
+        const timestamp = this.safeInteger (trade, 'time');
+        let symbol = undefined;
+        if (market !== undefined) {
+            symbol = market['symbol'];
+        }
+        // this code handles the duality of public vs private trades
+        const makerSide = this.safeString (trade, 'makerSide');
+        const oppositeSide = (makerSide === 'buy') ? 'sell' : 'buy';
+        const side = this.safeString (trade, 'side', oppositeSide);
+        const takerOrMaker = this.safeString (trade, 'liquidity', 'taker');
+        const feeCost = this.safeFloat (trade, 'fee');
+        let fee = undefined;
+        if (feeCost !== undefined) {
+            const feeCurrencyId = this.safeString (trade, 'feeAsset');
+            fee = {
+                'cost': feeCost,
+                'currency': this.safeCurrencyCode (feeCurrencyId),
+            };
+        }
+        const orderId = this.safeString (trade, 'orderId');
+        return {
+            'info': trade,
+            'timestamp': timestamp,
+            'datetime': this.iso8601 (timestamp),
+            'symbol': symbol,
+            'id': id,
+            'order': orderId,
+            'type': 'limit',
+            'side': side,
+            'takerOrMaker': takerOrMaker,
+            'price': price,
+            'amount': amount,
+            'cost': cost,
+            'fee': fee,
+        };
+    }
+
+    async fetchOrderBook (symbol, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'market': market['id'],
+            'level': 2,
+        };
+        if (limit !== undefined) {
+            request['limit'] = limit;
+        }
+        // {
+        //   sequence: 36416753,
+        //   bids: [
+        //     [ '0.09672815', '8.22284267', 1 ],
+        //     [ '0.09672814', '1.83685554', 1 ],
+        //     [ '0.09672143', '4.10962617', 1 ],
+        //     [ '0.09658884', '4.03863759', 1 ],
+        //     [ '0.09653781', '3.35730684', 1 ],
+        //     [ '0.09624660', '2.54163586', 1 ],
+        //     [ '0.09617490', '1.93065030', 1 ]
+        //   ],
+        //   asks: [
+        //     [ '0.09910476', '3.22840154', 1 ],
+        //     [ '0.09940587', '3.39796593', 1 ],
+        //     [ '0.09948189', '4.25088898', 1 ],
+        //     [ '0.09958362', '2.42195784', 1 ],
+        //     [ '0.09974393', '4.25234367', 1 ],
+        //     [ '0.09995250', '3.40192141', 1 ]
+        //   ]
+        // }
+        const response = await this.publicGetOrderbook (this.extend (request, params));
+        const nonce = this.safeInteger (response, 'sequence');
+        const book = this.parseOrderBook (response, undefined, 'bids', 'asks', 0, 1);
+        book['nonce'] = nonce;
+        return book;
+    }
+
+    async fetchCurrencies (params = {}) {
+        // [
+        //   {
+        //     name: 'Ether',
+        //     symbol: 'ETH',
+        //     contractAddress: '0x0000000000000000000000000000000000000000',
+        //     assetDecimals: 18,
+        //     exchangeDecimals: 8
+        //   }, ..
+        // ]
+        const response = await this.publicGetAssets (params);
+        const result = {};
+        for (let i = 0; i < response.length; i++) {
+            const entry = response[i];
+            const name = this.safeString (entry, 'name');
+            const currencyId = this.safeString (entry, 'symbol');
+            const precision = this.safeInteger (entry, 'exchangeDecimals');
+            const code = this.safeCurrencyCode (currencyId);
+            const lot = Math.pow (-10, precision);
+            result[code] = {
+                'id': currencyId,
+                'code': code,
+                'info': entry,
+                'type': undefined,
+                'name': name,
+                'active': undefined,
+                'fee': undefined,
+                'precision': precision,
+                'limits': {
+                    'amount': { 'min': lot, 'max': undefined },
+                    'price': { 'min': lot, 'max': undefined },
+                    'cost': { 'min': undefined, 'max': undefined },
+                    'withdraw': { 'min': lot, 'max': undefined },
+                },
+            };
+        }
+        return result;
+    }
+
+    async fetchBalance (params = {}) {
+        await this.loadMarkets ();
+        const nonce1 = this.uuidv1 ();
+        const request = {
+            'nonce': nonce1,
+            'wallet': this.walletAddress,
+        };
+        // [
+        //   {
+        //     asset: 'DIL',
+        //     quantity: '0.00000000',
+        //     availableForTrade: '0.00000000',
+        //     locked: '0.00000000',
+        //     usdValue: null
+        //   }, ...
+        // ]
+        const response = await this.privateGetBalances (this.extend (request, params));
+        const result = {
+            'info': response,
+        };
+        for (let i = 0; i < response.length; i++) {
+            const entry = response[i];
+            const currencyId = this.safeString (entry, 'asset');
+            const code = this.safeCurrencyCode (currencyId);
+            const total = this.safeFloat (entry, 'quantity');
+            const free = this.safeFloat (entry, 'availableForTrade');
+            const used = this.safeFloat (entry, 'locked');
+            result[code] = {
+                'free': free,
+                'used': used,
+                'total': total,
+            };
+        }
+        return this.parseBalance (result);
+    }
+
+    async fetchMyTrades (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        let market = undefined;
+        const request = {
+            'nonce': this.uuidv1 (),
+            'wallet': this.walletAddress,
+        };
+        if (symbol !== undefined) {
+            market = this.market (symbol);
+            request['market'] = market['id'];
+        }
+        if (since !== undefined) {
+            request['start'] = since;
+        }
+        if (limit !== undefined) {
+            request['limit'] = limit;
+        }
+        // [
+        //   {
+        //     fillId: '48582d10-b9bb-3c4b-94d3-e67537cf2472',
+        //     price: '0.09905990',
+        //     quantity: '0.40000000',
+        //     quoteQuantity: '0.03962396',
+        //     time: 1598873478762,
+        //     makerSide: 'sell',
+        //     sequence: 5053,
+        //     market: 'DIL-ETH',
+        //     orderId: '7cdc8e90-eb7d-11ea-9e60-4118569f6e63',
+        //     side: 'buy',
+        //     fee: '0.00080000',
+        //     feeAsset: 'DIL',
+        //     gas: '0.00857497',
+        //     liquidity: 'taker',
+        //     txId: '0xeaa02b112c0b8b61bc02fa1776a2b39d6c614e287c1af90df0a2e591da573e65',
+        //     txStatus: 'mined'
+        //   }
+        // ]
+        const response = await this.privateGetFills (this.extend (request, params));
+        return this.parseTrades (response, market, since, limit);
+    }
+
+    async fetchOrder (id, symbol = undefined, params = {}) {
+        const request = {
+            'orderId': id,
+        };
+        return await this.fetchOrdersHelper (symbol, undefined, undefined, this.extend (request, params));
+    }
+
+    async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        const request = {
+            'closed': false,
+        };
+        return await this.fetchOrdersHelper (symbol, since, limit, this.extend (request, params));
+    }
+
+    async fetchClosedOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        const request = {
+            'closed': true,
+        };
+        return await this.fetchOrdersHelper (symbol, since, limit, this.extend (request, params));
+    }
+
+    async fetchOrdersHelper (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const request = {
+            'nonce': this.uuidv1 (),
+            'wallet': this.walletAddress,
+        };
+        let market = undefined;
+        if (symbol !== undefined) {
+            market = this.market (symbol);
+            request['market'] = market['id'];
+        }
+        if (since !== undefined) {
+            request['start'] = since;
+        }
+        if (limit !== undefined) {
+            request['limit'] = limit;
+        }
+        const response = await this.privateGetOrders (this.extend (request, params));
+        // fetchClosedOrders / fetchOpenOrders
+        // [
+        //   {
+        //     "market": "DIL-ETH",
+        //     "orderId": "7cdc8e90-eb7d-11ea-9e60-4118569f6e63",
+        //     "wallet": "0x0AB991497116f7F5532a4c2f4f7B1784488628e1",
+        //     "time": 1598873478650,
+        //     "status": "filled",
+        //     "type": "limit",
+        //     "side": "buy",
+        //     "originalQuantity": "0.40000000",
+        //     "executedQuantity": "0.40000000",
+        //     "cumulativeQuoteQuantity": "0.03962396",
+        //     "avgExecutionPrice": "0.09905990",
+        //     "price": "1.00000000",
+        //     "fills": [
+        //       {
+        //         "fillId": "48582d10-b9bb-3c4b-94d3-e67537cf2472",
+        //         "price": "0.09905990",
+        //         "quantity": "0.40000000",
+        //         "quoteQuantity": "0.03962396",
+        //         "time": 1598873478650,
+        //         "makerSide": "sell",
+        //         "sequence": 5053,
+        //         "fee": "0.00080000",
+        //         "feeAsset": "DIL",
+        //         "gas": "0.00857497",
+        //         "liquidity": "taker",
+        //         "txId": "0xeaa02b112c0b8b61bc02fa1776a2b39d6c614e287c1af90df0a2e591da573e65",
+        //         "txStatus": "mined"
+        //       }
+        //     ]
+        //   }
+        // ]
+        // fetchOrder
+        // { market: 'DIL-ETH',
+        //   orderId: '7cdc8e90-eb7d-11ea-9e60-4118569f6e63',
+        //   wallet: '0x0AB991497116f7F5532a4c2f4f7B1784488628e1',
+        //   time: 1598873478650,
+        //   status: 'filled',
+        //   type: 'limit',
+        //   side: 'buy',
+        //   originalQuantity: '0.40000000',
+        //   executedQuantity: '0.40000000',
+        //   cumulativeQuoteQuantity: '0.03962396',
+        //   avgExecutionPrice: '0.09905990',
+        //   price: '1.00000000',
+        //   fills:
+        //    [ { fillId: '48582d10-b9bb-3c4b-94d3-e67537cf2472',
+        //        price: '0.09905990',
+        //        quantity: '0.40000000',
+        //        quoteQuantity: '0.03962396',
+        //        time: 1598873478650,
+        //        makerSide: 'sell',
+        //        sequence: 5053,
+        //        fee: '0.00080000',
+        //        feeAsset: 'DIL',
+        //        gas: '0.00857497',
+        //        liquidity: 'taker',
+        //        txId: '0xeaa02b112c0b8b61bc02fa1776a2b39d6c614e287c1af90df0a2e591da573e65',
+        //        txStatus: 'mined' } ] }
+        if (Array.isArray (response)) {
+            return this.parseOrders (response, market, since, limit);
+        } else {
+            return this.parseOrder (response, market);
+        }
+    }
+
+    parseOrderStatus (status) {
+        const statuses = {
+            'filled': 'closed',
+        };
+        return this.safeString (statuses, status, status);
+    }
+
+    parseOrder (order, market = undefined) {
+        // {
+        //   "market": "DIL-ETH",
+        //   "orderId": "7cdc8e90-eb7d-11ea-9e60-4118569f6e63",
+        //   "wallet": "0x0AB991497116f7F5532a4c2f4f7B1784488628e1",
+        //   "time": 1598873478650,
+        //   "status": "filled",
+        //   "type": "limit",
+        //   "side": "buy",
+        //   "originalQuantity": "0.40000000",
+        //   "executedQuantity": "0.40000000",
+        //   "cumulativeQuoteQuantity": "0.03962396",
+        //   "avgExecutionPrice": "0.09905990",
+        //   "price": "1.00000000",
+        //   "fills": [
+        //     {
+        //       "fillId": "48582d10-b9bb-3c4b-94d3-e67537cf2472",
+        //       "price": "0.09905990",
+        //       "quantity": "0.40000000",
+        //       "quoteQuantity": "0.03962396",
+        //       "time": 1598873478650,
+        //       "makerSide": "sell",
+        //       "sequence": 5053,
+        //       "fee": "0.00080000",
+        //       "feeAsset": "DIL",
+        //       "gas": "0.00857497",
+        //       "liquidity": "taker",
+        //       "txId": "0xeaa02b112c0b8b61bc02fa1776a2b39d6c614e287c1af90df0a2e591da573e65",
+        //       "txStatus": "mined"
+        //     }
+        //   ]
+        // }
+        const timestamp = this.safeInteger (order, 'time');
+        const fills = this.safeValue (order, 'fills');
+        const id = this.safeString (order, 'orderId');
+        const marketId = this.safeString (order, 'market');
+        let symbol = undefined;
+        const side = this.safeString (order, 'side');
+        if (marketId !== undefined) {
+            if (marketId in this.markets_by_id) {
+                market = this.markets_by_id[marketId];
+            } else {
+                const [ baseId, quoteId ] = marketId.split ('-');
+                const base = this.safeCurrencyCode (baseId);
+                const quote = this.safeCurrencyCode (quoteId);
+                symbol = base + '/' + quote;
+            }
+        }
+        if ((symbol === undefined) && (market !== undefined)) {
+            symbol = market['symbol'];
+        }
+        const trades = this.parseTrades (fills, market);
+        const type = this.safeString (order, 'type');
+        const amount = this.safeFloat (order, 'originalQuantity');
+        const filled = this.safeFloat (order, 'executedQuantity');
+        let remaining = undefined;
+        if ((amount !== undefined) && (filled !== undefined)) {
+            remaining = amount - filled;
+        }
+        const average = this.safeFloat (order, 'avgExecutionPrice');
+        const price = this.safeFloat (order, 'price', average);  // for market orders
+        let cost = undefined;
+        if ((amount !== undefined) && (price !== undefined)) {
+            cost = amount * price;
+        }
+        const rawStatus = this.safeString (order, 'status');
+        const status = this.parseOrderStatus (rawStatus);
+        const fee = {
+            'currency': undefined,
+            'cost': undefined,
+        };
+        let lastTrade = undefined;
+        for (let i = 0; i < trades.length; i++) {
+            lastTrade = trades[i];
+            fee['currency'] = lastTrade['fee']['currency'];
+            fee['cost'] = this.sum (fee['cost'], lastTrade['fee']['cost']);
+        }
+        const lastTradeTimestamp = this.safeInteger (lastTrade, 'timestamp');
+        return {
+            'info': order,
+            'id': id,
+            'clientOrderId': undefined,
+            'timestamp': timestamp,
+            'datetime': this.iso8601 (timestamp),
+            'lastTradeTimestamp': lastTradeTimestamp,
+            'symbol': symbol,
+            'type': type,
+            'side': side,
+            'price': price,
+            'amount': amount,
+            'cost': cost,
+            'average': average,
+            'filled': filled,
+            'remaining': remaining,
+            'status': status,
+            'fee': fee,
+            'trades': trades,
+        };
+    }
+
+    async associateWallet (walletAddress, params = {}) {
+        const nonce = this.uuidv1 ();
+        const noPrefix = this.remove0xPrefix (walletAddress);
+        const byteArray = [
+            this.base16ToBinary (nonce),
+            this.base16ToBinary (noPrefix),
+        ];
+        const binary = this.binaryConcatArray (byteArray);
+        const hash = this.hash (binary, 'keccak', 'hex');
+        const signature = this.signMessageString (hash, this.privateKey);
+        // {
+        //   address: '0x0AB991497116f7F5532a4c2f4f7B1784488628e1',
+        //   totalPortfolioValueUsd: '0.00',
+        //   time: 1598468353626
+        // }
+        const request = {
+            'parameters': {
+                'nonce': nonce,
+                'wallet': walletAddress,
+            },
+            'signature': signature,
+        };
+        return await this.privatePostWallets (request);
+    }
+
+    async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
+        // https://docs.idex.io/#create-order
+        this.checkRequiredCredentials ();
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const nonce = this.uuidv1 ();
+        let typeEnum = undefined;
+        let priceString = undefined;
+        if (type === 'limit') {
+            typeEnum = 1;
+            priceString = this.priceToPrecision (symbol, price);
+        } else if (type === 'market') {
+            typeEnum = 0;
+        }
+        const sideEnum = (side === 'buy') ? 0 : 1;
+        const walletBytes = this.remove0xPrefix (this.walletAddress);
+        const orderVersion = 1;
+        const amountString = this.amountToPrecision (symbol, amount);
+        const timeInForceEnum = 0;  // Good-til-canceled
+        const timeInForce = 'gtc';
+        const selfTradePrevention = 'cn';
+        const selfTradePreventionEnum = 2;  // Cancel newest
+        const byteArray = [
+            this.numberToBE (orderVersion, 1),
+            this.base16ToBinary (nonce),
+            this.base16ToBinary (walletBytes),
+            this.stringToBinary (this.encode (market['id'])),  // TODO: refactor to remove either encode or stringToBinary
+            this.numberToBE (typeEnum, 1),
+            this.numberToBE (sideEnum, 1),
+            this.stringToBinary (this.encode (amountString)),
+        ];
+        if (type === 'limit') {
+            const encodedPrice = this.stringToBinary (this.encode (priceString));
+            byteArray.push (encodedPrice);
+        }
+        const after = [
+            this.numberToBE (timeInForceEnum, 1),
+            this.numberToBE (selfTradePreventionEnum, 1),
+            this.numberToBE (0, 8), // unused
+        ];
+        const allBytes = this.arrayConcat (byteArray, after);
+        const binary = this.binaryConcatArray (allBytes);
+        const hash = this.hash (binary, 'keccak', 'hex');
+        const signature = this.signMessageString (hash, this.privateKey);
+        const request = {
+            'parameters': {
+                'nonce': nonce,
+                'market': market['id'],
+                'side': side,
+                'type': type,
+                'quantity': amountString,
+                'wallet': this.walletAddress,
+                'timeInForce': timeInForce,
+                'selfTradePrevention': selfTradePrevention,
+            },
+            'signature': signature,
+        };
+        if (type === 'limit') {
+            request['parameters']['price'] = priceString;
+        }
+        // {
+        //   market: 'DIL-ETH',
+        //   orderId: '7cdc8e90-eb7d-11ea-9e60-4118569f6e63',
+        //   wallet: '0x0AB991497116f7F5532a4c2f4f7B1784488628e1',
+        //   time: 1598873478650,
+        //   status: 'filled',
+        //   type: 'limit',
+        //   side: 'buy',
+        //   originalQuantity: '0.40000000',
+        //   executedQuantity: '0.40000000',
+        //   cumulativeQuoteQuantity: '0.03962396',
+        //   price: '1.00000000',
+        //   fills: [
+        //     {
+        //       fillId: '48582d10-b9bb-3c4b-94d3-e67537cf2472',
+        //       price: '0.09905990',
+        //       quantity: '0.40000000',
+        //       quoteQuantity: '0.03962396',
+        //       time: 1598873478650,
+        //       makerSide: 'sell',
+        //       sequence: 5053,
+        //       fee: '0.00080000',
+        //       feeAsset: 'DIL',
+        //       gas: '0.00857497',
+        //       liquidity: 'taker',
+        //       txStatus: 'pending'
+        //     }
+        //   ],
+        //   avgExecutionPrice: '0.09905990'
+        // }
+        const response = await this.privatePostOrders (this.extend (request, params));
+        return this.parseOrder (response, market);
+    }
+
+    async withdraw (code, amount, address, tag = undefined, params = {}) {
+        this.checkRequiredCredentials ();
+        await this.loadMarkets ();
+        const nonce = this.uuidv1 ();
+        const amountString = this.currencyToPrecision (code, amount);
+        const currency = this.currency (code);
+        const walletBytes = this.remove0xPrefix (this.walletAddress);
+        const byteArray = [
+            this.base16ToBinary (nonce),
+            this.base16ToBinary (walletBytes),
+            this.stringToBinary (this.encode (currency['id'])),
+            this.stringToBinary (this.encode (amountString)),
+            this.numberToBE (1, 1), // bool set to true
+        ];
+        const binary = this.binaryConcatArray (byteArray);
+        const hash = this.hash (binary, 'keccak', 'hex');
+        const signature = this.signMessageString (hash, this.privateKey);
+        const request = {
+            'parameters': {
+                'nonce': nonce,
+                'wallet': this.walletAddress,
+                'asset': currency['id'],
+                'quantity': amountString,
+            },
+            'signature': signature,
+        };
+        // {
+        //   withdrawalId: 'a61dcff0-ec4d-11ea-8b83-c78a6ecb3180',
+        //   asset: 'ETH',
+        //   assetContractAddress: '0x0000000000000000000000000000000000000000',
+        //   quantity: '0.20000000',
+        //   time: 1598962883190,
+        //   fee: '0.00024000',
+        //   txStatus: 'pending',
+        //   txId: null
+        // }
+        const response = await this.privatePostWithdrawals (this.extend (request, params));
+        const id = this.safeString (response, 'withdrawalId');
+        return {
+            'info': response,
+            'id': id,
+        };
+    }
+
+    async cancelOrder (id, symbol = undefined, params = {}) {
+        await this.loadMarkets ();
+        let market = undefined;
+        if (symbol !== undefined) {
+            market = this.market (symbol);
+        }
+        const nonce = this.uuidv1 ();
+        const walletBytes = this.remove0xPrefix (this.walletAddress);
+        const byteArray = [
+            this.base16ToBinary (nonce),
+            this.base16ToBinary (walletBytes),
+            this.stringToBinary (this.encode (id)),
+        ];
+        const binary = this.binaryConcatArray (byteArray);
+        const hash = this.hash (binary, 'keccak', 'hex');
+        const signature = this.signMessageString (hash, this.privateKey);
+        const request = {
+            'parameters': {
+                'nonce': nonce,
+                'wallet': this.walletAddress,
+                'orderId': id,
+            },
+            'signature': signature,
+        };
+        // [ { orderId: '688336f0-ec50-11ea-9842-b332f8a34d0e' } ]
+        const response = await this.privateDeleteOrders (this.extend (request, params));
+        const canceledOrder = this.safeValue (response, 0);
+        return this.parseOrder (canceledOrder, market);
+    }
+
+    handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
+        const errorCode = this.safeString (response, 'code');
+        const message = this.safeString (response, 'message');
+        if (errorCode in this.exceptions) {
+            const Exception = this.exceptions[errorCode];
+            throw new Exception (this.id + ' ' + message);
+        }
+        if (errorCode !== undefined) {
+            throw new ExchangeError (this.id + ' ' + message);
+        }
+    }
+
+    async fetchDeposits (code = undefined, since = undefined, limit = undefined, params = {}) {
+        params = this.extend ({
+            'method': 'privateGetDeposits',
+        }, params);
+        return this.fetchTransactionsHelper (code, since, limit, params);
+    }
+
+    async fetchWithdrawals (code = undefined, since = undefined, limit = undefined, params = {}) {
+        params = this.extend ({
+            'method': 'privateGetWithdrawals',
+        }, params);
+        return this.fetchTransactionsHelper (code, since, limit, params);
+    }
+
+    async fetchTransactionsHelper (code = undefined, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const nonce = this.uuidv1 ();
+        const request = {
+            'nonce': nonce,
+            'wallet': this.walletAddress,
+        };
+        let currency = undefined;
+        if (code !== undefined) {
+            currency = this.currency (code);
+            request['asset'] = currency['id'];
+        }
+        if (since !== undefined) {
+            request['start'] = since;
+        }
+        if (limit !== undefined) {
+            request['limit'] = limit;
+        }
+        // [
+        //   {
+        //     depositId: 'e9970cc0-eb6b-11ea-9e89-09a5ebc1f98e',
+        //     asset: 'ETH',
+        //     quantity: '1.00000000',
+        //     txId: '0xcd4aac3171d7131cc9e795568c67938675185ac17641553ef54c8a7c294c8142',
+        //     txTime: 1598865853000,
+        //     confirmationTime: 1598865930231
+        //   }
+        // ]
+        const method = params['method'];
+        params = this.omit (params, 'method');
+        const response = await this[method] (this.extend (request, params));
+        return this.parseTransactions (response, currency, since, limit);
+    }
+
+    parseTransactionStatus (status) {
+        const statuses = {
+            'mined': 'ok',
+        };
+        return this.safeString (statuses, status, status);
+    }
+
+    parseTransaction (transaction, currency = undefined) {
+        // fetchDeposits
+        // {
+        //   depositId: 'e9970cc0-eb6b-11ea-9e89-09a5ebc1f98f',
+        //   asset: 'ETH',
+        //   quantity: '1.00000000',
+        //   txId: '0xcd4aac3171d7131cc9e795568c67938675185ac17641553ef54c8a7c294c8142',
+        //   txTime: 1598865853000,
+        //   confirmationTime: 1598865930231
+        // }
+        // fetchWithdrwalas
+        // {
+        //   withdrawalId: 'a62d8760-ec4d-11ea-9fa6-47904c19499b',
+        //   asset: 'ETH',
+        //   assetContractAddress: '0x0000000000000000000000000000000000000000',
+        //   quantity: '0.20000000',
+        //   time: 1598962883288,
+        //   fee: '0.00024000',
+        //   txId: '0x305e9cdbaa85ad029f50578d13d31d777c085de573ed5334d95c19116d8c03ce',
+        //   txStatus: 'mined'
+        //  }
+        let type = undefined;
+        if ('depositId' in transaction) {
+            type = 'deposit';
+        } else if ('withdrawalId' in transaction) {
+            type = 'withdrawal';
+        }
+        const id = this.safeString2 (transaction, 'depositId', 'withdrawId');
+        const code = this.safeCurrencyCode (this.safeString (transaction, 'asset'), currency);
+        const amount = this.safeFloat (transaction, 'quantity');
+        const txid = this.safeString (transaction, 'txId');
+        const timestamp = this.safeInteger (transaction, 'txTime');
+        let fee = undefined;
+        if ('fee' in transaction) {
+            fee = {
+                'cost': this.safeFloat (transaction, 'fee'),
+                'currency': 'ETH',
+            };
+        }
+        const rawStatus = this.safeString (transaction, 'txStatus');
+        const status = this.parseTransactionStatus (rawStatus);
+        const updated = this.safeInteger (transaction, 'confirmationTime');
+        return {
+            'info': transaction,
+            'id': id,
+            'txid': txid,
+            'timestamp': timestamp,
+            'datetime': this.iso8601 (timestamp),
+            'address': undefined,
+            'tag': undefined,
+            'type': type,
+            'amount': amount,
+            'currency': code,
+            'status': status,
+            'updated': updated,
+            'fee': fee,
+        };
+    }
+
+    sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
+        const version = this.safeString (this.options, 'version', 'v1');
+        let url = this.urls['api'][api] + '/' + version + '/' + path;
+        const keys = Object.keys (params);
+        const length = keys.length;
+        let query = undefined;
+        if (length > 0) {
+            if (method === 'GET') {
+                query = this.urlencode (params);
+                url = url + '?' + query;
+            } else {
+                body = this.json (params);
+            }
+        }
+        headers = {
+            'Content-Type': 'application/json',
+        };
+        if (this.apiKey !== undefined) {
+            headers['IDEX-API-Key'] = this.apiKey;
+        }
+        if (api === 'private') {
+            let payload = undefined;
+            if (method === 'GET') {
+                payload = query;
+            } else {
+                payload = body;
+            }
+            headers['IDEX-HMAC-Signature'] = this.hmac (this.encode (payload), this.encode (this.secret), 'sha256', 'hex');
+        }
+        return { 'url': url, 'method': method, 'body': body, 'headers': headers };
+    }
+};
+
+},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],98:[function(require,module,exports){
+'use strict';
+
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
@@ -76829,7 +78026,7 @@ module.exports = class independentreserve extends Exchange {
     }
 };
 
-},{"./base/Exchange":5}],98:[function(require,module,exports){
+},{"./base/Exchange":5}],99:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -77444,7 +78641,7 @@ module.exports = class indodax extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],99:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],100:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -78094,7 +79291,7 @@ module.exports = class itbit extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],100:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],101:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -79787,7 +80984,7 @@ module.exports = class kraken extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],101:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],102:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -81633,7 +82830,7 @@ module.exports = class kucoin extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],102:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],103:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -81849,7 +83046,7 @@ module.exports = class kuna extends acx {
     }
 };
 
-},{"./acx.js":3,"./base/errors":7}],103:[function(require,module,exports){
+},{"./acx.js":3,"./base/errors":7}],104:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -82182,7 +83379,7 @@ module.exports = class lakebtc extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],104:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],105:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -83081,7 +84278,7 @@ module.exports = class latoken extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],105:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],106:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -83779,7 +84976,7 @@ module.exports = class lbank extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],106:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],107:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -84912,7 +86109,7 @@ module.exports = class liquid extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],107:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],108:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -85852,7 +87049,7 @@ module.exports = class livecoin extends Exchange {
 };
 
 
-},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],108:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],109:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -86502,7 +87699,7 @@ module.exports = class luno extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],109:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],110:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -87127,7 +88324,7 @@ module.exports = class lykke extends Exchange {
     }
 };
 
-},{"./base/Exchange":5}],110:[function(require,module,exports){
+},{"./base/Exchange":5}],111:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -87642,7 +88839,7 @@ module.exports = class mercado extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],111:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],112:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -87873,7 +89070,7 @@ module.exports = class mixcoins extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],112:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],113:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -88586,7 +89783,7 @@ module.exports = class oceanex extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],113:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],114:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -88623,7 +89820,7 @@ module.exports = class okcoin extends okex {
     }
 };
 
-},{"./okex.js":114}],114:[function(require,module,exports){
+},{"./okex.js":115}],115:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -91944,7 +93141,7 @@ module.exports = class okex extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],115:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],116:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -92209,7 +93406,7 @@ module.exports = class paymium extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],116:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],117:[function(require,module,exports){
 'use strict';
 
 // ----------------------------------------------------------------------------
@@ -94448,7 +95645,7 @@ module.exports = class phemex extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],117:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],118:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -96016,7 +97213,7 @@ module.exports = class poloniex extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],118:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],119:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -97324,7 +98521,7 @@ module.exports = class probit extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],119:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],120:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -98903,7 +100100,7 @@ module.exports = class qtrade extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],120:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],121:[function(require,module,exports){
 'use strict';
 
 const Exchange = require ('./base/Exchange');
@@ -99676,7 +100873,7 @@ module.exports = class rightbtc extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],121:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],122:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -100375,7 +101572,7 @@ module.exports = class southxchange extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],122:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],123:[function(require,module,exports){
 (function (module, exports) {
     'use strict';
 
@@ -103903,7 +105100,7 @@ module.exports = class southxchange extends Exchange {
     };
 })(typeof module === 'undefined' || module, this);
 
-},{"buffer":184}],123:[function(require,module,exports){
+},{"buffer":185}],124:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -109892,7 +111089,7 @@ module.exports = class southxchange extends Exchange {
 	return CryptoJS;
 
 }));
-},{}],124:[function(require,module,exports){
+},{}],125:[function(require,module,exports){
 'use strict';
 
 var elliptic = exports;
@@ -109916,7 +111113,7 @@ elliptic.curves = require('./elliptic/curves');
 elliptic.ec = require('./elliptic/ec');
 elliptic.eddsa = require('./elliptic/eddsa');
 
-},{"./elliptic/curve":127,"./elliptic/curves":130,"./elliptic/ec":131,"./elliptic/eddsa":134,"./elliptic/utils":138}],125:[function(require,module,exports){
+},{"./elliptic/curve":128,"./elliptic/curves":131,"./elliptic/ec":132,"./elliptic/eddsa":135,"./elliptic/utils":139}],126:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -110293,7 +111490,7 @@ BasePoint.prototype.dblp = function dblp(k) {
   return r;
 };
 
-},{"../../../../BN/bn":122,"../../elliptic":124}],126:[function(require,module,exports){
+},{"../../../../BN/bn":123,"../../elliptic":125}],127:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -110728,7 +111925,7 @@ Point.prototype.eqXToP = function eqXToP(x) {
 Point.prototype.toP = Point.prototype.normalize;
 Point.prototype.mixedAdd = Point.prototype.add;
 
-},{"../../../../BN/bn":122,"../../elliptic":124,"../curve":127}],127:[function(require,module,exports){
+},{"../../../../BN/bn":123,"../../elliptic":125,"../curve":128}],128:[function(require,module,exports){
 'use strict';
 
 var curve = exports;
@@ -110738,7 +111935,7 @@ curve.short = require('./short');
 curve.mont = require('./mont');
 curve.edwards = require('./edwards');
 
-},{"./base":125,"./edwards":126,"./mont":128,"./short":129}],128:[function(require,module,exports){
+},{"./base":126,"./edwards":127,"./mont":129,"./short":130}],129:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -110920,7 +112117,7 @@ Point.prototype.getX = function getX() {
   return this.x.fromRed();
 };
 
-},{"../../../../BN/bn":122,"../../elliptic":124,"../curve":127}],129:[function(require,module,exports){
+},{"../../../../BN/bn":123,"../../elliptic":125,"../curve":128}],130:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -111860,7 +113057,7 @@ JPoint.prototype.isInfinity = function isInfinity() {
   return this.z.cmpn(0) === 0;
 };
 
-},{"../../../../BN/bn":122,"../../elliptic":124,"../curve":127}],130:[function(require,module,exports){
+},{"../../../../BN/bn":123,"../../elliptic":125,"../curve":128}],131:[function(require,module,exports){
 'use strict';
 
 var curves = exports;
@@ -112066,7 +113263,7 @@ defineCurve('secp256k1', {
   ]
 });
 
-},{"../elliptic":124,"./precomputed/secp256k1":137}],131:[function(require,module,exports){
+},{"../elliptic":125,"./precomputed/secp256k1":138}],132:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -112308,7 +113505,7 @@ EC.prototype.getKeyRecoveryParam = function(e, signature, Q, enc) {
   throw new Error('Unable to find valid recovery factor');
 };
 
-},{"../../../../BN/bn":122,"../../elliptic":124,"../../hmac-drbg/hmac-drbg":139,"./key":132,"./signature":133}],132:[function(require,module,exports){
+},{"../../../../BN/bn":123,"../../elliptic":125,"../../hmac-drbg/hmac-drbg":140,"./key":133,"./signature":134}],133:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -112429,7 +113626,7 @@ KeyPair.prototype.inspect = function inspect() {
          ' pub: ' + (this.pub && this.pub.inspect()) + ' >';
 };
 
-},{"../../../../BN/bn":122,"../../elliptic":124}],133:[function(require,module,exports){
+},{"../../../../BN/bn":123,"../../elliptic":125}],134:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -112455,7 +113652,7 @@ function Signature(options, enc) {
 }
 module.exports = Signature;
 
-},{"../../../../BN/bn":122,"../../elliptic":124}],134:[function(require,module,exports){
+},{"../../../../BN/bn":123,"../../elliptic":125}],135:[function(require,module,exports){
 'use strict';
 
 var curves = require('../curves');
@@ -112602,7 +113799,7 @@ EDDSA.prototype.isPoint = function isPoint(val) {
   return val instanceof this.pointClass;
 };
 
-},{"../../../../../base/functions/encode":10,"../../../../BN/bn.js":122,"../../../../crypto-js/crypto-js":123,"../curves":130,"../utils":138,"./key":135,"./signature":136}],135:[function(require,module,exports){
+},{"../../../../../base/functions/encode":10,"../../../../BN/bn.js":123,"../../../../crypto-js/crypto-js":124,"../curves":131,"../utils":139,"./key":136,"./signature":137}],136:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -112704,7 +113901,7 @@ KeyPair.prototype.getPublic = function getPublic(enc) {
 
 module.exports = KeyPair;
 
-},{"../utils":138}],136:[function(require,module,exports){
+},{"../utils":139}],137:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -112771,7 +113968,7 @@ Signature.prototype.toHex = function toHex() {
 
 module.exports = Signature;
 
-},{"../../../../BN/bn":122,"../utils":138}],137:[function(require,module,exports){
+},{"../../../../BN/bn":123,"../utils":139}],138:[function(require,module,exports){
 module.exports = {
   doubles: {
     step: 4,
@@ -113553,7 +114750,7 @@ module.exports = {
   }
 };
 
-},{}],138:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 'use strict';
 
 var utils = exports;
@@ -113769,7 +114966,7 @@ utils.encode = function encode(arr, enc) {
     return arr;
 };
 
-},{"../../../BN/bn":122}],139:[function(require,module,exports){
+},{"../../../BN/bn":123}],140:[function(require,module,exports){
 'use strict';
 
 var CryptoJS = require('../../../crypto-js/crypto-js');
@@ -113885,7 +115082,7 @@ HmacDRBG.prototype.generate = function generate(len, enc, add, addEnc) {
   return utils.wordArrayToBuffer(res);
 };
 
-},{"../../../../base/functions/encode":10,"../../../crypto-js/crypto-js":123,"../elliptic/utils":138}],140:[function(require,module,exports){
+},{"../../../../base/functions/encode":10,"../../../crypto-js/crypto-js":124,"../elliptic/utils":139}],141:[function(require,module,exports){
 'use strict';
 
 var fetch = require('../node-fetch/index');
@@ -113926,7 +115123,7 @@ module.exports = function (context) {
   };
 };
 
-},{"../node-fetch/index":141}],141:[function(require,module,exports){
+},{"../node-fetch/index":142}],142:[function(require,module,exports){
 (function (global,Buffer){
 'use strict';
 
@@ -115494,7 +116691,7 @@ exports.Response = Response;
 exports.FetchError = FetchError;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"buffer":184,"http":226,"https":189,"stream":225,"url":232,"zlib":183}],142:[function(require,module,exports){
+},{"buffer":185,"http":227,"https":190,"stream":226,"url":233,"zlib":184}],143:[function(require,module,exports){
 (function (Buffer){
 /*!
  * RSA library for Node.js
@@ -115721,7 +116918,7 @@ module.exports = (function () {
 })();
 
 }).call(this,require("buffer").Buffer)
-},{"./formats/formats.js":149,"./libs/rsa.js":153,"./schemes/schemes.js":155,"./utils":156,"buffer":184}],143:[function(require,module,exports){
+},{"./formats/formats.js":150,"./libs/rsa.js":154,"./schemes/schemes.js":156,"./utils":157,"buffer":185}],144:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 
@@ -115736,7 +116933,7 @@ module.exports = {
 
 };
 
-},{}],144:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 var errors = require('./errors');
@@ -115759,7 +116956,7 @@ for (var e in errors) {
     module.exports[e] = errors[e];
 }
 
-},{"./errors":143,"./reader":145,"./types":146}],145:[function(require,module,exports){
+},{"./errors":144,"./reader":146,"./types":147}],146:[function(require,module,exports){
 (function (Buffer){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
@@ -116025,7 +117222,7 @@ Reader.prototype._readTag = function (tag) {
 module.exports = Reader;
 
 }).call(this,require("buffer").Buffer)
-},{"./errors":143,"./types":146,"assert":179,"buffer":184}],146:[function(require,module,exports){
+},{"./errors":144,"./types":147,"assert":180,"buffer":185}],147:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 
@@ -116063,7 +117260,7 @@ module.exports = {
   Context: 128
 };
 
-},{}],147:[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 // If you have no idea what ASN.1 or BER is, see this:
@@ -116082,7 +117279,7 @@ module.exports = {
   BerReader: Ber.Reader,
 };
 
-},{"./ber/index":144}],148:[function(require,module,exports){
+},{"./ber/index":145}],149:[function(require,module,exports){
 var _ = require('../utils')._;
 var utils = require('../utils');
 
@@ -116155,7 +117352,7 @@ module.exports = {
     }
 };
 
-},{"../utils":156}],149:[function(require,module,exports){
+},{"../utils":157}],150:[function(require,module,exports){
 var _ = require('../utils')._;
 
 module.exports = {
@@ -116188,7 +117385,7 @@ module.exports = {
     },
 };
 
-},{"../utils":156,"./components":148,"./pkcs1":150,"./pkcs8":151}],150:[function(require,module,exports){
+},{"../utils":157,"./components":149,"./pkcs1":151,"./pkcs8":152}],151:[function(require,module,exports){
 (function (Buffer){
 var ber = require('../asn1/index').Ber;
 var _ = require('../utils')._;
@@ -116340,7 +117537,7 @@ module.exports = {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"../asn1/index":147,"../utils":156,"buffer":184}],151:[function(require,module,exports){
+},{"../asn1/index":148,"../utils":157,"buffer":185}],152:[function(require,module,exports){
 (function (Buffer){
 var ber = require('../asn1/index').Ber;
 var _ = require('../utils')._;
@@ -116531,7 +117728,7 @@ module.exports = {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"../asn1/index":147,"../utils":156,"buffer":184}],152:[function(require,module,exports){
+},{"../asn1/index":148,"../utils":157,"buffer":185}],153:[function(require,module,exports){
 (function (Buffer){
 /*
  * Basic JavaScript BN library - subset useful for RSA encryption.
@@ -117787,7 +118984,7 @@ BigInteger.prototype.square = bnSquare;
 module.exports = BigInteger;
 
 }).call(this,require("buffer").Buffer)
-},{"../utils":156,"buffer":184}],153:[function(require,module,exports){
+},{"../utils":157,"buffer":185}],154:[function(require,module,exports){
 /*
  * RSA Encryption / Decryption with PKCS1 v2 Padding.
  *
@@ -117936,7 +119133,7 @@ module.exports.Key = (function () {
 })();
 
 
-},{"../schemes/schemes.js":155,"../utils":156,"../utils.js":156,"./jsbn.js":152}],154:[function(require,module,exports){
+},{"../schemes/schemes.js":156,"../utils":157,"../utils.js":157,"./jsbn.js":153}],155:[function(require,module,exports){
 (function (Buffer){
 /**
  * PKCS1 padding and signature scheme
@@ -118116,7 +119313,7 @@ function wordArrayToBuffer(wordArray) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"../../crypto-js/crypto-js":123,"../libs/jsbn":152,"buffer":184,"constants":186}],155:[function(require,module,exports){
+},{"../../crypto-js/crypto-js":124,"../libs/jsbn":153,"buffer":185,"constants":187}],156:[function(require,module,exports){
 module.exports = {
     pkcs1: require('./pkcs1'),
 
@@ -118139,7 +119336,7 @@ module.exports = {
     }
 };
 
-},{"./pkcs1":154}],156:[function(require,module,exports){
+},{"./pkcs1":155}],157:[function(require,module,exports){
 /*
  * Utils functions
  *
@@ -118239,7 +119436,7 @@ module.exports.trimSurroundingText = function (data, opening, closing) {
     return data.substring(trimStartIndex, trimEndIndex);
 }
 
-},{}],157:[function(require,module,exports){
+},{}],158:[function(require,module,exports){
 'use strict';
 
 var replace = String.prototype.replace;
@@ -118259,7 +119456,7 @@ module.exports = {
     RFC3986: 'RFC3986'
 };
 
-},{}],158:[function(require,module,exports){
+},{}],159:[function(require,module,exports){
 'use strict';
 
 var stringify = require('./stringify');
@@ -118272,7 +119469,7 @@ module.exports = {
     stringify: stringify
 };
 
-},{"./formats":157,"./parse":159,"./stringify":160}],159:[function(require,module,exports){
+},{"./formats":158,"./parse":160,"./stringify":161}],160:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -118516,7 +119713,7 @@ module.exports = function (str, opts) {
     return utils.compact(obj);
 };
 
-},{"./utils":161}],160:[function(require,module,exports){
+},{"./utils":162}],161:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -118787,7 +119984,7 @@ module.exports = function (object, opts) {
     return joined.length > 0 ? prefix + joined : '';
 };
 
-},{"./formats":157,"./utils":161}],161:[function(require,module,exports){
+},{"./formats":158,"./utils":162}],162:[function(require,module,exports){
 'use strict';
 
 var has = Object.prototype.hasOwnProperty;
@@ -119019,7 +120216,7 @@ module.exports = {
     merge: merge
 };
 
-},{}],162:[function(require,module,exports){
+},{}],163:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -120845,7 +122042,7 @@ module.exports = class stex extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],163:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],164:[function(require,module,exports){
 'use strict';
 
 // ----------------------------------------------------------------------------
@@ -121641,7 +122838,7 @@ module.exports = class stronghold extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],164:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],165:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -121675,7 +122872,7 @@ module.exports = class surbitcoin extends foxbit {
     }
 };
 
-},{"./foxbit.js":85}],165:[function(require,module,exports){
+},{"./foxbit.js":85}],166:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -122914,7 +124111,7 @@ module.exports = class therock extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],166:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],167:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -123464,7 +124661,7 @@ module.exports = class tidebit extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],167:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],168:[function(require,module,exports){
 'use strict';
 
 const Exchange = require ('./base/Exchange');
@@ -124335,7 +125532,7 @@ module.exports = class tidex extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],168:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],169:[function(require,module,exports){
 'use strict';
 
 const Exchange = require ('./base/Exchange');
@@ -125598,7 +126795,7 @@ module.exports = class timex extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],169:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],170:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -127149,7 +128346,7 @@ module.exports = class upbit extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],170:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],171:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -127354,7 +128551,7 @@ module.exports = class vaultoro extends Exchange {
     }
 };
 
-},{"./base/Exchange":5}],171:[function(require,module,exports){
+},{"./base/Exchange":5}],172:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -127388,7 +128585,7 @@ module.exports = class vbtc extends foxbit {
     }
 };
 
-},{"./foxbit.js":85}],172:[function(require,module,exports){
+},{"./foxbit.js":85}],173:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -127897,7 +129094,7 @@ module.exports = class wavesexchange extends Exchange {
             seconds = seconds.toString ();
             const clientId = 'waves.exchange';
             const message = 'W:' + clientId + ':' + seconds;
-            const messageHex = this.decode (this.binaryToBase16 (this.stringToBinary (this.encode (message))));
+            const messageHex = this.binaryToBase16 (this.stringToBinary (this.encode (message)));
             const payload = prefix + messageHex;
             const hexKey = this.binaryToBase16 (this.base58ToBinary (this.secret));
             const signature = this.eddsa (payload, hexKey, 'ed25519');
@@ -129027,7 +130224,7 @@ module.exports = class wavesexchange extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],173:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],174:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -129682,7 +130879,7 @@ module.exports = class whitebit extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],174:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],175:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -130054,7 +131251,7 @@ module.exports = class xbtce extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],175:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],176:[function(require,module,exports){
 'use strict';
 
 const Exchange = require ('./base/Exchange');
@@ -131803,7 +133000,7 @@ module.exports = class xena extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],176:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],177:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -132752,7 +133949,7 @@ module.exports = class yobit extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],177:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],178:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -133271,7 +134468,7 @@ module.exports = class zaif extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],178:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],179:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -133929,7 +135126,7 @@ module.exports = class zb extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],179:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],180:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -134423,7 +135620,7 @@ var objectKeys = Object.keys || function (obj) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"util/":237}],180:[function(require,module,exports){
+},{"util/":238}],181:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -134539,9 +135736,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],181:[function(require,module,exports){
-
 },{}],182:[function(require,module,exports){
+
+},{}],183:[function(require,module,exports){
 (function (process,Buffer){
 'use strict';
 /* eslint camelcase: "off" */
@@ -134953,7 +136150,7 @@ Zlib.prototype._reset = function () {
 
 exports.Zlib = Zlib;
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":206,"assert":179,"buffer":184,"pako/lib/zlib/constants":196,"pako/lib/zlib/deflate.js":198,"pako/lib/zlib/inflate.js":200,"pako/lib/zlib/zstream":204}],183:[function(require,module,exports){
+},{"_process":207,"assert":180,"buffer":185,"pako/lib/zlib/constants":197,"pako/lib/zlib/deflate.js":199,"pako/lib/zlib/inflate.js":201,"pako/lib/zlib/zstream":205}],184:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -135565,7 +136762,7 @@ util.inherits(DeflateRaw, Zlib);
 util.inherits(InflateRaw, Zlib);
 util.inherits(Unzip, Zlib);
 }).call(this,require('_process'))
-},{"./binding":182,"_process":206,"assert":179,"buffer":184,"stream":225,"util":237}],184:[function(require,module,exports){
+},{"./binding":183,"_process":207,"assert":180,"buffer":185,"stream":226,"util":238}],185:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -137281,7 +138478,7 @@ function numberIsNaN (obj) {
   return obj !== obj // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":180,"ieee754":190}],185:[function(require,module,exports){
+},{"base64-js":181,"ieee754":191}],186:[function(require,module,exports){
 module.exports = {
   "100": "Continue",
   "101": "Switching Protocols",
@@ -137347,7 +138544,7 @@ module.exports = {
   "511": "Network Authentication Required"
 }
 
-},{}],186:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 module.exports={
   "O_RDONLY": 0,
   "O_WRONLY": 1,
@@ -137558,7 +138755,7 @@ module.exports={
   "UV_UDP_REUSEADDR": 4
 }
 
-},{}],187:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -137669,7 +138866,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":192}],188:[function(require,module,exports){
+},{"../../is-buffer/index.js":193}],189:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -137973,7 +139170,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],189:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 var http = require('http')
 var url = require('url')
 
@@ -138006,7 +139203,7 @@ function validateParams (params) {
   return params
 }
 
-},{"http":226,"url":232}],190:[function(require,module,exports){
+},{"http":227,"url":233}],191:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -138092,7 +139289,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],191:[function(require,module,exports){
+},{}],192:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -138117,7 +139314,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],192:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -138140,14 +139337,14 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],193:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],194:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 'use strict';
 
 
@@ -138254,7 +139451,7 @@ exports.setTyped = function (on) {
 
 exports.setTyped(TYPED_OK);
 
-},{}],195:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 'use strict';
 
 // Note: adler32 takes 12% for level 0 and 2% for level 6.
@@ -138307,7 +139504,7 @@ function adler32(adler, buf, len, pos) {
 
 module.exports = adler32;
 
-},{}],196:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -138377,7 +139574,7 @@ module.exports = {
   //Z_NULL:                 null // Use -1 or null inline, depending on var type
 };
 
-},{}],197:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 'use strict';
 
 // Note: we can't get significant speed boost here.
@@ -138438,7 +139635,7 @@ function crc32(crc, buf, len, pos) {
 
 module.exports = crc32;
 
-},{}],198:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -140314,7 +141511,7 @@ exports.deflatePrime = deflatePrime;
 exports.deflateTune = deflateTune;
 */
 
-},{"../utils/common":194,"./adler32":195,"./crc32":197,"./messages":202,"./trees":203}],199:[function(require,module,exports){
+},{"../utils/common":195,"./adler32":196,"./crc32":198,"./messages":203,"./trees":204}],200:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -140661,7 +141858,7 @@ module.exports = function inflate_fast(strm, start) {
   return;
 };
 
-},{}],200:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -142219,7 +143416,7 @@ exports.inflateSyncPoint = inflateSyncPoint;
 exports.inflateUndermine = inflateUndermine;
 */
 
-},{"../utils/common":194,"./adler32":195,"./crc32":197,"./inffast":199,"./inftrees":201}],201:[function(require,module,exports){
+},{"../utils/common":195,"./adler32":196,"./crc32":198,"./inffast":200,"./inftrees":202}],202:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -142564,7 +143761,7 @@ module.exports = function inflate_table(type, lens, lens_index, codes, table, ta
   return 0;
 };
 
-},{"../utils/common":194}],202:[function(require,module,exports){
+},{"../utils/common":195}],203:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -142598,7 +143795,7 @@ module.exports = {
   '-6':   'incompatible version' /* Z_VERSION_ERROR (-6) */
 };
 
-},{}],203:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -143820,7 +145017,7 @@ exports._tr_flush_block  = _tr_flush_block;
 exports._tr_tally = _tr_tally;
 exports._tr_align = _tr_align;
 
-},{"../utils/common":194}],204:[function(require,module,exports){
+},{"../utils/common":195}],205:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -143869,7 +145066,7 @@ function ZStream() {
 
 module.exports = ZStream;
 
-},{}],205:[function(require,module,exports){
+},{}],206:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -143916,7 +145113,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 }
 
 }).call(this,require('_process'))
-},{"_process":206}],206:[function(require,module,exports){
+},{"_process":207}],207:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -144102,7 +145299,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],207:[function(require,module,exports){
+},{}],208:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
@@ -144639,7 +145836,7 @@ process.umask = function() { return 0; };
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],208:[function(require,module,exports){
+},{}],209:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -144725,7 +145922,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],209:[function(require,module,exports){
+},{}],210:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -144812,16 +146009,16 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],210:[function(require,module,exports){
+},{}],211:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":208,"./encode":209}],211:[function(require,module,exports){
+},{"./decode":209,"./encode":210}],212:[function(require,module,exports){
 module.exports = require('./lib/_stream_duplex.js');
 
-},{"./lib/_stream_duplex.js":212}],212:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":213}],213:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -144946,7 +146143,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":214,"./_stream_writable":216,"core-util-is":187,"inherits":191,"process-nextick-args":205}],213:[function(require,module,exports){
+},{"./_stream_readable":215,"./_stream_writable":217,"core-util-is":188,"inherits":192,"process-nextick-args":206}],214:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -144994,7 +146191,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":215,"core-util-is":187,"inherits":191}],214:[function(require,module,exports){
+},{"./_stream_transform":216,"core-util-is":188,"inherits":192}],215:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -146004,7 +147201,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./_stream_duplex":212,"./internal/streams/BufferList":217,"./internal/streams/destroy":218,"./internal/streams/stream":219,"_process":206,"core-util-is":187,"events":188,"inherits":191,"isarray":193,"process-nextick-args":205,"safe-buffer":224,"string_decoder/":230,"util":181}],215:[function(require,module,exports){
+},{"./_stream_duplex":213,"./internal/streams/BufferList":218,"./internal/streams/destroy":219,"./internal/streams/stream":220,"_process":207,"core-util-is":188,"events":189,"inherits":192,"isarray":194,"process-nextick-args":206,"safe-buffer":225,"string_decoder/":231,"util":182}],216:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -146219,7 +147416,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":212,"core-util-is":187,"inherits":191}],216:[function(require,module,exports){
+},{"./_stream_duplex":213,"core-util-is":188,"inherits":192}],217:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -146886,7 +148083,7 @@ Writable.prototype._destroy = function (err, cb) {
   cb(err);
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./_stream_duplex":212,"./internal/streams/destroy":218,"./internal/streams/stream":219,"_process":206,"core-util-is":187,"inherits":191,"process-nextick-args":205,"safe-buffer":224,"util-deprecate":234}],217:[function(require,module,exports){
+},{"./_stream_duplex":213,"./internal/streams/destroy":219,"./internal/streams/stream":220,"_process":207,"core-util-is":188,"inherits":192,"process-nextick-args":206,"safe-buffer":225,"util-deprecate":235}],218:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -146961,7 +148158,7 @@ module.exports = function () {
 
   return BufferList;
 }();
-},{"safe-buffer":224}],218:[function(require,module,exports){
+},{"safe-buffer":225}],219:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -147034,13 +148231,13 @@ module.exports = {
   destroy: destroy,
   undestroy: undestroy
 };
-},{"process-nextick-args":205}],219:[function(require,module,exports){
+},{"process-nextick-args":206}],220:[function(require,module,exports){
 module.exports = require('events').EventEmitter;
 
-},{"events":188}],220:[function(require,module,exports){
+},{"events":189}],221:[function(require,module,exports){
 module.exports = require('./readable').PassThrough
 
-},{"./readable":221}],221:[function(require,module,exports){
+},{"./readable":222}],222:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = exports;
 exports.Readable = exports;
@@ -147049,13 +148246,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":212,"./lib/_stream_passthrough.js":213,"./lib/_stream_readable.js":214,"./lib/_stream_transform.js":215,"./lib/_stream_writable.js":216}],222:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":213,"./lib/_stream_passthrough.js":214,"./lib/_stream_readable.js":215,"./lib/_stream_transform.js":216,"./lib/_stream_writable.js":217}],223:[function(require,module,exports){
 module.exports = require('./readable').Transform
 
-},{"./readable":221}],223:[function(require,module,exports){
+},{"./readable":222}],224:[function(require,module,exports){
 module.exports = require('./lib/_stream_writable.js');
 
-},{"./lib/_stream_writable.js":216}],224:[function(require,module,exports){
+},{"./lib/_stream_writable.js":217}],225:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -147119,7 +148316,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":184}],225:[function(require,module,exports){
+},{"buffer":185}],226:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -147248,7 +148445,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":188,"inherits":191,"readable-stream/duplex.js":211,"readable-stream/passthrough.js":220,"readable-stream/readable.js":221,"readable-stream/transform.js":222,"readable-stream/writable.js":223}],226:[function(require,module,exports){
+},{"events":189,"inherits":192,"readable-stream/duplex.js":212,"readable-stream/passthrough.js":221,"readable-stream/readable.js":222,"readable-stream/transform.js":223,"readable-stream/writable.js":224}],227:[function(require,module,exports){
 (function (global){
 var ClientRequest = require('./lib/request')
 var extend = require('xtend')
@@ -147330,7 +148527,7 @@ http.METHODS = [
 	'UNSUBSCRIBE'
 ]
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./lib/request":228,"builtin-status-codes":185,"url":232,"xtend":238}],227:[function(require,module,exports){
+},{"./lib/request":229,"builtin-status-codes":186,"url":233,"xtend":239}],228:[function(require,module,exports){
 (function (global){
 exports.fetch = isFunction(global.fetch) && isFunction(global.ReadableStream)
 
@@ -147403,7 +148600,7 @@ function isFunction (value) {
 xhr = null // Help gc
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],228:[function(require,module,exports){
+},{}],229:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -147713,7 +148910,7 @@ var unsafeHeaders = [
 ]
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":227,"./response":229,"_process":206,"buffer":184,"inherits":191,"readable-stream":221,"to-arraybuffer":231}],229:[function(require,module,exports){
+},{"./capability":228,"./response":230,"_process":207,"buffer":185,"inherits":192,"readable-stream":222,"to-arraybuffer":232}],230:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -147899,7 +149096,7 @@ IncomingMessage.prototype._onXHRProgress = function () {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":227,"_process":206,"buffer":184,"inherits":191,"readable-stream":221}],230:[function(require,module,exports){
+},{"./capability":228,"_process":207,"buffer":185,"inherits":192,"readable-stream":222}],231:[function(require,module,exports){
 'use strict';
 
 var Buffer = require('safe-buffer').Buffer;
@@ -148172,7 +149369,7 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":224}],231:[function(require,module,exports){
+},{"safe-buffer":225}],232:[function(require,module,exports){
 var Buffer = require('buffer').Buffer
 
 module.exports = function (buf) {
@@ -148201,7 +149398,7 @@ module.exports = function (buf) {
 	}
 }
 
-},{"buffer":184}],232:[function(require,module,exports){
+},{"buffer":185}],233:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -148935,7 +150132,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":233,"punycode":207,"querystring":210}],233:[function(require,module,exports){
+},{"./util":234,"punycode":208,"querystring":211}],234:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -148953,7 +150150,7 @@ module.exports = {
   }
 };
 
-},{}],234:[function(require,module,exports){
+},{}],235:[function(require,module,exports){
 (function (global){
 
 /**
@@ -149024,16 +150221,16 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],235:[function(require,module,exports){
-arguments[4][191][0].apply(exports,arguments)
-},{"dup":191}],236:[function(require,module,exports){
+},{}],236:[function(require,module,exports){
+arguments[4][192][0].apply(exports,arguments)
+},{"dup":192}],237:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],237:[function(require,module,exports){
+},{}],238:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -149623,7 +150820,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":236,"_process":206,"inherits":235}],238:[function(require,module,exports){
+},{"./support/isBuffer":237,"_process":207,"inherits":236}],239:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
