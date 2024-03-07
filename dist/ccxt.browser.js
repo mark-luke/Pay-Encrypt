@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.37'
+const version = '1.30.41'
 
 Exchange.ccxtVersion = version
 
@@ -4411,12 +4411,10 @@ module.exports = class Exchange {
     filterBySinceLimit (array, since = undefined, limit = undefined, key = 'timestamp', tail = false) {
         const sinceIsDefined = (since !== undefined && since !== null)
         if (sinceIsDefined) {
-            array = Object.values (array).filter ((entry) => entry[key] >= since)
+            array = array.filter ((entry) => entry[key] >= since)
         }
         if (limit !== undefined && limit !== null) {
-            array = (tail && !sinceIsDefined) ?
-                Object.values (array).slice (-limit) :
-                Object.values (array).slice (0, limit)
+            array = (tail && !sinceIsDefined) ? array.slice (-limit) : array.slice (0, limit)
         }
         return array
     }
@@ -4428,15 +4426,13 @@ module.exports = class Exchange {
 
         // single-pass filter for both symbol and since
         if (valueIsDefined || sinceIsDefined) {
-            array = Object.values (array).filter ((entry) =>
+            array = array.filter ((entry) =>
                 ((valueIsDefined ? (entry[field] === value) : true) &&
                  (sinceIsDefined ? (entry[key] >= since) : true)))
         }
 
         if (limit !== undefined && limit !== null) {
-            array = ((tail && !sinceIsDefined) ?
-                Object.values (array).slice (-limit) :
-                Object.values (array).slice (0, limit))
+            array = (tail && !sinceIsDefined) ? array.slice (-limit) : array.slice (0, limit)
         }
 
         return array
@@ -69674,7 +69670,7 @@ module.exports = class idex extends Exchange {
             'address': this.walletAddress,
         };
         if (since !== undefined) {
-            request['start'] = parseInt (Math.floor (since / 1000));
+            request['start'] = parseInt (since / 1000);
         }
         const response = await this.publicPostReturnDepositsWithdrawals (this.extend (request, params));
         // { deposits:
@@ -69774,6 +69770,9 @@ module.exports = class idex extends Exchange {
         if (symbol !== undefined) {
             market = this.market (symbol);
             request['market'] = market['id'];
+        }
+        if (limit !== undefined) {
+            request['count'] = limit;
         }
         const response = await this.publicPostReturnOpenOrders (this.extend (request, params));
         // [ { timestamp: 1564041428,
@@ -69938,8 +69937,11 @@ module.exports = class idex extends Exchange {
             market = this.market (symbol);
             request['market'] = market['id'];
         }
+        if (since !== undefined) {
+            request['start'] = parseInt (since / 1000);
+        }
         if (limit !== undefined) {
-            request['start'] = parseInt (Math.floor (limit));
+            request['count'] = limit;
         }
         const response = await this.publicPostReturnTradeHistory (this.extend (request, params));
         // { ETH_IDEX:
@@ -85525,7 +85527,7 @@ module.exports = class phemex extends Exchange {
                 'fetchDepositAddress': true,
                 'fetchOrder': true,
                 'fetchOrders': true,
-                'fetchOpenOrdrs': true,
+                'fetchOpenOrders': true,
                 'fetchClosedOrders': true,
                 'fetchMyTrades': true,
             },
