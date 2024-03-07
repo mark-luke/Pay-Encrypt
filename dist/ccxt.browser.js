@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.97'
+const version = '1.20.98'
 
 Exchange.ccxtVersion = version
 
@@ -76822,7 +76822,7 @@ module.exports = class poloniex extends Exchange {
         const request = { 'currencyPair': pair };
         if (since !== undefined) {
             request['start'] = parseInt (since / 1000);
-            request['end'] = this.seconds () + 1; // adding 1 is a fix for #3411
+            request['end'] = this.sum (this.seconds (), 1); // adding 1 is a fix for #3411
         }
         // limit is disabled (does not really work as expected)
         if (limit !== undefined) {
