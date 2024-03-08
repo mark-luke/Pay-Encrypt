@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.78'
+const version = '1.26.80'
 
 Exchange.ccxtVersion = version
 
@@ -18193,7 +18193,7 @@ module.exports = class bitforex extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ExchangeNotAvailable, AuthenticationError, BadRequest, PermissionDenied, InvalidAddress, ArgumentsRequired } = require ('./base/errors');
+const { ExchangeError, ExchangeNotAvailable, AuthenticationError, BadRequest, PermissionDenied, InvalidAddress, ArgumentsRequired, InvalidOrder } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -18525,8 +18525,14 @@ module.exports = class bithumb extends Exchange {
         }
         const response = await this[method] (this.extend (request, params));
         const id = this.safeString (response, 'order_id');
+        if (id === undefined) {
+            throw new InvalidOrder (this.id + ' createOrder did not return an order id');
+        }
         return {
             'info': response,
+            'symbol': symbol,
+            'type': type,
+            'side': side,
             'id': id,
         };
     }
@@ -36284,7 +36290,7 @@ module.exports = class bytetrade extends Exchange {
                 this.numberToLE (address.length, 1),
                 this.stringToBinary (this.encode (address)),
                 this.numberToLE (parseInt (coinId), 4),
-                this.numberToLE (Math.floor (parseInt (parseFloat (this.integerDivide (amountChain, eightBytes)))), 8),
+                this.numberToLE (this.integerDivide (amountChain, eightBytes), 8),
                 this.numberToLE (this.integerModulo (amountChain, eightBytes), 8),
                 this.numberToLE (1, 1),
                 this.numberToLE (this.integerDivide (assetFee, eightBytes), 8),
@@ -36317,7 +36323,7 @@ module.exports = class bytetrade extends Exchange {
                 this.numberToLE (middleAddress.length, 1),
                 this.stringToBinary (this.encode (middleAddress)),
                 this.numberToLE (parseInt (coinId), 4),
-                this.numberToLE (Math.floor (parseInt (parseFloat (this.integerDivide (amountChain, eightBytes)))), 8),
+                this.numberToLE (this.integerDivide (amountChain, eightBytes), 8),
                 this.numberToLE (this.integerModulo (amountChain, eightBytes), 8),
                 this.numberToLE (0, 1),
                 this.numberToLE (1, 1),
