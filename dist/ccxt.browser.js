@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.82'
+const version = '1.29.83'
 
 Exchange.ccxtVersion = version
 
@@ -22177,6 +22177,8 @@ module.exports = class bitmex extends Exchange {
                 request['clOrdID'] = clientOrderId;
             }
             params = this.omit (params, [ 'origClOrdID', 'clOrdID', 'clientOrderId' ]);
+        } else {
+            request['orderID'] = id;
         }
         if (amount !== undefined) {
             request['orderQty'] = amount;
