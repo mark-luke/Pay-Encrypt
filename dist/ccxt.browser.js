@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.19'
+const version = '1.30.20'
 
 Exchange.ccxtVersion = version
 
@@ -26607,7 +26607,7 @@ module.exports = class bitvavo extends Exchange {
         return this.parseTrades (response, market, since, limit);
     }
 
-    parseTrade (trade, market) {
+    parseTrade (trade, market = undefined) {
         //
         // fetchTrades (public)
         //
