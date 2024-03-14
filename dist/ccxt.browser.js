@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1138'
+const version = '1.18.1139'
 
 Exchange.ccxtVersion = version
 
@@ -12103,7 +12103,22 @@ module.exports = class bitbay extends Exchange {
             'payment_currency': market['quoteId'],
             'rate': price,
         };
-        return await this.privatePostTrade (this.extend (request, params));
+        //   {
+        //     "success": 1,
+        //     "order_id": 324057928260,
+        //     "amount": 0.01,
+        //     "rate": 2000,
+        //     "price": 20,
+        //     "fee": 0,
+        //     "fee_currency": "EUR",
+        //     "wrong": [],
+        //     "bought": []
+        //   }
+        const res = await this.privatePostTrade (this.extend (request, params));
+        return {
+            'id': this.safeString (res, 'order_id'),
+            'info': res,
+        };
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
