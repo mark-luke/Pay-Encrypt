@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.10'
+const version = '1.32.11'
 
 Exchange.ccxtVersion = version
 
@@ -77476,6 +77476,15 @@ module.exports = class kucoin extends Exchange {
             const payload = timestamp + method + endpoint + endpart;
             const signature = this.hmac (this.encode (payload), this.encode (this.secret), 'sha256', 'base64');
             headers['KC-API-SIGN'] = this.decode (signature);
+            const partner = this.safeValue (this.options, 'partner', {});
+            const partnerId = this.safeString (partner, 'id');
+            const partnerSecret = this.safeString (partner, 'secret');
+            if ((partnerId !== undefined) && (partnerSecret !== undefined)) {
+                const partnerPayload = timestamp + partnerId + this.apiKey;
+                const partnerSignature = this.hmac (this.encode (partnerPayload), this.encode (partnerSecret), 'sha256', 'base64');
+                headers['KC-API-PARTNER-SIGN'] = this.decode (partnerSignature);
+                headers['KC-API-PARTNER'] = partnerId;
+            }
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
     }
