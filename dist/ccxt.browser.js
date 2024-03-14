@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.46'
+const version = '1.31.47'
 
 Exchange.ccxtVersion = version
 
@@ -199,12 +199,19 @@ module.exports = class acx extends Exchange {
             'rateLimit': 1000,
             'version': 'v2',
             'has': {
+                'cancelOrder': true,
                 'CORS': true,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchMarkets': true,
+                'fetchOHLCV': true,
+                'fetchOrder': true,
+                'fetchOrderBook': true,
+                'fetchTicker': true,
                 'fetchTickers': true,
                 'fetchTime': true,
-                'fetchOHLCV': true,
+                'fetchTrades': true,
                 'withdraw': true,
-                'fetchOrder': true,
             },
             'timeframes': {
                 '1m': '1',
