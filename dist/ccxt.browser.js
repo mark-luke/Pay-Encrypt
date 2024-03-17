@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.72'
+const version = '1.35.73'
 
 Exchange.ccxtVersion = version
 
@@ -93579,6 +93579,7 @@ module.exports = class phemex extends Exchange {
                         'exchange/wallets/confirm/withdraw', // ?code=<withdrawConfirmCode>
                         'exchange/wallets/withdrawList', // ?currency=<currency>&limit=<limit>&offset=<offset>&withCount=<withCount>
                         'exchange/wallets/depositList', // ?currency=<currency>&offset=<offset>&limit=<limit>
+                        'exchange/wallets/v2/depositAddress', // ?currency=<currency>
                     ],
                     'post': [
                         // spot
