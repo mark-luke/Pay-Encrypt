@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.35'
+const version = '1.23.37'
 
 Exchange.ccxtVersion = version
 
@@ -29179,7 +29179,7 @@ module.exports = class btcmarkets extends Exchange {
     }
 
     parseTrade (trade, market = undefined) {
-        const timestamp = this.safeTimestamp (trade, 'timestamp');
+        const timestamp = this.safeTimestamp (trade, 'date');
         let symbol = undefined;
         if (market !== undefined) {
             symbol = market['symbol'];
@@ -77690,6 +77690,7 @@ module.exports = class southxchange extends Exchange {
             'commonCurrencies': {
                 'SMT': 'SmartNode',
                 'MTC': 'Marinecoin',
+                'BHD': 'Bithold',
             },
         });
     }
@@ -96436,6 +96437,9 @@ module.exports = class stex extends Exchange {
                     'taker': 0.002,
                     'maker': 0.002,
                 },
+            },
+            'commonCurrencies': {
+                'BHD': 'Bithold',
             },
             'options': {
                 'parseOrderToPrecision': false,
