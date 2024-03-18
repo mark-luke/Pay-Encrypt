@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.89'
+const version = '1.20.90'
 
 Exchange.ccxtVersion = version
 
@@ -20963,7 +20963,7 @@ module.exports = class bitso extends Exchange {
         // warn the user with an exception if the user wants to filter
         // starting from since timestamp, but does not set the trade id with an extra 'marker' param
         if ((since !== undefined) && !markerInParams) {
-            throw ExchangeError (this.id + ' fetchOpenOrders does not support fetching orders starting from a timestamp with the `since` argument, use the `marker` extra param to filter starting from an integer trade id');
+            throw new ExchangeError (this.id + ' fetchOpenOrders does not support fetching orders starting from a timestamp with the `since` argument, use the `marker` extra param to filter starting from an integer trade id');
         }
         // convert it to an integer unconditionally
         if (markerInParams) {
@@ -31982,7 +31982,7 @@ module.exports = class bytetrade extends Exchange {
         if (Array.isArray (response)) {
             const ticker = this.safeValue (response, 0);
             if (ticker === undefined) {
-                throw BadResponse (this.id + ' fetchTicker() returned an empty response');
+                throw new BadResponse (this.id + ' fetchTicker() returned an empty response');
             }
             return this.parseTicker (ticker, market);
         }
@@ -33656,9 +33656,9 @@ module.exports = class cex extends Exchange {
                 }
                 // --
                 // if (side !== tradeSide)
-                //     throw Error (JSON.stringify (order, null, 2));
+                //     throw new Error (JSON.stringify (order, null, 2));
                 // if (orderId !== item['order'])
-                //     throw Error (JSON.stringify (order, null, 2));
+                //     throw new Error (JSON.stringify (order, null, 2));
                 // --
                 // partial buy trade
                 //   {
