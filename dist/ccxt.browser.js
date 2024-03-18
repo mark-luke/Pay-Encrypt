@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.69'
+const version = '1.26.70'
 
 Exchange.ccxtVersion = version
 
@@ -33200,6 +33200,7 @@ module.exports = class bybit extends Exchange {
                         'order/create',
                         'order/cancel',
                         'order/cancelAll',
+                        'stop-order/create',
                         'stop-order/cancel',
                         'stop-order/cancelAll',
                     ],
@@ -34211,12 +34212,14 @@ module.exports = class bybit extends Exchange {
         }
         const stopPx = this.safeValue (params, 'stop_px');
         const basePrice = this.safeValue (params, 'base_price');
-        let method = 'privatePostOrderCreate';
+        const options = this.safeValue (this.options, 'marketTypes');
+        const marketType = this.safeString (options, symbol);
+        let method = (marketType === 'linear') ? 'privateLinearPostOrderCreate' : 'privatePostOrderCreate';
         if (stopPx !== undefined) {
             if (basePrice === undefined) {
                 throw new ArgumentsRequired (this.id + ' createOrder requires both the stop_px and base_price params for a conditional ' + type + ' order');
             } else {
-                method = 'openapiPostStopOrderCreate';
+                method = (marketType === 'linear') ? 'privateLinearPostStopOrderCreate' : 'openapiPostStopOrderCreate';
                 request['stop_px'] = this.priceToPrecision (symbol, stopPx);
                 request['base_price'] = this.priceToPrecision (symbol, basePrice);
                 params = this.omit (params, [ 'stop_px', 'base_price' ]);
