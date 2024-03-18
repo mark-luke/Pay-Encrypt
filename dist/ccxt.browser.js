@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.23'
+const version = '1.35.24'
 
 Exchange.ccxtVersion = version
 
@@ -40470,7 +40470,9 @@ module.exports = class bybit extends Exchange {
         await this.loadMarkets ();
         const defaultCode = this.safeValue (this.options, 'code', 'BTC');
         const options = this.safeValue (this.options, 'fetchBalance', {});
-        const code = this.safeValue (options, 'code', defaultCode);
+        let code = this.safeValue (options, 'code', defaultCode);
+        code = this.safeString (params, 'code', code);
+        params = this.omit (params, 'code');
         const currency = this.currency (code);
         const request = {
             'coin': currency['id'],
@@ -70852,8 +70854,6 @@ module.exports = class hitbtc extends Exchange {
         if (order['status'] === 'rejected') {
             throw new InvalidOrder (this.id + ' order was rejected by the exchange ' + this.json (order));
         }
-        const id = order['id'];
-        this.orders[id] = order;
         return order;
     }
 
@@ -70878,9 +70878,7 @@ module.exports = class hitbtc extends Exchange {
             request['price'] = this.priceToPrecision (symbol, price);
         }
         const response = await this.privatePatchOrderClientOrderId (this.extend (request, params));
-        const order = this.parseOrder (response);
-        this.orders[order['id']] = order;
-        return order;
+        return this.parseOrder (response);
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
@@ -70954,11 +70952,6 @@ module.exports = class hitbtc extends Exchange {
         const id = this.safeString (order, 'clientOrderId');
         const clientOrderId = id;
         let price = this.safeFloat (order, 'price');
-        if (price === undefined) {
-            if (id in this.orders) {
-                price = this.orders[id]['price'];
-            }
-        }
         let remaining = undefined;
         let cost = undefined;
         if (amount !== undefined) {
