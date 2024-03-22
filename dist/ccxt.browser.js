@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1202'
+const version = '1.18.1203'
 
 Exchange.ccxtVersion = version
 
@@ -8886,6 +8886,7 @@ module.exports = class binance extends Exchange {
                 'CORS': false,
                 'fetchBidsAsks': true,
                 'fetchTickers': true,
+                'fetchTime': true,
                 'fetchOHLCV': true,
                 'fetchMyTrades': true,
                 'fetchOrder': true,
@@ -9103,10 +9104,15 @@ module.exports = class binance extends Exchange {
         return this.milliseconds () - this.options['timeDifference'];
     }
 
+    async fetchTime (params = {}) {
+        const response = await this.publicGetTime (params);
+        return this.safeFloat (response, 'serverTime');
+    }
+
     async loadTimeDifference () {
-        const response = await this.publicGetTime ();
+        const serverTime = await this.fetchTime ();
         const after = this.milliseconds ();
-        this.options['timeDifference'] = parseInt (after - response['serverTime']);
+        this.options['timeDifference'] = parseInt (after - serverTime);
         return this.options['timeDifference'];
     }
 
