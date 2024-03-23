@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.71'
+const version = '1.19.72'
 
 Exchange.ccxtVersion = version
 
@@ -33467,7 +33467,7 @@ module.exports = class cex extends Exchange {
             'lastTradeTimestamp': undefined,
             'status': status,
             'symbol': symbol,
-            'type': undefined,
+            'type': (price === undefined) ? 'market' : 'limit',
             'side': side,
             'price': price,
             'cost': cost,
