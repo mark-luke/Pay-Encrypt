@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.14'
+const version = '1.33.15'
 
 Exchange.ccxtVersion = version
 
@@ -92161,10 +92161,10 @@ module.exports = class phemex extends Exchange {
         };
         let market = undefined;
         if (symbol !== undefined) {
+            market = this.market (symbol);
             if (!market['swap']) {
                 throw new NotSupported (this.id + ' cancelAllOrders() supports swap market type orders only');
             }
-            market = this.market (symbol);
             request['symbol'] = market['id'];
         }
         return await this.privateDeleteOrdersAll (this.extend (request, params));
