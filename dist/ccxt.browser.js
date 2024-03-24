@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.60'
+const version = '1.25.61'
 
 Exchange.ccxtVersion = version
 
@@ -6593,22 +6593,19 @@ module.exports =
 /*  .............................................   */
 
     , deepExtend: function deepExtend (...xs) {
-
         let out = undefined
-
         for (const x of xs) {
-
             if (isDictionary (x)) {
-
-                if (!isObject (out))
+                if (!isObject (out)) {
                     out = {}
-
-                for (const k in x)
+                }
+                for (const k in x) {
                     out[k] = deepExtend (out[k], x[k])
-
-            } else out = x
+                }
+            } else {
+                out = x
+            }
         }
-
         return out
     }
 
