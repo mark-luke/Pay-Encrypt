@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.36'
+const version = '1.25.37'
 
 Exchange.ccxtVersion = version
 
@@ -623,6 +623,8 @@ module.exports = class acx extends Exchange {
                 'quoteId': quoteId,
                 'precision': precision,
                 'info': market,
+                'active': undefined,
+                'limits': this.limits,
             });
         }
         return result;
@@ -829,6 +831,8 @@ module.exports = class acx extends Exchange {
             'trades': undefined,
             'fee': undefined,
             'info': order,
+            'cost': undefined,
+            'average': undefined,
         };
     }
 
@@ -2686,6 +2690,7 @@ module.exports = class anxpro extends Exchange {
             'cost': cost,
             'fee': undefined,
             'info': trade,
+            'takerOrMaker': undefined,
         };
     }
 
@@ -3207,6 +3212,7 @@ module.exports = class anxpro extends Exchange {
             'fee': undefined,
             'trades': trades,
             'info': order,
+            'average': undefined,
         };
     }
 
@@ -3299,6 +3305,7 @@ module.exports = class anxpro extends Exchange {
             'status': status,
             'fee': fee,
             'trades': trades,
+            'average': undefined,
         };
     }
 
@@ -4458,6 +4465,7 @@ module.exports = class aofex extends Exchange {
             'remaining': undefined,
             'trades': undefined,
             'fee': undefined,
+            'clientOrderId': undefined,
         };
     }
 
@@ -7830,6 +7838,7 @@ module.exports = class bcex extends Exchange {
             'cost': cost,
             'order': orderId,
             'fee': undefined,
+            'takerOrMaker': undefined,
         };
     }
 
@@ -7978,6 +7987,8 @@ module.exports = class bcex extends Exchange {
             'remaining': this.safeFloat (order, 'numberover'),
             'status': status,
             'fee': undefined,
+            'clientOrderId': undefined,
+            'trades': undefined,
         };
     }
 
@@ -8019,6 +8030,7 @@ module.exports = class bcex extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': fee,
+            'trades': undefined,
         };
         return result;
     }
@@ -8899,6 +8911,7 @@ module.exports = class bibox extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': fee,
+            'trades': undefined,
         };
     }
 
@@ -12756,6 +12769,7 @@ module.exports = class bit2c extends Exchange {
             'trades': undefined,
             'fee': undefined,
             'info': order,
+            'average': undefined,
         };
     }
 
@@ -14497,6 +14511,7 @@ module.exports = class bitbay extends Exchange {
             'average': undefined,
             'fee': undefined,
             'trades': trades,
+            'clientOrderId': undefined,
         };
     }
 
@@ -15525,6 +15540,8 @@ module.exports = class bitfinex extends Exchange {
             'filled': this.safeFloat (order, 'executed_amount'),
             'status': status,
             'fee': undefined,
+            'cost': undefined,
+            'trades': undefined,
         };
     }
 
@@ -17413,6 +17430,8 @@ module.exports = class bitflyer extends Exchange {
             'filled': filled,
             'remaining': remaining,
             'fee': fee,
+            'average': undefined,
+            'trades': undefined,
         };
     }
 
@@ -17844,6 +17863,7 @@ module.exports = class bitforex extends Exchange {
             'cost': cost,
             'order': orderId,
             'fee': undefined,
+            'takerOrMaker': undefined,
         };
     }
 
@@ -18012,6 +18032,7 @@ module.exports = class bitforex extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': fee,
+            'trades': undefined,
         };
         return result;
     }
@@ -18261,6 +18282,8 @@ module.exports = class bithumb extends Exchange {
                         'max': undefined,
                     },
                 },
+                'baseId': undefined,
+                'quoteId': undefined,
             });
         }
         return result;
@@ -18860,6 +18883,7 @@ module.exports = class bitmart extends Exchange {
                 'precision': precision,
                 'limits': limits,
                 'info': market,
+                'active': undefined,
             });
         }
         return result;
@@ -21858,6 +21882,7 @@ module.exports = class bitmex extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': undefined,
+            'trades': undefined,
         };
     }
 
@@ -22197,6 +22222,7 @@ module.exports = class bitso extends Exchange {
                 'info': market,
                 'limits': limits,
                 'precision': precision,
+                'active': undefined,
             });
         }
         return result;
@@ -22445,6 +22471,8 @@ module.exports = class bitso extends Exchange {
             'filled': filled,
             'status': status,
             'fee': undefined,
+            'average': undefined,
+            'trades': undefined,
         };
     }
 
@@ -23607,6 +23635,7 @@ module.exports = class bitstamp extends Exchange {
             'trades': trades,
             'fee': fee,
             'info': order,
+            'average': undefined,
         };
     }
 
@@ -25181,6 +25210,7 @@ module.exports = class bittrex extends Exchange {
                 'currency': feeCurrency,
             },
             'info': order,
+            'trades': undefined,
         };
     }
 
@@ -25320,6 +25350,7 @@ module.exports = class bittrex extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': fee,
+            'trades': undefined,
         };
     }
 
@@ -25362,6 +25393,7 @@ module.exports = class bittrex extends Exchange {
             'datetime': this.iso8601 (timestamp),
             'fee': this.safeValue (order, 'fee'),
             'info': order,
+            'takerOrMaker': undefined,
         };
     }
 
@@ -26421,6 +26453,7 @@ module.exports = class bitz extends Exchange {
             'trades': undefined,
             'fee': undefined,
             'info': order,
+            'average': undefined,
         };
     }
 
@@ -27263,6 +27296,7 @@ module.exports = class bleutrade extends Exchange {
                 'fee': this.safeFloat (item, 'WithdrawTxFee'),
                 'precision': this.safeFloat (item, 'DecimalPlaces'),
                 'info': item,
+                'limits': this.limits,
             };
         }
         return result;
@@ -27795,6 +27829,7 @@ module.exports = class bleutrade extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': undefined,
+            'trades': undefined,
         };
     }
 
@@ -28404,6 +28439,7 @@ module.exports = class braziliex extends Exchange {
             'trades': undefined,
             'fee': fee,
             'info': info,
+            'average': undefined,
         };
     }
 
@@ -28706,6 +28742,8 @@ module.exports = class btcalpha extends Exchange {
                     },
                 },
                 'info': market,
+                'baseId': undefined,
+                'quoteId': undefined,
             });
         }
         return result;
@@ -28885,6 +28923,8 @@ module.exports = class btcalpha extends Exchange {
             'trades': trades,
             'fee': undefined,
             'info': order,
+            'lastTradeTimestamp': undefined,
+            'average': undefined,
         };
     }
 
@@ -29335,6 +29375,7 @@ module.exports = class btcbox extends Exchange {
             'trades': trades,
             'fee': undefined,
             'info': order,
+            'average': undefined,
         };
     }
 
@@ -30012,6 +30053,7 @@ module.exports = class btcmarkets extends Exchange {
                 'currency': feeCurrencyCode,
                 'cost': feeCost,
             },
+            'takerOrMaker': undefined,
         };
     }
 
@@ -30613,6 +30655,9 @@ module.exports = class btctradeua extends Exchange {
             'remaining': this.safeFloat (order, 'amnt_trade'),
             'trades': undefined,
             'info': order,
+            'cost': undefined,
+            'average': undefined,
+            'fee': undefined,
         };
     }
 
@@ -31564,6 +31609,7 @@ module.exports = class buda extends Exchange {
             'trades': undefined,
             'fee': fee,
             'info': order,
+            'average': undefined,
         };
     }
 
@@ -32440,6 +32486,7 @@ module.exports = class bw extends Exchange {
             'status': 'open',
             'fee': undefined,
             'trades': undefined,
+            'clientOrderId': undefined,
         };
     }
 
@@ -35443,6 +35490,7 @@ module.exports = class bytetrade extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': fee,
+            'trades': undefined,
         };
     }
 
@@ -35616,6 +35664,8 @@ module.exports = class bytetrade extends Exchange {
             'cost': undefined,
             'trades': undefined,
             'fee': undefined,
+            'clientOrderId': undefined,
+            'average': undefined,
         };
     }
 
@@ -35792,6 +35842,8 @@ module.exports = class bytetrade extends Exchange {
             'cost': undefined,
             'trades': undefined,
             'fee': undefined,
+            'clientOrderId': undefined,
+            'average': undefined,
         };
     }
 
@@ -35896,6 +35948,9 @@ module.exports = class bytetrade extends Exchange {
             'remaining': undefined,
             'cost': undefined,
             'fee': undefined,
+            'clientOrderId': undefined,
+            'average': undefined,
+            'trades': undefined,
         };
     }
 
@@ -36621,6 +36676,7 @@ module.exports = class cex extends Exchange {
                         'max': undefined,
                     },
                 },
+                'active': undefined,
             });
         }
         return result;
@@ -37072,6 +37128,8 @@ module.exports = class cex extends Exchange {
                         'currency': market['quote'],
                     },
                     'info': item,
+                    'type': undefined,
+                    'takerOrMaker': undefined,
                 });
             }
         }
@@ -37093,6 +37151,7 @@ module.exports = class cex extends Exchange {
             'trades': trades,
             'fee': fee,
             'info': order,
+            'average': undefined,
         };
     }
 
@@ -40163,6 +40222,8 @@ module.exports = class coinbasepro extends Exchange {
             'filled': filled,
             'remaining': remaining,
             'fee': fee,
+            'average': undefined,
+            'trades': undefined,
         };
     }
 
@@ -40734,6 +40795,8 @@ module.exports = class coincheck extends Exchange {
             'cost': cost,
             'fee': undefined,
             'info': order,
+            'average': undefined,
+            'trades': undefined,
         };
     }
 
@@ -41328,6 +41391,7 @@ module.exports = class coinegg extends Exchange {
             'trades': undefined,
             'fee': undefined,
             'info': info,
+            'average': undefined,
         };
     }
 
@@ -42721,6 +42785,8 @@ module.exports = class coinfalcon extends Exchange {
             'trades': undefined,
             'fee': undefined,
             'info': order,
+            'lastTradeTimestamp': undefined,
+            'average': undefined,
         };
     }
 
@@ -43289,6 +43355,8 @@ module.exports = class coinfloor extends Exchange {
             'remaining': undefined,
             'cost': cost,
             'fee': undefined,
+            'average': undefined,
+            'trades': undefined,
         };
     }
 
@@ -43870,6 +43938,9 @@ module.exports = class coinmarketcap extends Exchange {
                     'baseId': baseId,
                     'quoteId': quoteId,
                     'info': market,
+                    'active': undefined,
+                    'precision': this.precision,
+                    'limits': this.limits,
                 });
             }
         }
@@ -44698,6 +44769,7 @@ module.exports = class coinmate extends Exchange {
             'status': status,
             'trades': undefined,
             'info': order,
+            'fee': undefined,
         };
     }
 
@@ -45111,6 +45183,8 @@ module.exports = class coinone extends Exchange {
             'remaining': amount,
             'status': 'open',
             'fee': undefined,
+            'clientOrderId': undefined,
+            'trades': undefined,
         };
         this.orders[id] = order;
         return order;
@@ -45229,6 +45303,8 @@ module.exports = class coinone extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': fee,
+            'average': undefined,
+            'trades': undefined,
         };
     }
 
@@ -50405,6 +50481,7 @@ module.exports = class digifinex extends Exchange {
             'average': average,
             'status': status,
             'fee': undefined,
+            'trades': undefined,
         };
     }
 
@@ -51433,6 +51510,9 @@ module.exports = class dsx extends Exchange {
             'filled': filled,
             'fee': undefined,
             // 'trades': this.parseTrades (order['trades'], market),
+            'clientOrderId': undefined,
+            'average': undefined,
+            'trades': undefined,
         };
     }
 
@@ -51559,6 +51639,7 @@ module.exports = class dsx extends Exchange {
             'status': status,
             'fee': fee,
             'trades': trades,
+            'average': undefined,
         };
     }
 
@@ -52886,6 +52967,8 @@ module.exports = class exmo extends Exchange {
             'filled': 0.0,
             'fee': undefined,
             'trades': undefined,
+            'clientOrderId': undefined,
+            'average': undefined,
         };
         this.orders[id] = order;
         return order;
@@ -53759,6 +53842,7 @@ module.exports = class exx extends Exchange {
             'trades': undefined,
             'fee': fee,
             'info': order,
+            'average': undefined,
         };
     }
 
@@ -54753,6 +54837,7 @@ module.exports = class flowbtc extends Exchange {
                     },
                 },
                 'info': market,
+                'active': undefined,
             };
         }
         return result;
@@ -54842,6 +54927,8 @@ module.exports = class flowbtc extends Exchange {
             'price': price,
             'amount': amount,
             'cost': cost,
+            'takerOrMaker': undefined,
+            'fee': undefined,
         };
     }
 
@@ -57937,6 +58024,7 @@ module.exports = class gemini extends Exchange {
                         'max': undefined,
                     },
                 },
+                'active': undefined,
             });
         }
         return result;
@@ -58117,6 +58205,7 @@ module.exports = class gemini extends Exchange {
             'filled': filled,
             'remaining': remaining,
             'fee': fee,
+            'trades': undefined,
         };
     }
 
@@ -59064,6 +59153,7 @@ module.exports = class hitbtc extends Exchange {
             'amount': amount,
             'cost': cost,
             'fee': fee,
+            'takerOrMaker': undefined,
         };
     }
 
@@ -59230,6 +59320,8 @@ module.exports = class hitbtc extends Exchange {
             'filled': filled,
             'remaining': remaining,
             'fee': fee,
+            'average': undefined,
+            'trades': undefined,
         };
     }
 
@@ -61672,6 +61764,7 @@ module.exports = class hollaex extends Exchange {
             'trades': undefined,
             'fee': undefined,
             'info': order,
+            'average': undefined,
         };
         return result;
     }
@@ -63155,6 +63248,7 @@ module.exports = class huobipro extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': fee,
+            'trades': undefined,
         };
     }
 
@@ -63209,6 +63303,8 @@ module.exports = class huobipro extends Exchange {
             'cost': undefined,
             'trades': undefined,
             'fee': undefined,
+            'clientOrderId': undefined,
+            'average': undefined,
         };
     }
 
@@ -63682,6 +63778,7 @@ module.exports = class ice3x extends Exchange {
                     },
                 },
                 'info': currency,
+                'fee': undefined,
             };
         }
         return result;
@@ -63714,6 +63811,8 @@ module.exports = class ice3x extends Exchange {
                 'quoteId': quoteId,
                 'active': undefined,
                 'info': market,
+                'precision': this.precision,
+                'limits': this.limits,
             });
         }
         return result;
@@ -63912,6 +64011,7 @@ module.exports = class ice3x extends Exchange {
             'trades': undefined,
             'fee': fee,
             'info': order,
+            'average': undefined,
         };
     }
 
@@ -64818,6 +64918,10 @@ module.exports = class idex extends Exchange {
             'remaining': remaining,
             'cost': cost,
             'status': status,
+            'lastTradeTimestamp': undefined,
+            'average': undefined,
+            'trades': undefined,
+            'fee': undefined,
         };
     }
 
@@ -65231,6 +65335,9 @@ module.exports = class independentreserve extends Exchange {
                     'baseId': baseId,
                     'quoteId': quoteId,
                     'info': id,
+                    'active': undefined,
+                    'precision': this.precision,
+                    'limits': this.limits,
                 });
             }
         }
@@ -65394,6 +65501,7 @@ module.exports = class independentreserve extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': fee,
+            'trades': undefined,
         };
     }
 
@@ -65920,6 +66028,7 @@ module.exports = class indodax extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': fee,
+            'trades': undefined,
         };
     }
 
@@ -66343,6 +66452,7 @@ module.exports = class itbit extends Exchange {
             'price': price,
             'amount': amount,
             'cost': cost,
+            'fee': undefined,
         };
         if (feeCost !== undefined) {
             if (rebatesApplied !== undefined) {
@@ -66663,6 +66773,7 @@ module.exports = class itbit extends Exchange {
             'remaining': remaining,
             'fee': fee,
             // 'trades': this.parseTrades (order['trades'], market),
+            'trades': undefined,
         };
     }
 
@@ -67221,6 +67332,7 @@ module.exports = class kkex extends Exchange {
             'remaining': remaining,
             'fee': undefined,
             'info': order,
+            'trades': undefined,
         };
     }
 
@@ -67269,6 +67381,8 @@ module.exports = class kkex extends Exchange {
             'remaining': undefined,
             'trades': undefined,
             'fee': undefined,
+            'clientOrderId': undefined,
+            'average': undefined,
         };
     }
 
@@ -68347,6 +68461,7 @@ module.exports = class kraken extends Exchange {
             'remaining': remaining,
             'fee': fee,
             // 'trades': this.parseTrades (order['trades'], market),
+            'trades': undefined,
         };
     }
 
@@ -69118,6 +69233,9 @@ module.exports = class kucoin extends Exchange {
                 'code': code,
                 'precision': precision,
                 'info': entry,
+                'active': undefined,
+                'fee': undefined,
+                'limits': this.limits,
             };
         }
         return result;
@@ -69700,6 +69818,9 @@ module.exports = class kucoin extends Exchange {
             'fee': fee,
             'status': status,
             'info': order,
+            'lastTradeTimestamp': undefined,
+            'average': undefined,
+            'trades': undefined,
         };
     }
 
@@ -70583,6 +70704,8 @@ module.exports = class kuna extends acx {
                                 'max': undefined,
                             },
                         },
+                        'active': undefined,
+                        'info': undefined,
                     });
                     break;
                 }
@@ -70752,6 +70875,9 @@ module.exports = class lakebtc extends Exchange {
                 'baseId': baseId,
                 'quoteId': quoteId,
                 'info': market,
+                'active': undefined,
+                'precision': this.precision,
+                'limits': this.limits,
             });
         }
         return result;
@@ -71627,6 +71753,7 @@ module.exports = class latoken extends Exchange {
             'average': undefined,
             'remaining': remaining,
             'fee': undefined,
+            'trades': undefined,
         };
     }
 
@@ -72328,6 +72455,7 @@ module.exports = class lbank extends Exchange {
             'trades': undefined,
             'fee': undefined,
             'info': this.safeValue (order, 'info', order),
+            'average': undefined,
         };
     }
 
@@ -73719,6 +73847,9 @@ module.exports = class livecoin extends Exchange {
                     'max': Math.pow (10, precision),
                 },
             },
+            'id': undefined,
+            'code': undefined,
+            'name': undefined,
         };
         const currencies = [
             { 'id': 'USD', 'code': 'USD', 'name': 'US Dollar' },
@@ -74086,6 +74217,7 @@ module.exports = class livecoin extends Exchange {
                 'currency': feeCurrency,
                 'rate': feeRate,
             },
+            'average': undefined,
         };
     }
 
@@ -74481,6 +74613,9 @@ module.exports = class luno extends Exchange {
                 'baseId': baseId,
                 'quoteId': quoteId,
                 'info': market,
+                'active': undefined,
+                'precision': this.precision,
+                'limits': this.limits,
             });
         }
         return result;
@@ -74594,6 +74729,7 @@ module.exports = class luno extends Exchange {
             'trades': undefined,
             'fee': fee,
             'info': order,
+            'average': undefined,
         };
     }
 
@@ -75108,6 +75244,8 @@ module.exports = class lykke extends Exchange {
                         'max': undefined,
                     },
                 },
+                'baseId': undefined,
+                'quoteId': undefined,
             });
         }
         return result;
@@ -75226,6 +75364,7 @@ module.exports = class lykke extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': undefined,
+            'trades': undefined,
         };
     }
 
@@ -78675,6 +78814,8 @@ module.exports = class okex extends Exchange {
             'cost': undefined,
             'trades': undefined,
             'fee': undefined,
+            'clientOrderId': undefined,
+            'average': undefined,
         };
     }
 
@@ -78901,6 +79042,7 @@ module.exports = class okex extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': fee,
+            'trades': undefined,
         };
     }
 
@@ -82283,6 +82425,7 @@ module.exports = class rightbtc extends Exchange {
             'status': status,
             'fee': fee,
             'trades': trades,
+            'average': undefined,
         };
     }
 
@@ -82576,6 +82719,8 @@ module.exports = class southxchange extends Exchange {
                 'quoteId': quoteId,
                 'active': undefined,
                 'info': market,
+                'precision': this.precision,
+                'limits': this.limits,
             });
         }
         return result;
@@ -82750,6 +82895,8 @@ module.exports = class southxchange extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': undefined,
+            'average': undefined,
+            'trades': undefined,
         };
         return result;
     }
@@ -103148,6 +103295,7 @@ module.exports = class stronghold extends Exchange {
                 'precision': precision,
                 'info': entry,
                 'limits': limits,
+                'active': undefined,
             };
         }
         return result;
@@ -103205,6 +103353,7 @@ module.exports = class stronghold extends Exchange {
                 'active': undefined,
                 'name': undefined,
                 'limits': limits,
+                'fee': undefined,
             };
         }
         return result;
@@ -103518,6 +103667,7 @@ module.exports = class stronghold extends Exchange {
             'status': undefined,
             'type': undefined,
             'average': undefined,
+            'fee': undefined,
         };
     }
 
@@ -104471,6 +104621,7 @@ module.exports = class theocean extends Exchange {
             'status': status,
             'fee': fee,
             'trades': trades,
+            'average': undefined,
         };
         return result;
     }
@@ -106052,6 +106203,9 @@ module.exports = class tidebit extends Exchange {
                 'baseId': baseId,
                 'quoteId': quoteId,
                 'info': market,
+                'active': undefined,
+                'precision': this.precision,
+                'limits': this.limits,
             });
         }
         return result;
@@ -106312,6 +106466,7 @@ module.exports = class tidebit extends Exchange {
             'trades': undefined,
             'fee': undefined,
             'info': order,
+            'average': undefined,
         };
     }
 
@@ -106952,9 +107107,13 @@ module.exports = class tidex extends Exchange {
             'filled': filled,
             'fee': undefined,
             // 'trades': this.parseTrades (order['trades'], market),
+            'info': response,
+            'clientOrderId': undefined,
+            'average': undefined,
+            'trades': undefined,
         };
         this.orders[id] = order;
-        return this.extend ({ 'info': response }, order);
+        return order;
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
@@ -107030,6 +107189,9 @@ module.exports = class tidex extends Exchange {
             'filled': filled,
             'status': status,
             'fee': fee,
+            'clientOrderId': undefined,
+            'average': undefined,
+            'trades': undefined,
         };
     }
 
@@ -110160,6 +110322,9 @@ module.exports = class vaultoro extends Exchange {
             'baseId': baseId,
             'quoteId': quoteId,
             'info': market,
+            'active': undefined,
+            'precision': this.precision,
+            'limits': this.limits,
         });
         return result;
     }
@@ -111074,6 +111239,9 @@ module.exports = class xbtce extends Exchange {
                 'baseId': baseId,
                 'quoteId': quoteId,
                 'info': market,
+                'active': undefined,
+                'precision': this.precision,
+                'limits': this.limits,
             });
         }
         return result;
@@ -111849,9 +112017,13 @@ module.exports = class yobit extends Exchange {
             'filled': filled,
             'fee': undefined,
             // 'trades': this.parseTrades (order['trades'], market),
+            'info': response,
+            'clientOrderId': undefined,
+            'average': undefined,
+            'trades': undefined,
         };
         this.orders[id] = order;
-        return this.extend ({ 'info': response }, order);
+        return order;
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
@@ -111928,6 +112100,8 @@ module.exports = class yobit extends Exchange {
             'filled': filled,
             'status': status,
             'fee': fee,
+            'average': undefined,
+            'trades': undefined,
         };
         return result;
     }
@@ -112609,6 +112783,8 @@ module.exports = class zaif extends Exchange {
             'remaining': undefined,
             'trades': undefined,
             'fee': undefined,
+            'info': undefined,
+            'average': undefined,
         };
     }
 
@@ -113320,6 +113496,7 @@ module.exports = class zb extends Exchange {
             'remaining': remaining,
             'status': status,
             'fee': undefined,
+            'trades': undefined,
         };
     }
 
