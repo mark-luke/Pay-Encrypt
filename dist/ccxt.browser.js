@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.78'
+const version = '1.26.79'
 
 Exchange.ccxtVersion = version
 
@@ -18193,7 +18193,7 @@ module.exports = class bitforex extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ExchangeNotAvailable, AuthenticationError, BadRequest, PermissionDenied, InvalidAddress, ArgumentsRequired } = require ('./base/errors');
+const { ExchangeError, ExchangeNotAvailable, AuthenticationError, BadRequest, PermissionDenied, InvalidAddress, ArgumentsRequired, InvalidOrder } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -18525,8 +18525,14 @@ module.exports = class bithumb extends Exchange {
         }
         const response = await this[method] (this.extend (request, params));
         const id = this.safeString (response, 'order_id');
+        if (id === undefined) {
+            throw new InvalidOrder (this.id + ' createOrder did not return an order id');
+        }
         return {
             'info': response,
+            'symbol': symbol,
+            'type': type,
+            'side': side,
             'id': id,
         };
     }
