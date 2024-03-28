@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.8'
+const version = '1.23.9'
 
 Exchange.ccxtVersion = version
 
@@ -41173,6 +41173,7 @@ module.exports = class coinmarketcap extends Exchange {
             'KingN Coin': 'KingN Coin', // conflict with KNC (Kyber Network)
             'LiteBitcoin': 'LiteBitcoin', // conflict with LBTC (LightningBitcoin)
             'Maggie': 'Maggie',
+            'Monarch': 'Monarch', // conflict with MyToken (MT)
             'MTC Mesh Network': 'MTC Mesh Network', // conflict with MTC Docademic doc.com Token https://github.com/ccxt/ccxt/issues/6081 https://github.com/ccxt/ccxt/issues/3025
             'IOTA': 'IOTA', // a special case, most exchanges list it as IOTA, therefore we change just the Coinmarketcap instead of changing them all
             'NetCoin': 'NetCoin',
@@ -58721,8 +58722,9 @@ module.exports = class idex extends Exchange {
                 'secret': false,
             },
             'commonCurrencies': {
-                'ONE': 'Menlo One',
                 'FT': 'Fabric Token',
+                'MT': 'Monarch',
+                'ONE': 'Menlo One',
                 'PLA': 'PlayChip',
                 'WAX': 'WAXP',
             },
@@ -65543,6 +65545,7 @@ module.exports = class latoken extends Exchange {
                 },
             },
             'commonCurrencies': {
+                'MT': 'Monarch',
                 'TSL': 'Treasure SL',
             },
             'options': {
