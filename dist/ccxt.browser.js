@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.9'
+const version = '1.19.10'
 
 Exchange.ccxtVersion = version
 
@@ -56151,6 +56151,7 @@ module.exports = class huobipro extends Exchange {
                 '15m': '15min',
                 '30m': '30min',
                 '1h': '60min',
+                '4h': '4hour',
                 '1d': '1day',
                 '1w': '1week',
                 '1M': '1mon',
