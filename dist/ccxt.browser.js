@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.94'
+const version = '1.32.95'
 
 Exchange.ccxtVersion = version
 
@@ -76737,8 +76737,8 @@ module.exports = class kraken extends Exchange {
         await this.loadMarkets ();
         symbols = (symbols === undefined) ? this.symbols : symbols;
         const marketIds = [];
-        for (let i = 0; i < this.symbols.length; i++) {
-            const symbol = this.symbols[i];
+        for (let i = 0; i < symbols.length; i++) {
+            const symbol = symbols[i];
             const market = this.markets[symbol];
             if (market['active'] && !market['darkpool']) {
                 marketIds.push (market['id']);
