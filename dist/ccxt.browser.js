@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.17'
+const version = '1.29.18'
 
 Exchange.ccxtVersion = version
 
@@ -48440,7 +48440,7 @@ module.exports = class currencycom extends Exchange {
                     'private': 'https://api-adapter.backend.currency.com/api',
                 },
                 'www': 'https://www.currency.com',
-                'referral': 'https://www.currency.com/?ref=10205187',
+                'referral': 'https://currency.com/trading/signup?c=362jaimv&pid=referral',
                 'doc': [
                     'https://currency.com/api',
                 ],
