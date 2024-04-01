@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.8'
+const version = '1.29.9'
 
 Exchange.ccxtVersion = version
 
@@ -73768,7 +73768,7 @@ module.exports = class kuna extends acx {
                 'ask': 'sell',
                 'bid': 'buy',
             };
-            side = this.safeString (sideMap, side);
+            side = this.safeString (sideMap, side, side);
         }
         const price = this.safeFloat (trade, 'price');
         const amount = this.safeFloat (trade, 'volume');
