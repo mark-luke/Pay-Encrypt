@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1362'
+const version = '1.18.1363'
 
 Exchange.ccxtVersion = version
 
@@ -27302,6 +27302,20 @@ module.exports = class btcmarkets extends Exchange {
                 '3': InvalidOrder,
                 '6': DDoSProtection,
             },
+            'fees': {
+                'percentage': true,
+                'tierBased': true,
+                'maker': -0.05 / 100,
+                'taker': 0.20 / 100,
+            },
+            'options': {
+                'fees': {
+                    'AUD': {
+                        'maker': 0.85 / 100,
+                        'taker': 0.85 / 100,
+                    },
+                },
+            },
         });
     }
 
@@ -27429,8 +27443,7 @@ module.exports = class btcmarkets extends Exchange {
             const base = this.safeCurrencyCode (baseId);
             const quote = this.safeCurrencyCode (quoteId);
             const symbol = base + '/' + quote;
-            // todo: refactor this
-            const fee = (quote === 'AUD') ? 0.0085 : 0.0022;
+            const fees = this.safeValue (this.safeValue (this.options, 'fees', {}), quote, this.fees);
             let pricePrecision = 2;
             let amountPrecision = 4;
             const minAmount = 0.001; // where does it come from?
@@ -27469,8 +27482,8 @@ module.exports = class btcmarkets extends Exchange {
                 'baseId': baseId,
                 'quoteId': quoteId,
                 'active': undefined,
-                'maker': fee,
-                'taker': fee,
+                'maker': fees['maker'],
+                'taker': fees['taker'],
                 'limits': limits,
                 'precision': precision,
             });
