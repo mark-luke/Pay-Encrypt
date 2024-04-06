@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.26'
+const version = '1.19.29'
 
 Exchange.ccxtVersion = version
 
@@ -17169,7 +17169,7 @@ module.exports = class bitmart extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ArgumentsRequired, AuthenticationError, ExchangeError, InsufficientFunds, InvalidOrder } = require ('./base/errors');
+const { ArgumentsRequired, AuthenticationError, ExchangeError, InsufficientFunds, InvalidOrder, BadSymbol } = require ('./base/errors');
 const { ROUND } = require ('./base/functions/number');
 
 //  ---------------------------------------------------------------------------
@@ -17286,6 +17286,7 @@ module.exports = class bitmax extends Exchange {
             'exceptions': {
                 'exact': {
                     '2100': AuthenticationError, // {"code":2100,"message":"ApiKeyFailure"}
+                    '5002': BadSymbol, // {"code":5002,"message":"Invalid Symbol"}
                     '6010': InsufficientFunds, // {'code': 6010, 'message': 'Not enough balance.'}
                     '60060': InvalidOrder, // { 'code': 60060, 'message': 'The order is already filled or canceled.' }
                     '600503': InvalidOrder, // {"code":600503,"message":"Notional is too small."}
@@ -47434,7 +47435,7 @@ module.exports = class dx extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ArgumentsRequired, ExchangeError, ExchangeNotAvailable, OrderNotFound, AuthenticationError, InsufficientFunds, InvalidOrder, InvalidNonce, NotSupported } = require ('./base/errors');
+const { ArgumentsRequired, ExchangeError, OrderNotFound, AuthenticationError, InsufficientFunds, InvalidOrder, InvalidNonce, NotSupported, OnMaintenance } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -47812,7 +47813,7 @@ module.exports = class exmo extends Exchange {
                 '40005': AuthenticationError, // Authorization error, incorrect signature
                 '40009': InvalidNonce, //
                 '40015': ExchangeError, // API function do not exist
-                '40016': ExchangeNotAvailable, // Maintenance work in progress
+                '40016': OnMaintenance, // {"result":false,"error":"Error 40016: Maintenance work in progress"}
                 '40017': AuthenticationError, // Wrong API Key
                 '50052': InsufficientFunds,
                 '50054': InsufficientFunds,
@@ -74059,7 +74060,6 @@ module.exports = class okex3 extends Exchange {
                     '1': ExchangeError, // { "code": 1, "message": "System error" }
                     // undocumented
                     'failure to get a peer from the ring-balancer': ExchangeError, // { "message": "failure to get a peer from the ring-balancer" }
-                    '"instrument_id" is an invalid parameter': BadSymbol, // {"code":30024,"message":"\"instrument_id\" is an invalid parameter"}
                     '4010': PermissionDenied, // { "code": 4010, "message": "For the security of your funds, withdrawals are not permitted within 24 hours after changing fund password  / mobile number / Google Authenticator settings " }
                     // common
                     '30001': AuthenticationError, // { "code": 30001, "message": 'request header "OK_ACCESS_KEY" cannot be blank'}
@@ -74085,7 +74085,7 @@ module.exports = class okex3 extends Exchange {
                     '30021': BadRequest, // { "code": 30021, "message": "Json data format error" }, { "code": 30021, "message": "json data format error" }
                     '30022': PermissionDenied, // { "code": 30022, "message": "Api has been frozen" }
                     '30023': BadRequest, // { "code": 30023, "message": "{0} parameter cannot be blank" }
-                    '30024': BadRequest, // { "code": 30024, "message": "{0} parameter value error" }
+                    '30024': BadSymbol, // {"code":30024,"message":"\"instrument_id\" is an invalid parameter"}
                     '30025': BadRequest, // { "code": 30025, "message": "{0} parameter category error" }
                     '30026': DDoSProtection, // { "code": 30026, "message": "requested too frequent" }
                     '30027': AuthenticationError, // { "code": 30027, "message": "login failure" }
