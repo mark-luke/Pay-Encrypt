@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.51'
+const version = '1.22.52'
 
 Exchange.ccxtVersion = version
 
@@ -573,6 +573,9 @@ module.exports = class acx extends Exchange {
                     'percentage': true,
                     'withdraw': {}, // There is only 1% fee on withdrawals to your bank account.
                 },
+            },
+            'commonCurrencies': {
+                'PLA': 'Plair',
             },
             'exceptions': {
                 '2002': InsufficientFunds,
@@ -17307,6 +17310,7 @@ module.exports = class bitmart extends Exchange {
             },
             'commonCurrencies': {
                 'ONE': 'Menlo One',
+                'PLA': 'Plair',
             },
         });
     }
@@ -40555,6 +40559,8 @@ module.exports = class coinmarketcap extends Exchange {
             'IOTA': 'IOTA', // a special case, most exchanges list it as IOTA, therefore we change just the Coinmarketcap instead of changing them all
             'NetCoin': 'NetCoin',
             'PCHAIN': 'PCHAIN', // conflict with PAI (Project Pai)
+            'Plair': 'Plair', // conflict with PLA (PLANET)
+            'PlayChip': 'PlayChip', // conflict with PLA (PLANET)
             'Polcoin': 'Polcoin',
             'PutinCoin': 'PutinCoin', // conflict with PUT (Profile Utility Token)
             'Rcoin': 'Rcoin', // conflict with RCN (Ripio Credit Network)
@@ -53982,8 +53988,8 @@ module.exports = class hitbtc extends Exchange {
                         'ZSC': 191,
                     },
                     'deposit': {
-                        'BTC': 0.0006,
-                        'ETH': 0.003,
+                        'BTC': 0,
+                        'ETH': 0,
                         'BCH': 0,
                         'USDT': 0,
                         'BTG': 0,
@@ -54187,6 +54193,7 @@ module.exports = class hitbtc extends Exchange {
                 'GET': 'Themis',
                 'HSR': 'HC',
                 'LNC': 'LinkerCoin',
+                'PLA': 'PlayChip',
                 'UNC': 'Unigame',
                 'USD': 'USDT',
                 'XBT': 'BTC',
@@ -58083,6 +58090,7 @@ module.exports = class idex extends Exchange {
             'commonCurrencies': {
                 'ONE': 'Menlo One',
                 'FT': 'Fabric Token',
+                'PLA': 'PlayChip',
             },
         });
     }
@@ -59135,6 +59143,9 @@ module.exports = class independentreserve extends Exchange {
                     'percentage': true,
                     'tierBased': false,
                 },
+            },
+            'commonCurrencies': {
+                'PLA': 'PlayChip',
             },
         });
     }
@@ -69919,6 +69930,9 @@ module.exports = class oceanex extends Exchange {
                     'maker': 0.1 / 100,
                     'taker': 0.1 / 100,
                 },
+            },
+            'commonCurrencies': {
+                'PLA': 'Plair',
             },
             'exceptions': {
                 'codes': {
