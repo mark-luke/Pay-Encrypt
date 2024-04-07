@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.90'
+const version = '1.33.20'
 
 Exchange.ccxtVersion = version
 
@@ -1835,7 +1835,7 @@ const {
     , defaultFetch
 } = functions
 
-const {
+const { // eslint-disable-line object-curly-newline
     ExchangeError
     , BadSymbol
     , InvalidAddress
@@ -2245,46 +2245,31 @@ module.exports = class Exchange {
         }
     }
 
-    defineRestApi (api, methodName, options = {}) {
-
-        for (const type of Object.keys (api)) {
-            for (const httpMethod of Object.keys (api[type])) {
-
-                let paths = api[type][httpMethod]
-                for (let i = 0; i < paths.length; i++) {
-                    let path = paths[i].trim ()
-                    let splitPath = path.split (/[^a-zA-Z0-9]/)
-
-                    let uppercaseMethod  = httpMethod.toUpperCase ()
-                    let lowercaseMethod  = httpMethod.toLowerCase ()
-                    let camelcaseMethod  = this.capitalize (lowercaseMethod)
-                    let camelcaseSuffix  = splitPath.map (this.capitalize).join ('')
-                    let underscoreSuffix = splitPath.map (x => x.trim ().toLowerCase ()).filter (x => x.length > 0).join ('_')
-
-                    let camelcase  = type + camelcaseMethod + this.capitalize (camelcaseSuffix)
-                    let underscore = type + '_' + lowercaseMethod + '_' + underscoreSuffix
-
-                    if ('suffixes' in options) {
-                        if ('camelcase' in options['suffixes']) {
-                            camelcase += options['suffixes']['camelcase']
-                        }
-                        if ('underscore' in options.suffixes) {
-                            underscore += options['suffixes']['underscore']
-                        }
-                    }
-
-                    if ('underscore_suffix' in options) {
-                        underscore += options.underscoreSuffix;
-                    }
-                    if ('camelcase_suffix' in options) {
-                        camelcase += options.camelcaseSuffix;
-                    }
-
-                    let partial = async params => this[methodName] (path, type, uppercaseMethod, params || {})
-
+    defineRestApi (api, methodName, paths = []) {
+        const keys = Object.keys (api)
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i]
+            const value = api[key]
+            if (Array.isArray (value)) {
+                const uppercaseMethod = key.toUpperCase ()
+                const lowercaseMethod = key.toLowerCase ()
+                const camelcaseMethod = this.capitalize (lowercaseMethod)
+                for (let k = 0; k < value.length; k++) {
+                    const path = value[k].trim ()
+                    const splitPath = path.split (/[^a-zA-Z0-9]/)
+                    const camelcaseSuffix  = splitPath.map (this.capitalize).join ('')
+                    const underscoreSuffix = splitPath.map ((x) => x.trim ().toLowerCase ()).filter ((x) => x.length > 0).join ('_')
+                    const camelcasePrefix = [ paths[0] ].concat (paths.slice (1).map (this.capitalize)).join ('')
+                    const underscorePrefix = [ paths[0] ].concat (paths.slice (1).map ((x) => x.trim ()).filter ((x) => x.length > 0)).join ('_')
+                    const camelcase  = camelcasePrefix + camelcaseMethod + this.capitalize (camelcaseSuffix)
+                    const underscore = underscorePrefix + '_' + lowercaseMethod + '_' + underscoreSuffix
+                    const typeArgument = (paths.length > 1) ? paths : paths[0]
+                    const partial = async (params) => this[methodName] (path, typeArgument, uppercaseMethod, params || {})
                     this[camelcase]  = partial
                     this[underscore] = partial
                 }
+            } else {
+                this.defineRestApi (value, methodName, paths.concat ([ key ]))
             }
         }
     }
@@ -2440,11 +2425,11 @@ module.exports = class Exchange {
             }
 
             if (this.enableLastHttpResponse) {
-                this.last_http_response = responseBody // FIXME: for those classes that haven't switched to handleErrors yet
+                this.last_http_response = responseBody
             }
 
             if (this.enableLastJsonResponse) {
-                this.last_json_response = json         // FIXME: for those classes that haven't switched to handleErrors yet
+                this.last_json_response = json
             }
 
             if (this.verbose) {
@@ -4145,11 +4130,12 @@ function numberToString (x) { // avoids scientific notation for too large and to
 
     const s = x.toString ()
     if (Math.abs (x) < 1.0) {
-        const e = parseInt (s.split ('e-')[1])
+        const n_e = s.split ('e-')
+        const n = n_e[0].replace ('.', '')
+        const e = parseInt (n_e[1])
         const neg = (s[0] === '-')
         if (e) {
-            x *= Math.pow (10, e - 1)
-            x = (neg ? '-' : '') + '0.' + (new Array (e)).join ('0') + x.toString ().substring (neg ? 3 : 2)
+            x = (neg ? '-' : '') + '0.' + (new Array (e)).join ('0') + n.substring (neg)
             return x
         }
     } else {
@@ -4163,7 +4149,7 @@ function numberToString (x) { // avoids scientific notation for too large and to
             return m[0] + m[1] + (new Array (e + 1)).join ('0')
         }
     }
-    return s;
+    return s
 }
 
 //-----------------------------------------------------------------------------
@@ -19120,14 +19106,14 @@ module.exports = class bithumb extends Exchange {
         const data = this.safeValue (response, 'data');
         const currencyIds = Object.keys (data);
         const result = [];
+        const quote = this.safeCurrencyCode ('KRW');
         for (let i = 0; i < currencyIds.length; i++) {
             const currencyId = currencyIds[i];
             if (currencyId === 'date') {
                 continue;
             }
             const market = data[currencyId];
-            const base = currencyId;
-            const quote = 'KRW';
+            const base = this.safeCurrencyCode (currencyId);
             const symbol = currencyId + '/' + quote;
             let active = true;
             if (Array.isArray (market)) {
@@ -20967,9 +20953,26 @@ module.exports = class bitmax extends Exchange {
                         'futures/funding-rates',
                     ],
                 },
+                'accountCategory': {
+                    'get': [
+                        'balance',
+                        'order/open',
+                        'order/status',
+                        'order/hist/current',
+                        'risk',
+                    ],
+                    'post': [
+                        'order',
+                        'order/batch',
+                    ],
+                    'delete': [
+                        'order',
+                        'order/all',
+                        'order/batch',
+                    ],
+                },
                 'accountGroup': {
                     'get': [
-                        '{account-category}/balance',
                         'cash/balance',
                         'margin/balance',
                         'margin/risk',
@@ -20978,21 +20981,11 @@ module.exports = class bitmax extends Exchange {
                         'futures/position',
                         'futures/risk',
                         'futures/funding-payments',
-                        '{account-category}/order/open',
-                        '{account-category}/order/status',
-                        '{account-category}/order/hist/current',
                         'order/hist',
                     ],
                     'post': [
                         'futures/transfer/deposit',
                         'futures/transfer/withdraw',
-                        '{account-category}/order',
-                        '{account-category}/order/batch',
-                    ],
-                    'delete': [
-                        '{account-category}/order',
-                        '{account-category}/order/all',
-                        '{account-category}/order/batch',
                     ],
                 },
                 'private': {
@@ -21411,11 +21404,11 @@ module.exports = class bitmax extends Exchange {
         const request = {
             'account-group': accountGroup,
         };
-        let method = 'accountGroupGetCashBalance';
-        if (accountCategory === 'margin') {
-            method = 'accountGroupGetMarginBalance';
-        } else if (accountCategory === 'futures') {
+        let method = 'accountCategoryGetBalance';
+        if (accountCategory === 'futures') {
             method = 'accountGroupGetFuturesCollateralBalance';
+        } else {
+            request['account-category'] = accountCategory;
         }
         const response = await this[method] (this.extend (request, params));
         //
@@ -21979,7 +21972,7 @@ module.exports = class bitmax extends Exchange {
                 params = this.omit (params, 'stopPrice');
             }
         }
-        const response = await this.accountGroupPostAccountCategoryOrder (this.extend (request, params));
+        const response = await this.accountCategoryPostOrder (this.extend (request, params));
         //
         //     {
         //         "code": 0,
@@ -22018,7 +22011,7 @@ module.exports = class bitmax extends Exchange {
             'account-category': accountCategory,
             'orderId': id,
         };
-        const response = await this.accountGroupGetAccountCategoryOrderStatus (this.extend (request, params));
+        const response = await this.accountCategoryGetOrderStatus (this.extend (request, params));
         //
         //     {
         //         "code": 0,
@@ -22068,7 +22061,7 @@ module.exports = class bitmax extends Exchange {
             'account-group': accountGroup,
             'account-category': accountCategory,
         };
-        const response = await this.accountGroupGetAccountCategoryOrderOpen (this.extend (request, params));
+        const response = await this.accountCategoryGetOrderOpen (this.extend (request, params));
         //
         //     {
         //         "ac": "CASH",
@@ -22155,7 +22148,7 @@ module.exports = class bitmax extends Exchange {
         }
         const response = await this[method] (this.extend (request, params));
         //
-        // accountGroupGetAccountCategoryOrderHistCurrent
+        // accountCategoryGetOrderHistCurrent
         //
         //     {
         //         "code":0,
@@ -22254,7 +22247,7 @@ module.exports = class bitmax extends Exchange {
             request['id'] = clientOrderId;
             params = this.omit (params, [ 'clientOrderId', 'id' ]);
         }
-        const response = await this.accountGroupDeleteAccountCategoryOrder (this.extend (request, params));
+        const response = await this.accountCategoryDeleteOrder (this.extend (request, params));
         //
         //     {
         //         "code": 0,
@@ -22298,7 +22291,7 @@ module.exports = class bitmax extends Exchange {
             market = this.market (symbol);
             request['symbol'] = market['id'];
         }
-        const response = await this.accountGroupDeleteAccountCategoryOrderAll (this.extend (request, params));
+        const response = await this.accountCategoryDeleteOrderAll (this.extend (request, params));
         //
         //     {
         //         "code": 0,
@@ -22545,12 +22538,18 @@ module.exports = class bitmax extends Exchange {
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
         let url = '';
         let query = params;
-        if (api === 'accountGroup') {
+        const accountCategory = (api === 'accountCategory');
+        if (accountCategory || (api === 'accountGroup')) {
             url += this.implodeParams ('/{account-group}', params);
             query = this.omit (params, 'account-group');
         }
         const request = this.implodeParams (path, query);
-        url += '/api/pro/' + this.version + '/' + request;
+        url += '/api/pro/' + this.version;
+        if (accountCategory) {
+            url += this.implodeParams ('/{account-category}', query);
+            query = this.omit (query, 'account-category');
+        }
+        url += '/' + request;
         query = this.omit (query, this.extractParams (path));
         if (api === 'public') {
             if (Object.keys (query).length) {
@@ -53552,7 +53551,8 @@ module.exports = class currencycom extends Exchange {
             'name': 'Currency.com',
             'countries': [ 'BY' ], // Belarus
             'rateLimit': 500,
-            'certified': false,
+            'certified': true,
+            'pro': true,
             'version': 'v1',
             // new metainfo interface
             'has': {
@@ -63683,6 +63683,7 @@ module.exports = class ftx extends Exchange {
                     'Size too small': InvalidOrder, // {"error":"Size too small","success":false}
                     'Missing parameter price': InvalidOrder, // {"error":"Missing parameter price","success":false}
                     'Order not found': OrderNotFound, // {"error":"Order not found","success":false}
+                    'Order already closed': InvalidOrder, // {"error":"Order already closed","success":false}
                 },
                 'broad': {
                     'Invalid parameter': BadRequest, // {"error":"Invalid parameter start_time","success":false}
@@ -63704,6 +63705,10 @@ module.exports = class ftx extends Exchange {
                 },
                 'fetchOrders': {
                     'method': 'privateGetOrdersHistory', // privateGetConditionalOrdersHistory
+                },
+                'sign': {
+                    'ftx.com': 'FTX',
+                    'ftx.us': 'FTXUS',
                 },
             },
         });
@@ -64849,7 +64854,7 @@ module.exports = class ftx extends Exchange {
         return this.safeString (statuses, status, status);
     }
 
-    parseTransaction (transaction) {
+    parseTransaction (transaction, currency = undefined) {
         //
         // fetchDeposits
         //
@@ -64889,7 +64894,7 @@ module.exports = class ftx extends Exchange {
         const address = this.safeString (transaction, 'address');
         const tag = this.safeString (transaction, 'tag');
         const fee = this.safeFloat (transaction, 'fee');
-        const type = ('confirmations' in transaction) ? 'deposit' : 'withdrawal';
+        const type = ('destinationName' in transaction) ? 'withdrawal' : 'deposit';
         return {
             'info': transaction,
             'id': id,
@@ -64978,17 +64983,21 @@ module.exports = class ftx extends Exchange {
             this.checkRequiredCredentials ();
             const timestamp = this.milliseconds ().toString ();
             let auth = timestamp + method + request;
-            headers = {
-                'FTX-KEY': this.apiKey,
-                'FTX-TS': timestamp,
-            };
+            headers = {};
             if (method === 'POST') {
                 body = this.json (query);
                 auth += body;
                 headers['Content-Type'] = 'application/json';
             }
             const signature = this.hmac (this.encode (auth), this.encode (this.secret), 'sha256');
-            headers['FTX-SIGN'] = signature;
+            const options = this.safeValue (this.options, 'sign', {});
+            const headerPrefix = this.safeString (options, this.hostname, 'FTX');
+            const keyField = headerPrefix + '-KEY';
+            const tsField = headerPrefix + '-TS';
+            const signField = headerPrefix + '-SIGN';
+            headers[keyField] = this.apiKey;
+            headers[tsField] = timestamp;
+            headers[signField] = signature;
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
     }
@@ -75085,7 +75094,7 @@ module.exports = class indodax extends Exchange {
         const result = [];
         for (let i = 0; i < response.length; i++) {
             const market = response[i];
-            const id = this.safeString (market, 'id');
+            const id = this.safeString (market, 'ticker_id');
             const baseId = this.safeString (market, 'traded_currency');
             const quoteId = this.safeString (market, 'base_currency');
             const base = this.safeCurrencyCode (baseId);
@@ -75620,6 +75629,9 @@ module.exports = class itbit extends Exchange {
                 'ETH/USD': { 'id': 'ETHUSD', 'symbol': 'ETH/USD', 'base': 'ETH', 'quote': 'USD', 'baseId': 'ETH', 'quoteId': 'USD' },
                 'ETH/EUR': { 'id': 'ETHEUR', 'symbol': 'ETH/EUR', 'base': 'ETH', 'quote': 'EUR', 'baseId': 'ETH', 'quoteId': 'EUR' },
                 'ETH/SGD': { 'id': 'ETHSGD', 'symbol': 'ETH/SGD', 'base': 'ETH', 'quote': 'SGD', 'baseId': 'ETH', 'quoteId': 'SGD' },
+                'PAXGUSD': { 'id': 'PAXGUSD', 'symbol': 'PAXG/USD', 'base': 'PAXG', 'quote': 'USD', 'baseId': 'PAXG', 'quoteId': 'USD' },
+                'BCHUSD': { 'id': 'BCHUSD', 'symbol': 'BCH/USD', 'base': 'BCH', 'quote': 'USD', 'baseId': 'BCH', 'quoteId': 'USD' },
+                'LTCUSD': { 'id': 'LTCUSD', 'symbol': 'LTC/USD', 'base': 'LTC', 'quote': 'USD', 'baseId': 'LTC', 'quoteId': 'USD' },
             },
             'fees': {
                 'trading': {
@@ -76737,8 +76749,8 @@ module.exports = class kraken extends Exchange {
         await this.loadMarkets ();
         symbols = (symbols === undefined) ? this.symbols : symbols;
         const marketIds = [];
-        for (let i = 0; i < this.symbols.length; i++) {
-            const symbol = this.symbols[i];
+        for (let i = 0; i < symbols.length; i++) {
+            const symbol = symbols[i];
             const market = this.markets[symbol];
             if (market['active'] && !market['darkpool']) {
                 marketIds.push (market['id']);
@@ -86791,6 +86803,7 @@ module.exports = class okex extends Exchange {
                         'instruments/{instrument_id}/ticker',
                         'instruments/{instrument_id}/trades',
                         'instruments/{instrument_id}/candles',
+                        'instruments/{instrument_id}/history/candles',
                     ],
                     'post': [
                         'order_algo',
@@ -86855,6 +86868,7 @@ module.exports = class okex extends Exchange {
                         'instruments/{instrument_id}/ticker',
                         'instruments/{instrument_id}/trades',
                         'instruments/{instrument_id}/candles',
+                        'instruments/{instrument_id}/history/candles',
                         'instruments/{instrument_id}/index',
                         'rate',
                         'instruments/{instrument_id}/estimated_price',
@@ -86899,6 +86913,7 @@ module.exports = class okex extends Exchange {
                         'instruments/{instrument_id}/ticker',
                         'instruments/{instrument_id}/trades',
                         'instruments/{instrument_id}/candles',
+                        'instruments/{instrument_id}/history/candles',
                         'instruments/{instrument_id}/index',
                         'rate',
                         'instruments/{instrument_id}/open_interest',
@@ -88032,22 +88047,40 @@ module.exports = class okex extends Exchange {
     async fetchOHLCV (symbol, timeframe = '1m', since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const market = this.market (symbol);
-        const method = market['type'] + 'GetInstrumentsInstrumentIdCandles';
+        let method = undefined;
+        const duration = this.parseTimeframe (timeframe);
         const request = {
             'instrument_id': market['id'],
             'granularity': this.timeframes[timeframe],
         };
-        const duration = this.parseTimeframe (timeframe);
-        if (since !== undefined) {
-            if (limit !== undefined) {
-                request['end'] = this.iso8601 (this.sum (since, limit * duration * 1000));
+        if (market['option']) {
+            method = market['type'] + 'GetInstrumentsInstrumentIdCandles';
+            if (since !== undefined) {
+                if (limit !== undefined) {
+                    request['end'] = this.iso8601 (this.sum (since, limit * duration * 1000));
+                }
+                request['start'] = this.iso8601 (since);
+            } else {
+                if (limit !== undefined) {
+                    const now = this.milliseconds ();
+                    request['start'] = this.iso8601 (now - limit * duration * 1000);
+                    request['end'] = this.iso8601 (now);
+                }
             }
-            request['start'] = this.iso8601 (since);
         } else {
-            const now = this.milliseconds ();
-            if (limit !== undefined) {
-                request['start'] = this.iso8601 (now - limit * duration * 1000);
-                request['end'] = this.iso8601 (now);
+            method = market['type'] + 'GetInstrumentsInstrumentIdHistoryCandles';
+            if (since !== undefined) {
+                if (limit === undefined) {
+                    limit = 300; // default
+                }
+                request['start'] = this.iso8601 (this.sum (since, limit * duration * 1000));
+                request['end'] = this.iso8601 (since);
+            } else {
+                if (limit !== undefined) {
+                    const now = this.milliseconds ();
+                    request['end'] = this.iso8601 (now - limit * duration * 1000);
+                    request['start'] = this.iso8601 (now);
+                }
             }
         }
         const response = await this[method] (this.extend (request, params));
@@ -90229,7 +90262,7 @@ module.exports = class paymium extends Exchange {
 // ----------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, BadSymbol, AuthenticationError, InsufficientFunds, InvalidOrder, ArgumentsRequired, OrderNotFound, BadRequest, PermissionDenied, AccountSuspended, CancelPending, DDoSProtection, DuplicateOrderId } = require ('./base/errors');
+const { ExchangeError, BadSymbol, AuthenticationError, InsufficientFunds, InvalidOrder, ArgumentsRequired, OrderNotFound, BadRequest, PermissionDenied, AccountSuspended, CancelPending, DDoSProtection, DuplicateOrderId, NotSupported } = require ('./base/errors');
 const { TICK_SIZE, ROUND, DECIMAL_PLACES } = require ('./base/functions/number');
 
 // ----------------------------------------------------------------------------
@@ -90245,21 +90278,22 @@ module.exports = class phemex extends Exchange {
             'certified': false,
             'pro': true,
             'has': {
-                'fetchMarkets': true,
+                'cancelAllOrders': true, // swap contracts only
+                'cancelOrder': true,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchClosedOrders': true,
                 'fetchCurrencies': true,
-                'fetchOrderBook': true,
+                'fetchDepositAddress': true,
+                'fetchMarkets': true,
+                'fetchMyTrades': true,
                 'fetchOHLCV': true,
+                'fetchOpenOrders': true,
+                'fetchOrder': true,
+                'fetchOrderBook': true,
+                'fetchOrders': true,
                 'fetchTicker': true,
                 'fetchTrades': true,
-                'fetchBalance': true,
-                'createOrder': true,
-                'cancelOrder': true,
-                'fetchDepositAddress': true,
-                'fetchOrder': true,
-                'fetchOrders': true,
-                'fetchOpenOrders': true,
-                'fetchClosedOrders': true,
-                'fetchMyTrades': true,
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/85225056-221eb600-b3d7-11ea-930d-564d2690e3f6.jpg',
@@ -92117,6 +92151,24 @@ module.exports = class phemex extends Exchange {
         const response = await this[method] (this.extend (request, params));
         const data = this.safeValue (response, 'data', {});
         return this.parseOrder (data, market);
+    }
+
+    async cancelAllOrders (symbol = undefined, params = {}) {
+        await this.loadMarkets ();
+        const request = {
+            // 'symbol': market['id'],
+            // 'untriggerred': false, // false to cancel non-conditional orders, true to cancel conditional orders
+            // 'text': 'up to 40 characters max',
+        };
+        let market = undefined;
+        if (symbol !== undefined) {
+            market = this.market (symbol);
+            if (!market['swap']) {
+                throw new NotSupported (this.id + ' cancelAllOrders() supports swap market type orders only');
+            }
+            request['symbol'] = market['id'];
+        }
+        return await this.privateDeleteOrdersAll (this.extend (request, params));
     }
 
     async fetchOrder (id, symbol = undefined, params = {}) {
@@ -126681,11 +126733,9 @@ module.exports = class wavesexchange extends Exchange {
             let code = undefined;
             if (currencyId in this.currencies_by_id) {
                 code = this.safeCurrencyCode (currencyId);
-            } else {
-                code = this.safeCurrencyCode (this.safeString (issueTransaction, 'name'));
+                result[code] = this.account ();
+                result[code]['total'] = this.fromWei (balance, decimals);
             }
-            result[code] = this.account ();
-            result[code]['total'] = this.fromWei (balance, decimals);
         }
         const timestamp = this.milliseconds ();
         const byteArray = [
