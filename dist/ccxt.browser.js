@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.34'
+const version = '1.22.39'
 
 Exchange.ccxtVersion = version
 
@@ -11037,10 +11037,18 @@ module.exports = class binance extends Exchange {
         }
         if ((api === 'private') || (api === 'sapi') || (api === 'wapi' && path !== 'systemStatus') || (api === 'fapiPrivate')) {
             this.checkRequiredCredentials ();
-            let query = this.urlencode (this.extend ({
-                'timestamp': this.nonce (),
-                'recvWindow': this.options['recvWindow'],
-            }, params));
+            let query = undefined;
+            if ((api === 'sapi') && (path === 'asset/dust')) {
+                query = this.urlencodeWithArrayRepeat (this.extend ({
+                    'timestamp': this.nonce (),
+                    'recvWindow': this.options['recvWindow'],
+                }, params));
+            } else {
+                query = this.urlencode (this.extend ({
+                    'timestamp': this.nonce (),
+                    'recvWindow': this.options['recvWindow'],
+                }, params));
+            }
             const signature = this.hmac (this.encode (query), this.encode (this.secret));
             query += '&' + 'signature=' + signature;
             headers = {
@@ -95533,6 +95541,7 @@ module.exports = class stex extends Exchange {
                 'fetchDeposits': true,
                 'fetchWithdrawals': true,
                 'withdraw': true,
+                'fetchFundingFees': true,
             },
             'version': 'v3',
             'urls': {
@@ -97212,6 +97221,63 @@ module.exports = class stex extends Exchange {
         //
         const data = this.safeValue (response, 'data', {});
         return this.parseTransaction (data, currency);
+    }
+
+    async fetchFundingFees (codes = undefined, params = {}) {
+        const response = await this.publicGetCurrencies (params);
+        //
+        //     {
+        //         "success": true,
+        //         "data": [
+        //             {
+        //                 "id": 1,
+        //                 "code": "BTC",
+        //                 "name": "Bitcoin",
+        //                 "active": true,
+        //                 "delisted": false,
+        //                 "precision": 8,
+        //                 "minimum_tx_confirmations": 24,
+        //                 "minimum_withdrawal_amount": "0.009",
+        //                 "minimum_deposit_amount": "0.000003",
+        //                 "deposit_fee_currency_id": 1,
+        //                 "deposit_fee_currency_code": "ETH",
+        //                 "deposit_fee_const": "0.00001",
+        //                 "deposit_fee_percent": "0",
+        //                 "withdrawal_fee_currency_id": 1,
+        //                 "withdrawal_fee_currency_code": "ETH",
+        //                 "withdrawal_fee_const": "0.0015",
+        //                 "withdrawal_fee_percent": "0",
+        //                 "withdrawal_limit": "string",
+        //                 "block_explorer_url": "https://blockchain.info/tx/",
+        //                 "protocol_specific_settings": [
+        //                     {
+        //                         "protocol_name": "Tether OMNI",
+        //                         "protocol_id": 10,
+        //                         "active": true,
+        //                         "withdrawal_fee_currency_id": 1,
+        //                         "withdrawal_fee_const": 0.002,
+        //                         "withdrawal_fee_percent": 0,
+        //                         "block_explorer_url": "https://omniexplorer.info/search/"
+        //                     }
+        //                 ]
+        //             }
+        //         ]
+        //     }
+        //
+        const data = this.safeValue (response, 'data', []);
+        const withdrawFees = {};
+        const depositFees = {};
+        for (let i = 0; i < data.length; i++) {
+            const id = this.safeString (data[i], 'id');
+            const code = this.safeCurrencyCode (id);
+            withdrawFees[code] = this.safeFloat (data[i], 'withdrawal_fee_const');
+            depositFees[code] = this.safeFloat (data[i], 'deposit_fee_const');
+        }
+        return {
+            'withdraw': withdrawFees,
+            'deposit': depositFees,
+            'info': response,
+        };
     }
 
     handleErrors (httpCode, reason, url, method, headers, body, response, requestHeaders, requestBody) {
