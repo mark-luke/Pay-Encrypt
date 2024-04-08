@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.93'
+const version = '1.30.94'
 
 Exchange.ccxtVersion = version
 
@@ -79365,7 +79365,7 @@ module.exports = class luno extends Exchange {
             'urls': {
                 'referral': 'https://www.luno.com/invite/44893A',
                 'logo': 'https://user-images.githubusercontent.com/1294454/27766607-8c1a69d8-5ede-11e7-930c-540b5eb9be24.jpg',
-                'api': 'https://api.mybitx.com/api',
+                'api': 'https://api.luno.com/api',
                 'www': 'https://www.luno.com',
                 'doc': [
                     'https://www.luno.com/en/api',
@@ -79400,6 +79400,7 @@ module.exports = class luno extends Exchange {
                     ],
                     'post': [
                         'accounts',
+                        'accounts/{id}/name',
                         'postorder',
                         'marketorder',
                         'stoporder',
