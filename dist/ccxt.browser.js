@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.65'
+const version = '1.33.66'
 
 Exchange.ccxtVersion = version
 
@@ -2095,14 +2095,15 @@ module.exports = class Exchange {
         }
         unCamelCaseProperties ()
 
-        // merge configs
-        const config = deepExtend (this.describe (), userConfig)
-
         // merge to this
-        const configEntries = Object.entries (config)
+        const configEntries = Object.entries (this.describe ()).concat (Object.entries (userConfig))
         for (let i = 0; i < configEntries.length; i++) {
             const [property, value] = configEntries[i]
-            this[property] = deepExtend (this[property], value)
+            if (value && Object.getPrototypeOf (value) === Object.prototype) {
+                this[property] = deepExtend (this[property], value)
+            } else {
+                this[property] = value
+            }
         }
         
         const agentOptions = {
