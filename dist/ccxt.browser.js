@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1285'
+const version = '1.18.1286'
 
 Exchange.ccxtVersion = version
 
@@ -97611,8 +97611,8 @@ module.exports = class tidebit extends Exchange {
                 'trading': {
                     'tierBased': false,
                     'percentage': true,
-                    'maker': 0.2 / 100,
-                    'taker': 0.2 / 100,
+                    'maker': 0.3 / 100,
+                    'taker': 0.3 / 100,
                 },
                 'funding': {
                     'tierBased': false,
