@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.56'
+const version = '1.21.64'
 
 Exchange.ccxtVersion = version
 
@@ -8184,6 +8184,7 @@ module.exports = class bigone extends Exchange {
                 'fetchDeposits': true,
                 'fetchMyTrades': true,
                 'fetchOHLCV': true,
+                'fetchOrder': true,
                 'fetchOrders': true,
                 'fetchOpenOrders': true,
                 'fetchClosedOrders': true,
@@ -9452,6 +9453,8 @@ module.exports = class binance extends Exchange {
                 'fetchDeposits': true,
                 'fetchWithdrawals': true,
                 'fetchTransactions': false,
+                'fetchTradingFee': true,
+                'fetchTradingFees': true,
             },
             'timeframes': {
                 '1m': '1m',
@@ -11031,6 +11034,77 @@ module.exports = class binance extends Exchange {
             'info': response,
             'id': this.safeString (response, 'id'),
         };
+    }
+
+    parseTradingFee (fee, market = undefined) {
+        //
+        //     {
+        //         "symbol": "ADABNB",
+        //         "maker": 0.9000,
+        //         "taker": 1.0000
+        //     }
+        //
+        const marketId = this.safeString (fee, 'symbol');
+        let symbol = marketId;
+        if (marketId in this.markets_by_id) {
+            const market = this.markets_by_id[marketId];
+            symbol = market['symbol'];
+        }
+        return {
+            'info': fee,
+            'symbol': symbol,
+            'maker': this.safeFloat (fee, 'maker'),
+            'taker': this.safeFloat (fee, 'taker'),
+        };
+    }
+
+    async fetchTradingFee (symbol, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'symbol': market['id'],
+        };
+        const response = await this.wapiGetTradeFee (this.extend (request, params));
+        //
+        //     {
+        //         "tradeFee": [
+        //             {
+        //                 "symbol": "ADABNB",
+        //                 "maker": 0.9000,
+        //                 "taker": 1.0000
+        //             }
+        //         ],
+        //         "success": true
+        //     }
+        //
+        const tradeFee = this.safeValue (response, 'tradeFee', []);
+        const first = this.safeValue (tradeFee, 0, {});
+        return this.parseTradingFee (first);
+    }
+
+    async fetchTradingFees (params = {}) {
+        await this.loadMarkets ();
+        const response = await this.wapiGetTradeFee (params);
+        //
+        //     {
+        //         "tradeFee": [
+        //             {
+        //                 "symbol": "ADABNB",
+        //                 "maker": 0.9000,
+        //                 "taker": 1.0000
+        //             }
+        //         ],
+        //         "success": true
+        //     }
+        //
+        const tradeFee = this.safeValue (response, 'tradeFee', []);
+        const result = {};
+        for (let i = 0; i < tradeFee.length; i++) {
+            const fee = this.parseTradingFee (tradeFee[i]);
+            const symbol = fee['symbol'];
+            result[symbol] = fee;
+        }
+        return result;
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
@@ -31378,8 +31452,8 @@ module.exports = class bw extends Exchange {
             } else {
                 content = body;
             }
-            const signing = this.apiKey + ms + content + this.secret;
-            const hash = this.hash (this.encode (signing), 'md5');
+            const signature = this.apiKey + ms + content + this.secret;
+            const hash = this.hash (this.encode (signature), 'md5');
             if (!headers) {
                 headers = {};
             }
@@ -50564,6 +50638,8 @@ module.exports = class ftx extends Exchange {
                         'lt/balances',
                         'lt/creations',
                         'lt/redemptions',
+                        'subaccounts',
+                        'subaccounts/{nickname}/balances',
                     ],
                     'post': [
                         'account/leverage',
@@ -50572,12 +50648,16 @@ module.exports = class ftx extends Exchange {
                         'conditional_orders',
                         'lt/{token_name}/create',
                         'lt/{token_name}/redeem',
+                        'subaccounts',
+                        'subaccounts/update_name',
+                        'subaccounts/transfer',
                     ],
                     'delete': [
                         'orders/{order_id}',
                         'orders/by_client_id/{client_order_id}',
                         'orders',
                         'conditional_orders/{order_id}',
+                        'subaccounts',
                     ],
                 },
             },
@@ -54548,7 +54628,7 @@ module.exports = class hitbtc extends Exchange {
 // ---------------------------------------------------------------------------
 
 const hitbtc = require ('./hitbtc');
-const { BadSymbol, PermissionDenied, ExchangeError, ExchangeNotAvailable, OrderNotFound, InsufficientFunds, InvalidOrder, RequestTimeout } = require ('./base/errors');
+const { BadSymbol, PermissionDenied, ExchangeError, ExchangeNotAvailable, OrderNotFound, InsufficientFunds, InvalidOrder, RequestTimeout, AuthenticationError } = require ('./base/errors');
 const { TRUNCATE, DECIMAL_PLACES } = require ('./base/functions/number');
 // ---------------------------------------------------------------------------
 
@@ -55089,6 +55169,7 @@ module.exports = class hitbtc2 extends hitbtc {
             },
             'exceptions': {
                 '504': RequestTimeout, // {"error":{"code":504,"message":"Gateway Timeout"}}
+                '1002': AuthenticationError, // {"error":{"code":1002,"message":"Authorization failed","description":""}}
                 '1003': PermissionDenied, // "Action is forbidden for this API key"
                 '2010': InvalidOrder, // "Quantity not a valid number"
                 '2001': BadSymbol, // "Symbol not found"
@@ -73574,12 +73655,12 @@ module.exports = class okex3 extends Exchange {
             'amount': this.numberToString (amount),
             'fee': fee, // String. Network transaction fee ≥ 0. Withdrawals to OKCoin or OKEx are fee-free, please set as 0. Withdrawal to external digital asset address requires network transaction fee.
         };
-        if (this.password) {
-            request['trade_pwd'] = this.password;
-        } else if ('password' in params) {
+        if ('password' in params) {
             request['trade_pwd'] = params['password'];
         } else if ('trade_pwd' in params) {
             request['trade_pwd'] = params['trade_pwd'];
+        } else if (this.password) {
+            request['trade_pwd'] = this.password;
         }
         const query = this.omit (params, [ 'fee', 'password', 'trade_pwd' ]);
         if (!('trade_pwd' in request)) {
