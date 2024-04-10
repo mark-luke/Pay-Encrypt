@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.5'
+const version = '1.24.6'
 
 Exchange.ccxtVersion = version
 
@@ -23322,6 +23322,7 @@ module.exports = class bittrex extends Exchange {
                     'https://bittrex.zendesk.com/hc/en-us/articles/115003684371-BITTREX-SERVICE-FEES-AND-WITHDRAWAL-LIMITATIONS',
                     'https://bittrex.zendesk.com/hc/en-us/articles/115000199651-What-fees-does-Bittrex-charge-',
                 ],
+                'referral': 'https://bittrex.com/Account/Register?referralCode=1ZE-G0G-M3B',
             },
             'api': {
                 'v3': {
