@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.81'
+const version = '1.26.82'
 
 Exchange.ccxtVersion = version
 
@@ -30392,6 +30392,7 @@ module.exports = class btctradeua extends Exchange {
                 'CORS': false,
                 'createMarketOrder': false,
                 'fetchOpenOrders': true,
+                'signIn': true,
             },
             'urls': {
                 'referral': 'https://btc-trade.com.ua/registration/22689',
