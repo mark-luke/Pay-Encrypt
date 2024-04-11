@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1330'
+const version = '1.18.1331'
 
 Exchange.ccxtVersion = version
 
@@ -18095,7 +18095,7 @@ module.exports = class bitmax extends Exchange {
             request['startTime'] = since;
         }
         if (limit !== undefined) {
-            request['pageSize'] = limit;
+            request['n'] = limit; // default 15, max 50
         }
         const response = await this.privateGetOrderHistory (this.extend (request, params));
         //
