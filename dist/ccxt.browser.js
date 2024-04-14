@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.72'
+const version = '1.28.73'
 
 Exchange.ccxtVersion = version
 
@@ -84955,7 +84955,7 @@ module.exports = class qtrade extends Exchange {
             this.safeFloat (ohlcv, 'high'),
             this.safeFloat (ohlcv, 'low'),
             this.safeFloat (ohlcv, 'close'),
-            this.safeFloat (ohlcv, 'volume'),
+            this.safeFloat (ohlcv, 'market_volume'),
         ];
         return result;
     }
