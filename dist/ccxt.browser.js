@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.98'
+const version = '1.35.99'
 
 Exchange.ccxtVersion = version
 
@@ -49768,9 +49768,8 @@ module.exports = class coinfalcon extends Exchange {
         // TODO: test status=all if it works for closed orders too
         const response = await this.privateGetUserOrders (this.extend (request, params));
         const data = this.safeValue (response, 'data', []);
-        let orders = this.parseOrders (data, market);
-        orders = this.filterBy (orders, 'status', 'open');
-        return this.filterBySymbolSinceLimit (orders, symbol, since, limit);
+        const orders = this.filterByArray (data, 'status', [ 'pending', 'open', 'partially_filled' ]);
+        return this.parseOrders (orders, market, since, limit);
     }
 
     nonce () {
