@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.64'
+const version = '1.26.65'
 
 Exchange.ccxtVersion = version
 
@@ -33741,6 +33741,8 @@ module.exports = class bybit extends Exchange {
         //         "exec_id": "256e5ef8-abfe-5772-971b-f944e15e0d68",
         //         "exec_price": "8178.5",
         //         "exec_qty": 1,
+        //         // the docs say the exec_time field is "abandoned" now
+        //         // the user should use "trade_time_ms"
         //         "exec_time": "1571676941.70682",
         //         "exec_type": "Trade", //Exec Type Enum
         //         "exec_value": "0.00012227",
@@ -33755,7 +33757,8 @@ module.exports = class bybit extends Exchange {
         //         "order_type": "Market", //Order Type Enum
         //         "side": "Buy", //Side Enum
         //         "symbol": "BTCUSD", //Symbol Enum
-        //         "user_id": 1
+        //         "user_id": 1,
+        //         "trade_time_ms": 1577480599000
         //     }
         //
         const id = this.safeString2 (trade, 'id', 'exec_id');
@@ -33773,7 +33776,7 @@ module.exports = class bybit extends Exchange {
         }
         let timestamp = this.parse8601 (this.safeString (trade, 'time'));
         if (timestamp === undefined) {
-            timestamp = this.safeTimestamp (trade, 'exec_time');
+            timestamp = this.safeInteger (trade, 'trade_time_ms');
         }
         const side = this.safeStringLower (trade, 'side');
         const price = this.safeFloat2 (trade, 'price', 'exec_price');
@@ -34577,7 +34580,7 @@ module.exports = class bybit extends Exchange {
             request['symbol'] = market['id'];
         }
         if (since !== undefined) {
-            request['start_time'] = parseInt (since / 1000);
+            request['start_time'] = since;
         }
         if (limit !== undefined) {
             request['limit'] = limit; // default 20, max 50
