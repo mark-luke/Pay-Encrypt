@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.49'
+const version = '1.32.50'
 
 Exchange.ccxtVersion = version
 
@@ -20068,12 +20068,18 @@ module.exports = class bitmex extends Exchange {
             const currencyId = this.safeString (balance, 'currency');
             const code = this.safeCurrencyCode (currencyId);
             const account = this.account ();
-            account['free'] = this.safeFloat (balance, 'availableMargin');
-            account['total'] = this.safeFloat (balance, 'marginBalance');
+            let free = this.safeFloat (balance, 'availableMargin');
+            let total = this.safeFloat (balance, 'marginBalance');
             if (code === 'BTC') {
-                account['free'] = account['free'] / 100000000;
-                account['total'] = account['total'] / 100000000;
+                if (free !== undefined) {
+                    free /= 100000000;
+                }
+                if (total !== undefined) {
+                    total /= 100000000;
+                }
             }
+            account['free'] = free;
+            account['total'] = total;
             result[code] = account;
         }
         return this.parseBalance (result);
