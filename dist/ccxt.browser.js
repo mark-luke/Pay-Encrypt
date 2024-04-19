@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.90'
+const version = '1.35.91'
 
 Exchange.ccxtVersion = version
 
@@ -30582,8 +30582,7 @@ module.exports = class bittrex extends Exchange {
             request['marketSymbol'] = market['id'];
         }
         const response = await this.privateGetOrdersOpen (this.extend (request, params));
-        const orders = this.parseOrders (response, market, since, limit);
-        return this.filterBySymbol (orders, symbol);
+        return this.parseOrders (response, market, since, limit);
     }
 
     async fetchOrderTrades (id, symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -31019,11 +31018,7 @@ module.exports = class bittrex extends Exchange {
         const response = await this.privateGetOrdersClosed (this.extend (request, params));
         const orders = this.parseOrders (response, market);
         const trades = this.ordersToTrades (orders);
-        if (symbol !== undefined) {
-            return this.filterBySinceLimit (trades, since, limit);
-        } else {
-            return this.filterBySymbolSinceLimit (trades, symbol, since, limit);
-        }
+        return this.filterBySymbolSinceLimit (trades, symbol, since, limit);
     }
 
     async fetchClosedOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -31048,11 +31043,7 @@ module.exports = class bittrex extends Exchange {
             request['marketSymbol'] = market['base'] + '-' + market['quote'];
         }
         const response = await this.privateGetOrdersClosed (this.extend (request, params));
-        const orders = this.parseOrders (response, market, since, limit);
-        if (symbol !== undefined) {
-            return this.filterBySymbol (orders, symbol);
-        }
-        return orders;
+        return this.parseOrders (response, market, since, limit);
     }
 
     async fetchDepositAddress (code, params = {}) {
