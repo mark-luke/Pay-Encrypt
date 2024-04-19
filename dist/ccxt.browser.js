@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.50'
+const version = '1.31.51'
 
 Exchange.ccxtVersion = version
 
@@ -124890,7 +124890,7 @@ module.exports = class xena extends Exchange {
                     'private': 'https://api.xena.exchange',
                 },
                 'www': 'https://xena.exchange',
-                'doc': 'https://support.xena.exchange/support/solutions/articles/44000222066-introduction-to-xena-api',
+                'doc': 'https://support.xena.exchange/support/solutions/44000808700',
                 'fees': 'https://trading.xena.exchange/en/platform-specification/fee-schedule',
             },
             'timeframes': {
