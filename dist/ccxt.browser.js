@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.36'
+const version = '1.20.37'
 
 Exchange.ccxtVersion = version
 
@@ -63240,6 +63240,7 @@ module.exports = class kucoin extends Exchange {
                 '1w': '1week',
             },
             'exceptions': {
+                'order not exist': OrderNotFound,
                 'order_not_exist': OrderNotFound, // {"code":"order_not_exist","msg":"order_not_exist"} ¯\_(ツ)_/¯
                 'order_not_exist_or_not_allow_to_cancel': InvalidOrder, // {"code":"400100","msg":"order_not_exist_or_not_allow_to_cancel"}
                 'Order size below the minimum requirement.': InvalidOrder, // {"code":"400100","msg":"Order size below the minimum requirement."}
