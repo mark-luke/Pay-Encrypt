@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1347'
+const version = '1.18.1348'
 
 Exchange.ccxtVersion = version
 
@@ -100805,6 +100805,7 @@ module.exports = class tidex extends Exchange {
                 },
                 'www': 'https://tidex.com',
                 'doc': 'https://tidex.com/exchange/public-api',
+                'referral': 'https://tidex.com/exchange/?ref=57f5638d9cd7',
                 'fees': [
                     'https://tidex.com/exchange/assets-spec',
                     'https://tidex.com/exchange/pairs-spec',
