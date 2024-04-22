@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.62'
+const version = '1.28.63'
 
 Exchange.ccxtVersion = version
 
@@ -21448,7 +21448,7 @@ module.exports = class bitmex extends Exchange {
             params = this.omit (params, [ 'clOrdID', 'clientOrderId' ]);
         }
         const response = await this.privateDeleteOrder (this.extend (request, params));
-        let order = response[0];
+        let order = this.safeValue (response, 0, {});
         const error = this.safeString (order, 'error');
         if (error !== undefined) {
             if (error.indexOf ('Unable to cancel order due to existing state') >= 0) {
