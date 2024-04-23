@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.71'
+const version = '1.25.72'
 
 Exchange.ccxtVersion = version
 
@@ -6857,8 +6857,9 @@ const decimalToPrecision = (x, roundingMode
     if (countingMode === TICK_SIZE) {
         const precisionDigitsString = decimalToPrecision (numPrecisionDigits, ROUND, 100, DECIMAL_PLACES, NO_PADDING)
         const newNumPrecisionDigits = precisionFromString (precisionDigitsString)
-        const missing = x % numPrecisionDigits
+        let missing = x % numPrecisionDigits
         // See: https://github.com/ccxt/ccxt/pull/6486
+        missing = Number (decimalToPrecision (missing, ROUND, 8, DECIMAL_PLACES, NO_PADDING));
         const fpError = decimalToPrecision (missing / numPrecisionDigits, ROUND, Math.max (newNumPrecisionDigits, 8), DECIMAL_PLACES, NO_PADDING)
         if (precisionFromString (fpError) !== 0) {
             if (roundingMode === ROUND) {
