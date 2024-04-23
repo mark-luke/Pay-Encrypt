@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.93'
+const version = '1.31.94'
 
 Exchange.ccxtVersion = version
 
@@ -31676,12 +31676,19 @@ module.exports = class braziliex extends Exchange {
             'countries': [ 'BR' ],
             'rateLimit': 1000,
             'has': {
+                'cancelOrder': true,
+                'createOrder': true,
+                'fetchBalance': true,
                 'fetchCurrencies': true,
-                'fetchTickers': true,
-                'fetchOpenOrders': true,
-                'fetchMyTrades': true,
                 'fetchDepositAddress': true,
+                'fetchMarkets': true,
+                'fetchMyTrades': true,
+                'fetchOpenOrders': true,
                 'fetchOrder': true,
+                'fetchOrderBook': true,
+                'fetchTicker': true,
+                'fetchTickers': true,
+                'fetchTrades': true,
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/34703593-c4498674-f504-11e7-8d14-ff8e44fb78c1.jpg',
