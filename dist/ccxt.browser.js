@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.89'
+const version = '1.33.90'
 
 Exchange.ccxtVersion = version
 
@@ -95052,8 +95052,7 @@ module.exports = class probit extends Exchange {
             return this.iso8601 (previousSunday * 1000);
         } else {
             timestamp = parseInt (timestamp / 1000);
-            const difference = this.integerModulo (timestamp, duration);
-            timestamp -= difference;
+            timestamp = duration * parseInt (timestamp / duration);
             if (after) {
                 timestamp = this.sum (timestamp, duration);
             }
