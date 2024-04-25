@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.35'
+const version = '1.30.36'
 
 Exchange.ccxtVersion = version
 
@@ -4411,10 +4411,12 @@ module.exports = class Exchange {
     filterBySinceLimit (array, since = undefined, limit = undefined, key = 'timestamp', tail = false) {
         const sinceIsDefined = (since !== undefined && since !== null)
         if (sinceIsDefined) {
-            array = array.filter ((entry) => entry[key] >= since)
+            array = Object.values (array).filter ((entry) => entry[key] >= since)
         }
         if (limit !== undefined && limit !== null) {
-            array = (tail && !sinceIsDefined) ? array.slice (-limit) : array.slice (0, limit)
+            array = (tail && !sinceIsDefined) ?
+                Object.values (array).slice (-limit) :
+                Object.values (array).slice (0, limit)
         }
         return array
     }
@@ -86651,12 +86653,15 @@ module.exports = class phemex extends Exchange {
         let orderId = undefined;
         let takerOrMaker = undefined;
         if (Array.isArray (trade)) {
+            const tradeLength = trade.length;
             timestamp = this.safeIntegerProduct (trade, 0, 0.000001);
-            id = this.safeString (trade, 1);
-            side = this.safeStringLower (trade, 2);
+            if (tradeLength > 4) {
+                id = this.safeString (trade, tradeLength - 4);
+            }
+            side = this.safeStringLower (trade, tradeLength - 3);
             if (market !== undefined) {
-                price = this.fromEp (this.safeFloat (trade, 3), market);
-                amount = this.fromEv (this.safeFloat (trade, 4), market);
+                price = this.fromEp (this.safeFloat (trade, tradeLength - 2), market);
+                amount = this.fromEv (this.safeFloat (trade, tradeLength - 1), market);
                 if (market['spot']) {
                     if ((price !== undefined) && (amount !== undefined)) {
                         cost = price * amount;
