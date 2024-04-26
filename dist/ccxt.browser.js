@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.76'
+const version = '1.29.77'
 
 Exchange.ccxtVersion = version
 
@@ -9374,6 +9374,7 @@ module.exports = class binance extends Exchange {
                         'sub-account/margin/account',
                         'sub-account/margin/accountSummary',
                         'sub-account/status',
+                        'sub-account/transfer/subUserHistory',
                         // lending endpoints
                         'lending/daily/product/list',
                         'lending/daily/userLeftQuota',
