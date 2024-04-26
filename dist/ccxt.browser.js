@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.58'
+const version = '1.32.59'
 
 Exchange.ccxtVersion = version
 
@@ -22866,6 +22866,10 @@ module.exports = class bitmex extends Exchange {
         return result;
     }
 
+    parseBalanceResponse (response) {
+        return this.parseBalances (response);
+    }
+
     parseBalances (balances) {
         //
         //     [
@@ -22990,7 +22994,7 @@ module.exports = class bitmex extends Exchange {
         //         }
         //     ]
         //
-        return this.parseBalances (response);
+        return this.parseBalanceResponse (response);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
