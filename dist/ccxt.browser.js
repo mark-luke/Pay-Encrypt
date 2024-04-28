@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.18'
+const version = '1.35.19'
 
 Exchange.ccxtVersion = version
 
@@ -3300,7 +3300,7 @@ module.exports = unCamelCasePropertyNames (Object.assign ({}
 
 const CryptoJS = require ('../../static_dependencies/crypto-js/crypto-js')
 const { capitalize } = require ('./string')
-const { stringToBase64, utf16ToBase64, urlencodeBase64 } = require ('./encode')
+const { stringToBase64, urlencodeBase64 } = require ('./encode')
 const NodeRSA = require ('./../../static_dependencies/node-rsa/NodeRSA')
 const { binaryToBase58, byteArrayToWordArray } = require ('./encode')
 const elliptic = require ('./../../static_dependencies/elliptic/lib/elliptic')
@@ -3485,7 +3485,6 @@ module.exports =
 
     , stringToBinary: string => CryptoJS.enc.Latin1.parse (string)
     , stringToBase64: string => CryptoJS.enc.Latin1.parse (string).toString (CryptoJS.enc.Base64)
-    , utf16ToBase64:  string => CryptoJS.enc.Utf16 .parse (string).toString (CryptoJS.enc.Base64)
     , base64ToBinary: string => CryptoJS.enc.Base64.parse (string)
     , base64ToString: string => CryptoJS.enc.Base64.parse (string).toString (CryptoJS.enc.Utf8)
     , binaryToBase64: binary => binary.toString (CryptoJS.enc.Base64)
@@ -13976,7 +13975,7 @@ module.exports = class bitfinex extends Exchange {
                 'request': request,
             }, query);
             body = this.json (query);
-            const payload = this.stringToBase64 (this.encode (body));
+            const payload = this.stringToBase64 (body);
             const secret = this.encode (this.secret);
             const signature = this.hmac (payload, secret, 'sha384');
             headers = {
@@ -19951,13 +19950,12 @@ module.exports = class bithumb extends Exchange {
             }, query));
             const nonce = this.nonce ().toString ();
             const auth = endpoint + "\0" + body + "\0" + nonce; // eslint-disable-line quotes
-            const signature = this.hmac (this.encode (auth), this.encode (this.secret), 'sha512');
-            const signature64 = this.decode (this.stringToBase64 (this.encode (signature)));
+            const signature64 = this.hmac (this.encode (auth), this.encode (this.secret), 'sha512', 'base64');
             headers = {
                 'Accept': 'application/json',
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Api-Key': this.apiKey,
-                'Api-Sign': signature64.toString (),
+                'Api-Sign': signature64,
                 'Api-Nonce': nonce,
             };
         }
@@ -37232,7 +37230,7 @@ module.exports = class btcmarkets extends Exchange {
         if (api === 'private') {
             this.checkRequiredCredentials ();
             const nonce = this.nonce ().toString ();
-            const secret = this.base64ToBinary (this.encode (this.secret)); // or stringToBase64
+            const secret = this.base64ToBinary (this.encode (this.secret));
             let auth = method + request + nonce;
             if ((method === 'GET') || (method === 'DELETE')) {
                 if (Object.keys (query).length) {
@@ -37998,7 +37996,7 @@ module.exports = class btcturk extends Exchange {
             headers = {
                 'X-PCK': this.apiKey,
                 'X-Stamp': nonce,
-                'X-Signature': this.stringToBase64 (this.hmac (this.encode (auth), secret, 'sha256', 'binary')),
+                'X-Signature': this.hmac (this.encode (auth), secret, 'sha256', 'base64'),
                 'Content-Type': 'application/x-www-form-urlencoded',
             };
         }
@@ -38770,7 +38768,7 @@ module.exports = class buda extends Exchange {
             const nonce = this.nonce ().toString ();
             const components = [ method, '/api/' + this.version + '/' + request ];
             if (body) {
-                const base64Body = this.stringToBase64 (this.encode (body));
+                const base64Body = this.stringToBase64 (body);
                 components.push (this.decode (base64Body));
             }
             components.push (nonce);
@@ -50033,7 +50031,7 @@ module.exports = class coinfloor extends Exchange {
             const nonce = this.nonce ();
             body = this.urlencode (this.extend ({ 'nonce': nonce }, query));
             const auth = this.uid + '/' + this.apiKey + ':' + this.password;
-            const signature = this.decode (this.stringToBase64 (this.encode (auth)));
+            const signature = this.decode (this.stringToBase64 (auth));
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Authorization': 'Basic ' + signature,
@@ -52166,7 +52164,7 @@ module.exports = class coinone extends Exchange {
                 'access_token': this.apiKey,
                 'nonce': nonce,
             }, params));
-            const payload = this.stringToBase64 (this.encode (json));
+            const payload = this.stringToBase64 (json);
             body = this.decode (payload);
             const secret = this.secret.toUpperCase ();
             const signature = this.hmac (payload, this.encode (secret), 'sha512');
@@ -54599,8 +54597,7 @@ module.exports = class crex24 extends Exchange {
                 body = this.json (params);
                 auth += body;
             }
-            const signature = this.stringToBase64 (this.hmac (this.encode (auth), secret, 'sha512', 'binary'));
-            headers['X-CREX24-API-SIGN'] = this.decode (signature);
+            headers['X-CREX24-API-SIGN'] = this.hmac (this.encode (auth), secret, 'sha512', 'base64');
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
     }
@@ -63979,7 +63976,7 @@ module.exports = class fcoin extends Exchange {
                     auth += this.urlencode (query);
                 }
             }
-            const payload = this.stringToBase64 (this.encode (auth));
+            const payload = this.stringToBase64 (auth);
             let signature = this.hmac (payload, this.encode (this.secret), 'sha1', 'binary');
             signature = this.decode (this.stringToBase64 (signature));
             headers = {
@@ -67990,7 +67987,7 @@ module.exports = class gemini extends Exchange {
                 'nonce': nonce,
             }, query);
             let payload = this.json (request);
-            payload = this.stringToBase64 (this.encode (payload));
+            payload = this.stringToBase64 (payload);
             const signature = this.hmac (payload, this.encode (this.secret), 'sha384');
             headers = {
                 'Content-Type': 'text/plain',
@@ -82700,7 +82697,7 @@ module.exports = class lakebtc extends Exchange {
             ];
             query = query.join ('&');
             const signature = this.hmac (this.encode (query), this.encode (this.secret), 'sha1');
-            const auth = this.encode (this.apiKey + ':' + signature);
+            const auth = this.apiKey + ':' + signature;
             const signature64 = this.decode (this.stringToBase64 (auth));
             headers = {
                 'Json-Rpc-Tonce': nonceAsString,
@@ -86998,9 +86995,10 @@ module.exports = class luno extends Exchange {
         }
         if (api === 'private') {
             this.checkRequiredCredentials ();
-            let auth = this.encode (this.apiKey + ':' + this.secret);
-            auth = this.stringToBase64 (auth);
-            headers = { 'Authorization': 'Basic ' + this.decode (auth) };
+            const auth = this.stringToBase64 (this.apiKey + ':' + this.secret);
+            headers = {
+                'Authorization': 'Basic ' + this.decode (auth),
+            };
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
     }
@@ -98713,7 +98711,7 @@ module.exports = class probit extends Exchange {
             this.checkRequiredCredentials ();
             url += this.implodeParams (path, params);
             const auth = this.apiKey + ':' + this.secret;
-            const auth64 = this.stringToBase64 (this.encode (auth));
+            const auth64 = this.stringToBase64 (auth);
             headers = {
                 'Authorization': 'Basic ' + this.decode (auth64),
                 'Content-Type': 'application/json',
@@ -127997,7 +127995,7 @@ module.exports = class timex extends Exchange {
         }
         if (api !== 'public') {
             this.checkRequiredCredentials ();
-            const auth = this.stringToBase64 (this.encode (this.apiKey + ':' + this.secret));
+            const auth = this.stringToBase64 (this.apiKey + ':' + this.secret);
             const secret = 'Basic ' + this.decode (auth);
             headers = { 'authorization': secret };
         }
