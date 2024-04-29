@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.32'
+const version = '1.27.33'
 
 Exchange.ccxtVersion = version
 
@@ -10095,6 +10095,10 @@ module.exports = class binance extends Exchange {
         if (market !== undefined) {
             symbol = market['symbol'];
         }
+        let cost = undefined;
+        if ((price !== undefined) && (amount !== undefined)) {
+            cost = price * amount;
+        }
         return {
             'info': trade,
             'timestamp': timestamp,
@@ -10103,11 +10107,11 @@ module.exports = class binance extends Exchange {
             'id': id,
             'order': orderId,
             'type': undefined,
-            'takerOrMaker': takerOrMaker,
             'side': side,
+            'takerOrMaker': takerOrMaker,
             'price': price,
             'amount': amount,
-            'cost': price * amount,
+            'cost': cost,
             'fee': fee,
         };
     }
@@ -14432,12 +14436,12 @@ module.exports = class bitfinex extends Exchange {
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
         return [
-            ohlcv[0],
-            ohlcv[1],
-            ohlcv[3],
-            ohlcv[4],
-            ohlcv[2],
-            ohlcv[5],
+            this.safeInteger (ohlcv, 0),
+            this.safeFloat (ohlcv, 1),
+            this.safeFloat (ohlcv, 3),
+            this.safeFloat (ohlcv, 4),
+            this.safeFloat (ohlcv, 2),
+            this.safeFloat (ohlcv, 5),
         ];
     }
 
@@ -67210,18 +67214,20 @@ module.exports = class kucoin extends Exchange {
     async fetchMarkets (params = {}) {
         const response = await this.publicGetSymbols (params);
         //
-        // { quoteCurrency: 'BTC',
-        //   symbol: 'KCS-BTC',
-        //   quoteMaxSize: '9999999',
-        //   quoteIncrement: '0.000001',
-        //   baseMinSize: '0.01',
-        //   quoteMinSize: '0.00001',
-        //   enableTrading: true,
-        //   priceIncrement: '0.00000001',
-        //   name: 'KCS-BTC',
-        //   baseIncrement: '0.01',
-        //   baseMaxSize: '9999999',
-        //   baseCurrency: 'KCS' }
+        //     {
+        //         quoteCurrency: 'BTC',
+        //         symbol: 'KCS-BTC',
+        //         quoteMaxSize: '9999999',
+        //         quoteIncrement: '0.000001',
+        //         baseMinSize: '0.01',
+        //         quoteMinSize: '0.00001',
+        //         enableTrading: true,
+        //         priceIncrement: '0.00000001',
+        //         name: 'KCS-BTC',
+        //         baseIncrement: '0.01',
+        //         baseMaxSize: '9999999',
+        //         baseCurrency: 'KCS'
+        //     }
         //
         const data = response['data'];
         const result = [];
