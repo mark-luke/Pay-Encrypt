@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.48'
+const version = '1.19.49'
 
 Exchange.ccxtVersion = version
 
@@ -102041,9 +102041,10 @@ module.exports = class upbit extends Exchange {
                 '1w': 'weeks',
                 '1M': 'months',
             },
+            'hostname': 'api.upbit.com',
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/49245610-eeaabe00-f423-11e8-9cba-4b0aed794799.jpg',
-                'api': 'https://api.upbit.com',
+                'api': 'https://{hostname}',
                 'www': 'https://upbit.com',
                 'doc': 'https://docs.upbit.com/docs/%EC%9A%94%EC%B2%AD-%EC%88%98-%EC%A0%9C%ED%95%9C',
                 'fees': 'https://upbit.com/service_center/guide',
@@ -103455,7 +103456,10 @@ module.exports = class upbit extends Exchange {
     }
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
-        let url = this.urls['api'] + '/' + this.version + '/' + this.implodeParams (path, params);
+        let url = this.implodeParams (this.urls['api'], {
+            'hostname': this.hostname,
+        });
+        url += '/' + this.version + '/' + this.implodeParams (path, params);
         const query = this.omit (params, this.extractParams (path));
         if (method === 'GET') {
             if (Object.keys (query).length) {
