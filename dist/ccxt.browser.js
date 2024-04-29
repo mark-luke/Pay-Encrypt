@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.89'
+const version = '1.21.90'
 
 Exchange.ccxtVersion = version
 
@@ -62417,7 +62417,7 @@ module.exports = class kucoin extends Exchange {
             'countries': [ 'SC' ],
             'rateLimit': 334,
             'version': 'v2',
-            'certified': true,
+            'certified': false,
             'comment': 'Platform 2.0',
             'has': {
                 'fetchTime': true,
