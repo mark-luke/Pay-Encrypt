@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.40'
+const version = '1.32.41'
 
 Exchange.ccxtVersion = version
 
@@ -7932,6 +7932,7 @@ module.exports = class binance extends Exchange {
                     'sapi': 'https://api.binance.com/sapi/v1',
                     'fapiPublic': 'https://fapi.binance.com/fapi/v1',
                     'fapiPrivate': 'https://fapi.binance.com/fapi/v1',
+                    'fapiData': 'https://fapi.binance.com/futures/data',
                     'fapiPrivateV2': 'https://fapi.binance.com/fapi/v2',
                     'public': 'https://api.binance.com/api/v3',
                     'private': 'https://api.binance.com/api/v3',
@@ -8080,6 +8081,15 @@ module.exports = class binance extends Exchange {
                         'allForceOrders',
                         'openInterest',
                         'leverageBracket',
+                    ],
+                },
+                'fapiData': {
+                    'get': [
+                        'openInterestHist',
+                        'topLongShortAccountRatio',
+                        'topLongShortPositionRatio',
+                        'globalLongShortAccountRatio',
+                        'takerlongshortRatio',
                     ],
                 },
                 'fapiPrivate': {
