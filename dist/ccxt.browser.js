@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.50'
+const version = '1.29.51'
 
 Exchange.ccxtVersion = version
 
@@ -14569,7 +14569,7 @@ module.exports = class bitfinex extends Exchange {
     async editOrder (id, symbol, type, side, amount = undefined, price = undefined, params = {}) {
         await this.loadMarkets ();
         const order = {
-            'order_id': id,
+            'order_id': parseInt (id),
         };
         if (price !== undefined) {
             order['price'] = this.priceToPrecision (symbol, price);
