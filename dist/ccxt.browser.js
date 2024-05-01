@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.49'
+const version = '1.35.50'
 
 Exchange.ccxtVersion = version
 
@@ -47421,18 +47421,7 @@ module.exports = class coincheck extends Exchange {
         }
         const status = undefined;
         const marketId = this.safeString (order, 'pair');
-        let symbol = undefined;
-        if (marketId !== undefined) {
-            if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[marketId];
-                symbol = market['symbol'];
-            } else {
-                const [ baseId, quoteId ] = marketId.split ('_');
-                const base = this.safeCurrencyCode (baseId);
-                const quote = this.safeCurrencyCode (quoteId);
-                symbol = base + '/' + quote;
-            }
-        }
+        const symbol = this.safeSymbol (marketId, market, '_');
         return {
             'id': id,
             'clientOrderId': undefined,
