@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1080'
+const version = '1.18.1081'
 
 Exchange.ccxtVersion = version
 
@@ -7681,6 +7681,7 @@ module.exports = class binance extends Exchange {
                 'api': {
                     'web': 'https://www.binance.com',
                     'wapi': 'https://api.binance.com/wapi/v3',
+                    'sapi': 'https://api.binance.com/sapi/v1',
                     'public': 'https://api.binance.com/api/v1',
                     'private': 'https://api.binance.com/api/v3',
                     'v3': 'https://api.binance.com/api/v3',
@@ -7699,6 +7700,14 @@ module.exports = class binance extends Exchange {
                     'get': [
                         'exchange/public/product',
                         'assetWithdraw/getAllAsset.html',
+                    ],
+                },
+                'sapi': {
+                    'get': [
+                        'asset/assetDividend',
+                    ],
+                    'post': [
+                        'asset/dust',
                     ],
                 },
                 'wapi': {
@@ -8865,7 +8874,7 @@ module.exports = class binance extends Exchange {
                 'Content-Type': 'application/x-www-form-urlencoded',
             };
         }
-        if ((api === 'private') || (api === 'wapi' && path !== 'systemStatus')) {
+        if ((api === 'private') || (api === 'sapi') || (api === 'wapi' && path !== 'systemStatus')) {
             this.checkRequiredCredentials ();
             let query = this.urlencode (this.extend ({
                 'timestamp': this.nonce (),
