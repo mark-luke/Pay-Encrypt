@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.75'
+const version = '1.26.77'
 
 Exchange.ccxtVersion = version
 
@@ -52058,11 +52058,11 @@ module.exports = class exmo extends Exchange {
                 if (limit > maxLimit) {
                     throw new BadRequest (this.id + ' fetchOHLCV will serve ' + maxLimit.toString () + ' candles at most');
                 }
-                request['from'] = parseInt (now / 1000) - limit * duration;
+                request['from'] = parseInt (now / 1000) - limit * duration - 1;
                 request['to'] = parseInt (now / 1000);
             }
         } else {
-            request['from'] = parseInt (since / 1000);
+            request['from'] = parseInt (since / 1000) - 1;
             if (limit === undefined) {
                 request['to'] = parseInt (now / 1000);
             } else {
@@ -67101,7 +67101,10 @@ module.exports = class kraken extends Exchange {
         const id = this.safeString (order, 'id');
         const clientOrderId = this.safeString (order, 'userref');
         const rawTrades = this.safeValue (order, 'trades');
-        const trades = this.parseTrades (rawTrades, market, undefined, undefined, { 'order': id });
+        let trades = undefined;
+        if (rawTrades !== undefined) {
+            trades = this.parseTrades (rawTrades, market, undefined, undefined, { 'order': id });
+        }
         return {
             'id': id,
             'clientOrderId': clientOrderId,
