@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.31'
+const version = '1.33.32'
 
 Exchange.ccxtVersion = version
 
@@ -24379,6 +24379,9 @@ module.exports = class bitpanda extends Exchange {
                 },
                 'broad': {
                 },
+            },
+            'commonCurrencies': {
+                'MIOTA': 'IOTA',
             },
         });
     }
