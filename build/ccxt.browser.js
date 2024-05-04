@@ -45,7 +45,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.17.383'
+const version = '1.17.384'
 
 Exchange.ccxtVersion = version
 
@@ -41485,7 +41485,7 @@ module.exports = class kraken extends Exchange {
                 'api': {
                     'public': 'https://api.kraken.com',
                     'private': 'https://api.kraken.com',
-                    'zendesk': 'https://support.kraken.com/hc/en-us/articles',
+                    'zendesk': 'https://support.kraken.com/hc/en-us/articles/',
                 },
                 'www': 'https://www.kraken.com',
                 'doc': [
@@ -41654,7 +41654,7 @@ module.exports = class kraken extends Exchange {
         let parts = html.split ('<td class="wysiwyg-text-align-right">');
         let numParts = parts.length;
         if (numParts < 3) {
-            throw new ExchangeError (this.id + ' fetchMinOrderSizes HTML page markup has changed: https://support.kraken.com/hc/en-us/articles205893708-What-is-the-minimum-order-size-');
+            throw new ExchangeError (this.id + ' fetchMinOrderSizes HTML page markup has changed: https://support.kraken.com/hc/en-us/articles/205893708-What-is-the-minimum-order-size-');
         }
         let result = {};
         // skip the part before the header and the header itself
@@ -41662,11 +41662,11 @@ module.exports = class kraken extends Exchange {
             let part = parts[i];
             let chunks = part.split ('</td>');
             let amountAndCode = chunks[0];
-            if (amountAndCode !== 'to be announced') {
+            if (amountAndCode !== 'To Be Announced') {
                 let pieces = amountAndCode.split (' ');
                 let numPieces = pieces.length;
                 if (numPieces !== 2) {
-                    throw new ExchangeError (this.id + ' fetchMinOrderSizes HTML page markup has changed: https://support.kraken.com/hc/en-us/articles205893708-What-is-the-minimum-order-size-');
+                    throw new ExchangeError (this.id + ' fetchMinOrderSizes HTML page markup has changed: https://support.kraken.com/hc/en-us/articles/205893708-What-is-the-minimum-order-size-');
                 }
                 let amount = parseFloat (pieces[0]);
                 let code = this.commonCurrencyCode (pieces[1]);
