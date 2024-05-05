@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.84'
+const version = '1.35.85'
 
 Exchange.ccxtVersion = version
 
@@ -41209,23 +41209,12 @@ module.exports = class bybit extends Exchange {
         //     }
         //
         const id = this.safeString2 (trade, 'id', 'exec_id');
-        let symbol = undefined;
-        let base = undefined;
         const marketId = this.safeString (trade, 'symbol');
+        market = this.safeMarket (marketId, market);
+        const symbol = market['symbol'];
         const amount = this.safeFloat2 (trade, 'qty', 'exec_qty');
         let cost = this.safeFloat (trade, 'exec_value');
         const price = this.safeFloat2 (trade, 'exec_price', 'price');
-        if (marketId in this.markets_by_id) {
-            market = this.markets_by_id[marketId];
-            symbol = market['symbol'];
-            base = market['base'];
-        }
-        if (market !== undefined) {
-            if (symbol === undefined) {
-                symbol = market['symbol'];
-                base = market['base'];
-            }
-        }
         if (cost === undefined) {
             if (amount !== undefined) {
                 if (price !== undefined) {
@@ -41243,9 +41232,10 @@ module.exports = class bybit extends Exchange {
         const feeCost = this.safeFloat (trade, 'exec_fee');
         let fee = undefined;
         if (feeCost !== undefined) {
+            const feeCurrencyCode = market['inverse'] ? market['base'] : market['quote'];
             fee = {
                 'cost': feeCost,
-                'currency': base,
+                'currency': feeCurrencyCode,
                 'rate': this.safeFloat (trade, 'fee_rate'),
             };
         }
