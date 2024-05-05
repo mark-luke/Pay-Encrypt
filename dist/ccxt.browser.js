@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1191'
+const version = '1.18.1192'
 
 Exchange.ccxtVersion = version
 
@@ -34041,6 +34041,7 @@ module.exports = class coinexchange extends Exchange {
                 'BONPAY': 'BON',
                 'eNAU': 'ENAU',
                 'ETN': 'Ethernex',
+                'FAIR': 'FairCoin',
                 'FRC': 'FireRoosterCoin',
                 'GET': 'GreenEnergyToken',
                 'GDC': 'GoldenCryptoCoin',
@@ -68290,6 +68291,9 @@ module.exports = class nova extends Exchange {
                     'taker': 0.2 / 100,
                 },
             },
+            'commonCurrencies': {
+                'FAIR': 'FairCoin',
+            },
         });
     }
 
@@ -70662,7 +70666,6 @@ module.exports = class okex extends okcoinusd {
             'commonCurrencies': {
                 // OKEX refers to ERC20 version of Aeternity (AEToken)
                 'AE': 'AET', // https://github.com/ccxt/ccxt/issues/4981
-                'FAIR': 'FairGame',
                 'HOT': 'Hydro Protocol',
                 'HSR': 'HC',
                 'MAG': 'Maggie',
@@ -71128,7 +71131,6 @@ module.exports = class okex3 extends Exchange {
             'commonCurrencies': {
                 // OKEX refers to ERC20 version of Aeternity (AEToken)
                 'AE': 'AET', // https://github.com/ccxt/ccxt/issues/4981
-                'FAIR': 'FairGame',
                 'HOT': 'Hydro Protocol',
                 'HSR': 'HC',
                 'MAG': 'Maggie',
