@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.33'
+const version = '1.33.34'
 
 Exchange.ccxtVersion = version
 
@@ -83168,6 +83168,7 @@ module.exports = class livecoin extends Exchange {
                 'FirstBlood': '1ST',
                 'FORTYTWO': '42',
                 'LEO': 'LeoCoin',
+                'MIOTA': 'IOTA', // https://github.com/ccxt/ccxt/issues/7487
                 'ORE': 'Orectic',
                 'PLN': 'Plutaneum', // conflict with Polish Zloty
                 'RUR': 'RUB',
