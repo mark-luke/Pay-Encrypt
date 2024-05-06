@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.63'
+const version = '1.24.64'
 
 Exchange.ccxtVersion = version
 
@@ -46050,6 +46050,7 @@ module.exports = class crex24 extends Exchange {
             },
             'commonCurrencies': {
                 'YOYO': 'YOYOW',
+                'BULL': 'BuySell',
                 'BCC': 'BCH',
             },
             // exchange-specific options
