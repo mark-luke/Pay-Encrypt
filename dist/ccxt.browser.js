@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.95'
+const version = '1.31.96'
 
 Exchange.ccxtVersion = version
 
@@ -56475,7 +56475,7 @@ module.exports = class dsx extends Exchange {
 
 const Exchange = require ('./base/Exchange');
 const { ArgumentsRequired, InvalidOrder, ExchangeError, BadRequest } = require ('./base/errors');
-const { TRUNCATE } = require ('./base/functions/number');
+const { TRUNCATE, SIGNIFICANT_DIGITS } = require ('./base/functions/number');
 
 // ----------------------------------------------------------------------------
 
@@ -56583,6 +56583,7 @@ module.exports = class eterbase extends Exchange {
                 'secret': true,
                 'uid': true,
             },
+            'precisionMode': SIGNIFICANT_DIGITS,
             'options': {
                 'createMarketBuyOrderRequiresPrice': true,
             },
