@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1198'
+const version = '1.18.1199'
 
 Exchange.ccxtVersion = version
 
@@ -48609,6 +48609,7 @@ module.exports = class gdax extends Exchange {
                 'fetchOrder': true,
                 'fetchOrderTrades': true,
                 'fetchOrders': true,
+                'fetchTime': true,
                 'fetchTransactions': true,
                 'withdraw': true,
             },
@@ -49000,7 +49001,7 @@ module.exports = class gdax extends Exchange {
 
     async fetchTime (params = {}) {
         const response = await this.publicGetTime (params);
-        return this.parse8601 (response, 'iso');
+        return this.parse8601 (this.safeString (response, 'iso'));
     }
 
     parseOrderStatus (status) {
