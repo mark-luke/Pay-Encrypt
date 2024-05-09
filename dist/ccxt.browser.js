@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.31'
+const version = '1.31.32'
 
 Exchange.ccxtVersion = version
 
@@ -85624,7 +85624,11 @@ module.exports = class okex extends Exchange {
         //         "result":true
         //     }
         //
-        return this.parseOrder (response, market);
+        const order = this.parseOrder (response, market);
+        return this.extend (order, {
+            'type': type,
+            'side': side,
+        });
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
@@ -85777,16 +85781,9 @@ module.exports = class okex extends Exchange {
         const id = this.safeString (order, 'order_id');
         const timestamp = this.parse8601 (this.safeString (order, 'timestamp'));
         let side = this.safeString (order, 'side');
-        let type = this.safeString (order, 'type');
+        const type = this.safeString (order, 'type');
         if ((side !== 'buy') && (side !== 'sell')) {
             side = this.parseOrderSide (type);
-        }
-        if ((type !== 'limit') && (type !== 'market')) {
-            if ('pnl' in order) {
-                type = 'futures';
-            } else {
-                type = 'swap';
-            }
         }
         let symbol = undefined;
         const marketId = this.safeString (order, 'instrument_id');
