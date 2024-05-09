@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1248'
+const version = '1.18.1249'
 
 Exchange.ccxtVersion = version
 
@@ -35027,10 +35027,10 @@ module.exports = class coinfalcon extends Exchange {
         let fee = undefined;
         const feeCost = this.safeFloat (trade, 'fee');
         if (feeCost !== undefined) {
-            const feeCurrencyCode = undefined;
+            const feeCurrencyCode = this.safeString (trade, 'fee_currency_code');
             fee = {
                 'cost': feeCost,
-                'currency': feeCurrencyCode,
+                'currency': this.safeCurrencyCode (feeCurrencyCode),
             };
         }
         return {
