@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.89'
+const version = '1.34.90'
 
 Exchange.ccxtVersion = version
 
@@ -87209,14 +87209,8 @@ module.exports = class lykke extends Exchange {
         //         Price: 9847.427,
         //         Fee: { Amount: null, Type: 'Unknown', FeeAssetId: null }
         //     },
-        let symbol = undefined;
-        if (market === undefined) {
-            const marketId = this.safeString (trade, 'AssetPairId');
-            market = this.safeValue (this.markets_by_id, marketId);
-        }
-        if (market) {
-            symbol = market['symbol'];
-        }
+        const marketId = this.safeString (trade, 'AssetPairId');
+        const symbol = this.safeSymbol (marketId, market);
         const id = this.safeString2 (trade, 'id', 'Id');
         const orderId = this.safeString (trade, 'OrderId');
         const timestamp = this.parse8601 (this.safeString2 (trade, 'dateTime', 'DateTime'));
@@ -87503,14 +87497,8 @@ module.exports = class lykke extends Exchange {
         //     }
         //
         const status = this.parseOrderStatus (this.safeString (order, 'Status'));
-        let symbol = undefined;
-        if (market === undefined) {
-            const marketId = this.safeString (order, 'AssetPairId');
-            market = this.safeValue (this.markets_by_id, marketId);
-        }
-        if (market) {
-            symbol = market['symbol'];
-        }
+        const marketId = this.safeString (order, 'AssetPairId');
+        const symbol = this.safeSymbol (marketId, market);
         const lastTradeTimestamp = this.parse8601 (this.safeString (order, 'LastMatchTime'));
         let timestamp = undefined;
         if (('Registered' in order) && (order['Registered'])) {
