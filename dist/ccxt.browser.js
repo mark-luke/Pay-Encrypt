@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.11'
+const version = '1.28.12'
 
 Exchange.ccxtVersion = version
 
@@ -49592,6 +49592,9 @@ module.exports = class dsx extends hitbtc {
                     'maker': 0.15 / 100,
                     'taker': 0.25 / 100,
                 },
+            },
+            'commonCurrencies': {
+                'USD': 'USD',
             },
         });
     }
