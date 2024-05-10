@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.99'
+const version = '1.27.100'
 
 Exchange.ccxtVersion = version
 
@@ -50931,8 +50931,8 @@ module.exports = class eterbase extends Exchange {
                 'trading': {
                     'tierBased': true,
                     'percentage': true,
-                    'taker': 0.09,
-                    'maker': 0.09,
+                    'taker': 0.35 / 100,
+                    'maker': 0.35 / 100,
                 },
             },
             'requiredCredentials': {
