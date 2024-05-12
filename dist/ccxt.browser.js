@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1304'
+const version = '1.18.1305'
 
 Exchange.ccxtVersion = version
 
@@ -103656,6 +103656,9 @@ module.exports = class zb extends Exchange {
         const marketFieldName = this.getMarketFieldName ();
         const request = {};
         request[marketFieldName] = market['id'];
+        if (limit !== undefined) {
+            request['size'] = limit;
+        }
         const response = await this.publicGetDepth (this.extend (request, params));
         return this.parseOrderBook (response);
     }
