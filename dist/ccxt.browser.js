@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1329'
+const version = '1.18.1330'
 
 Exchange.ccxtVersion = version
 
@@ -18283,7 +18283,11 @@ module.exports = class bitmax extends Exchange {
             }
             const signature = this.hmac (this.encode (auth), this.encode (this.secret), 'sha256', 'base64');
             headers['x-auth-signature'] = signature;
-            if (method !== 'GET') {
+            if (method === 'GET') {
+                if (Object.keys (query).length) {
+                    url += '?' + this.urlencode (query);
+                }
+            } else {
                 body = this.json (query);
             }
         }
