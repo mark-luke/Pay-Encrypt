@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1219'
+const version = '1.18.1220'
 
 Exchange.ccxtVersion = version
 
@@ -15891,6 +15891,7 @@ module.exports = class bitlish extends Exchange {
                 'api': 'https://bitlish.com/api',
                 'www': 'https://bitlish.com',
                 'doc': 'https://bitlish.com/api',
+                'fees': 'https://bitlish.com/fees',
             },
             'requiredCredentials': {
                 'apiKey': true,
@@ -15901,7 +15902,7 @@ module.exports = class bitlish extends Exchange {
                     'tierBased': false,
                     'percentage': true,
                     'taker': 0.3 / 100, // anonymous 0.3%, verified 0.2%
-                    'maker': 0,
+                    'maker': 0.2 / 100, // anonymous 0.2%, verified 0.1%
                 },
                 'funding': {
                     'tierBased': false,
