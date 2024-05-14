@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.93'
+const version = '1.22.94'
 
 Exchange.ccxtVersion = version
 
@@ -9566,13 +9566,13 @@ module.exports = class binance extends Exchange {
         const type = this.safeString2 (this.options, 'fetchTime', 'defaultType', 'spot');
         const method = (type === 'spot') ? 'publicGetTime' : 'fapiPublicGetTime';
         const response = await this[method] (params);
-        return this.safeFloat (response, 'serverTime');
+        return this.safeInteger (response, 'serverTime');
     }
 
     async loadTimeDifference () {
         const serverTime = await this.fetchTime ();
         const after = this.milliseconds ();
-        this.options['timeDifference'] = parseInt (after - serverTime);
+        this.options['timeDifference'] = after - serverTime;
         return this.options['timeDifference'];
     }
 
