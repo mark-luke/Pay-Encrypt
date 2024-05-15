@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.79'
+const version = '1.19.80'
 
 Exchange.ccxtVersion = version
 
@@ -55303,14 +55303,10 @@ module.exports = class gemini extends Exchange {
     }
 
     handleErrors (httpCode, reason, url, method, headers, body, response, requestHeaders, requestBody) {
-        const broad = this.exceptions['broad'];
         if (response === undefined) {
             if (typeof body === 'string') {
-                const broadKey = this.findBroadlyMatchedKey (broad, body);
                 const feedback = this.id + ' ' + body;
-                if (broadKey !== undefined) {
-                    throw new broad[broadKey] (feedback);
-                }
+                this.throwBroadlyMatchedException (this.exceptions['broad'], body, feedback);
             }
             return; // fallback to default error handler
         }
@@ -55332,10 +55328,7 @@ module.exports = class gemini extends Exchange {
             } else if (message in exact) {
                 throw new exact[message] (feedback);
             }
-            const broadKey = this.findBroadlyMatchedKey (broad, message);
-            if (broadKey !== undefined) {
-                throw new broad[broadKey] (feedback);
-            }
+            this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
     }
@@ -56403,11 +56396,7 @@ module.exports = class hitbtc extends Exchange {
             if (code in exact) {
                 throw new exact[code] (feedback);
             }
-            const broad = this.exceptions['broad'];
-            const broadKey = this.findBroadlyMatchedKey (broad, error);
-            if (broadKey !== undefined) {
-                throw new broad[broadKey] (feedback);
-            }
+            this.throwBroadlyMatchedException (this.exceptions['broad'], error, feedback);
             throw new ExchangeError (feedback); // unknown error
         }
     }
@@ -61680,11 +61669,7 @@ module.exports = class indodax extends Exchange {
         if (error in exact) {
             throw new exact[error] (feedback);
         }
-        const broad = this.exceptions['broad'];
-        const broadKey = this.findBroadlyMatchedKey (broad, error);
-        if (broadKey !== undefined) {
-            throw new broad[broadKey] (feedback);
-        }
+        this.throwBroadlyMatchedException (this.exceptions['broad'], error, feedback);
         throw new ExchangeError (feedback); // unknown message
     }
 };
@@ -67240,16 +67225,12 @@ module.exports = class latoken extends Exchange {
         //
         const message = this.safeString (response, 'message');
         const exact = this.exceptions['exact'];
-        const broad = this.exceptions['broad'];
         const feedback = this.id + ' ' + body;
         if (message !== undefined) {
             if (message in exact) {
                 throw new exact[message] (feedback);
             }
-            const broadKey = this.findBroadlyMatchedKey (broad, message);
-            if (broadKey !== undefined) {
-                throw new broad[broadKey] (feedback);
-            }
+            this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
         }
         const error = this.safeValue (response, 'error', {});
         const errorMessage = this.safeString (error, 'message');
@@ -67257,10 +67238,7 @@ module.exports = class latoken extends Exchange {
             if (errorMessage in exact) {
                 throw new exact[errorMessage] (feedback);
             }
-            const broadKey = this.findBroadlyMatchedKey (broad, errorMessage);
-            if (broadKey !== undefined) {
-                throw new broad[broadKey] (feedback);
-            }
+            this.throwBroadlyMatchedException (this.exceptions['broad'], errorMessage, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
     }
@@ -69769,13 +69747,9 @@ module.exports = class livecoin extends Exchange {
         const success = this.safeValue (response, 'success', true);
         if (!success) {
             const feedback = this.id + ' ' + body;
-            const broad = this.exceptions['broad'];
             const message = this.safeString2 (response, 'message', 'exception');
             if (message !== undefined) {
-                const broadKey = this.findBroadlyMatchedKey (broad, message);
-                if (broadKey !== undefined) {
-                    throw new broad[broadKey] (feedback);
-                }
+                this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             }
             throw new ExchangeError (feedback);
         }
@@ -78329,11 +78303,7 @@ module.exports = class okex3 extends Exchange {
             if (message in exact) {
                 throw new exact[message] (feedback);
             }
-            const broad = this.exceptions['broad'];
-            const broadKey = this.findBroadlyMatchedKey (broad, message);
-            if (broadKey !== undefined) {
-                throw new broad[broadKey] (feedback);
-            }
+            this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
         }
         if (errorCode in exact) {
             throw new exact[errorCode] (feedback);
@@ -79951,11 +79921,7 @@ module.exports = class poloniex extends Exchange {
             if (message in exact) {
                 throw new exact[message] (feedback);
             }
-            const broad = this.exceptions['broad'];
-            const broadKey = this.findBroadlyMatchedKey (broad, message);
-            if (broadKey !== undefined) {
-                throw new broad[broadKey] (feedback);
-            }
+            this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
     }
@@ -101082,11 +101048,7 @@ module.exports = class theocean extends Exchange {
                 if (message in exact) {
                     throw new exact[message] (feedback);
                 }
-                const broad = this.exceptions['broad'];
-                const broadKey = this.findBroadlyMatchedKey (broad, body);
-                if (broadKey !== undefined) {
-                    throw new broad[broadKey] (feedback);
-                }
+                this.throwBroadlyMatchedException (this.exceptions['broad'], body, feedback);
                 throw new ExchangeError (feedback); // unknown message
             }
         }
@@ -102312,7 +102274,6 @@ module.exports = class therock extends Exchange {
         if (numErrors > 0) {
             const feedback = this.id + ' ' + body;
             const exact = this.exceptions['exact'];
-            const broad = this.exceptions['broad'];
             // here we throw the first error we can identify
             for (let i = 0; i < numErrors; i++) {
                 const error = errors[i];
@@ -102320,10 +102281,7 @@ module.exports = class therock extends Exchange {
                 if (message in exact) {
                     throw new exact[message] (feedback);
                 }
-                const broadKey = this.findBroadlyMatchedKey (broad, message);
-                if (broadKey !== undefined) {
-                    throw new broad[broadKey] (feedback);
-                }
+                this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             }
             throw new ExchangeError (feedback); // unknown message
         }
@@ -103673,11 +103631,7 @@ module.exports = class tidex extends Exchange {
                 } else if (message in exact) {
                     throw new exact[message] (feedback);
                 }
-                const broad = this.exceptions['broad'];
-                const broadKey = this.findBroadlyMatchedKey (broad, message);
-                if (broadKey !== undefined) {
-                    throw new broad[broadKey] (feedback);
-                }
+                this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
                 throw new ExchangeError (feedback); // unknown message
             }
         }
@@ -105208,15 +105162,8 @@ module.exports = class upbit extends Exchange {
             if (name in exact) {
                 throw new exact[name] (feedback);
             }
-            const broad = this.exceptions['broad'];
-            let broadKey = this.findBroadlyMatchedKey (broad, message);
-            if (broadKey !== undefined) {
-                throw new broad[broadKey] (feedback);
-            }
-            broadKey = this.findBroadlyMatchedKey (broad, name);
-            if (broadKey !== undefined) {
-                throw new broad[broadKey] (feedback);
-            }
+            this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
+            this.throwBroadlyMatchedException (this.exceptions['broad'], name, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
     }
@@ -106399,11 +106346,7 @@ module.exports = class whitebit extends Exchange {
                         throw new exact[message] (feedback);
                     }
                 }
-                const broad = this.safeValue (this.exceptions, 'broad', {});
-                const broadKey = this.findBroadlyMatchedKey (broad, body);
-                if (broadKey !== undefined) {
-                    throw new broad[broadKey] (feedback);
-                }
+                this.throwBroadlyMatchedException (this.exceptions['broad'], body, feedback);
                 throw new ExchangeError (feedback);
             }
         }
@@ -107693,11 +107636,7 @@ module.exports = class yobit extends Exchange {
                 } else if (message in exact) {
                     throw new exact[message] (feedback);
                 }
-                const broad = this.exceptions['broad'];
-                const broadKey = this.findBroadlyMatchedKey (broad, message);
-                if (broadKey !== undefined) {
-                    throw new broad[broadKey] (feedback);
-                }
+                this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
                 throw new ExchangeError (feedback); // unknown message
             }
         }
@@ -108196,11 +108135,7 @@ module.exports = class zaif extends Exchange {
             if (error in exact) {
                 throw new exact[error] (feedback);
             }
-            const broad = this.exceptions['broad'];
-            const broadKey = this.findBroadlyMatchedKey (broad, error);
-            if (broadKey !== undefined) {
-                throw new broad[broadKey] (feedback);
-            }
+            this.throwBroadlyMatchedException (this.exceptions['broad'], error, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
         const success = this.safeValue (response, 'success', true);
