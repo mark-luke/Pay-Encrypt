@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.36'
+const version = '1.23.37'
 
 Exchange.ccxtVersion = version
 
@@ -77690,6 +77690,7 @@ module.exports = class southxchange extends Exchange {
             'commonCurrencies': {
                 'SMT': 'SmartNode',
                 'MTC': 'Marinecoin',
+                'BHD': 'Bithold',
             },
         });
     }
@@ -96436,6 +96437,9 @@ module.exports = class stex extends Exchange {
                     'taker': 0.002,
                     'maker': 0.002,
                 },
+            },
+            'commonCurrencies': {
+                'BHD': 'Bithold',
             },
             'options': {
                 'parseOrderToPrecision': false,
