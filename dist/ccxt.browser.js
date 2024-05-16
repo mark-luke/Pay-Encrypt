@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1179'
+const version = '1.18.1180'
 
 Exchange.ccxtVersion = version
 
@@ -70770,6 +70770,7 @@ module.exports = class okex3 extends Exchange {
                         'accounts/{currency}',
                         'accounts/{currency}/leverage',
                         'accounts/{currency}/ledger',
+                        'order_algo/{instrument_id}',
                         'orders/{instrument_id}',
                         'orders/{instrument_id}/{order_id}',
                         'orders/{instrument_id}/{client_oid}',
@@ -70795,6 +70796,8 @@ module.exports = class okex3 extends Exchange {
                         'accounts/margin_mode',
                         'order',
                         'orders',
+                        'order_algo',
+                        'cancel_algos',
                         'cancel_order/{instrument_id}/{order_id}',
                         'cancel_order/{instrument_id}/{client_oid}',
                         'cancel_batch_orders/{instrument_id}',
