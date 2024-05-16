@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.66'
+const version = '1.33.67'
 
 Exchange.ccxtVersion = version
 
@@ -2105,10 +2105,9 @@ module.exports = class Exchange {
                 this[property] = value
             }
         }
-        
+
         const agentOptions = {
-            // commented out temporarily until we fix keep-alive and reuse the connections
-            // 'keepAlive': true,
+            'keepAlive': true,
         }
 
         if (!this.httpAgent && defaultFetch.http && isNode) {
@@ -2202,8 +2201,6 @@ module.exports = class Exchange {
             const params = { method, headers, body, timeout: this.timeout }
 
             if (this.agent) {
-                // commented out temporarily until we fix keep-alive and reuse the connections
-                // this.agent.keepAlive = true
                 params['agent'] = this.agent
             } else if (this.httpAgent && url.indexOf ('http://') === 0) {
                 params['agent'] = this.httpAgent
@@ -96205,6 +96202,7 @@ module.exports = class qtrade extends Exchange {
     async fetchMyTrades (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const request = {
+            'desc': true, // Returns newest trades first when true
             // 'older_than': 123, // returns trades with id < older_than
             // 'newer_than': 123, // returns trades with id > newer_than
         };
