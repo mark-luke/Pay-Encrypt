@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.6'
+const version = '1.24.7'
 
 Exchange.ccxtVersion = version
 
@@ -15232,11 +15232,21 @@ module.exports = class bitfinex2 extends bitfinex {
             }
             orderId = trade[3].toString ();
             takerOrMaker = (trade[8] === 1) ? 'maker' : 'taker';
-            const feeCost = trade[9];
+            let feeCost = trade[9];
             const feeCurrency = this.safeCurrencyCode (trade[10]);
             if (feeCost !== undefined) {
+                feeCost = -feeCost;
+                if (symbol in this.markets) {
+                    feeCost = this.feeToPrecision (symbol, feeCost);
+                } else {
+                    const currencyId = 'f' + feeCurrency;
+                    if (currencyId in this.currencies_by_id) {
+                        const currency = this.currencies_by_id[currencyId];
+                        feeCost = this.currencyToPrecision (currency['code'], feeCost);
+                    }
+                }
                 fee = {
-                    'cost': parseFloat (this.feeToPrecision (symbol, Math.abs (feeCost))),
+                    'cost': parseFloat (feeCost),
                     'currency': feeCurrency,
                 };
             }
