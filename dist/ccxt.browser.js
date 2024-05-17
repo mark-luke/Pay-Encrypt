@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1089'
+const version = '1.18.1090'
 
 Exchange.ccxtVersion = version
 
@@ -52491,7 +52491,6 @@ module.exports = class idex extends Exchange {
             'name': 'IDEX',
             'countries': [ 'US' ],
             'rateLimit': 1500,
-            'version': '0',
             'certified': true,
             'requiresWeb3': true,
             'has': {
