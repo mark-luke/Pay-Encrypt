@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.11'
+const version = '1.31.12'
 
 Exchange.ccxtVersion = version
 
@@ -22182,6 +22182,7 @@ module.exports = class bitpanda extends Exchange {
             'version': 'v1',
             // new metainfo interface
             'has': {
+                'cancelAllOrders': true,
                 'cancelOrder': true,
                 'createDepositAddress': true,
                 'createOrder': true,
@@ -23426,6 +23427,22 @@ module.exports = class bitpanda extends Exchange {
         const response = await this[method] (this.extend (request, params));
         //
         // responds with an empty body
+        //
+        return response;
+    }
+
+    async cancelAllOrders (symbol = undefined, params = {}) {
+        await this.loadMarkets ();
+        const request = {};
+        if (symbol !== undefined) {
+            const market = this.market (symbol);
+            request['instrument_code'] = market['id'];
+        }
+        const response = await this.privateDeleteAccountOrders (this.extend (request, params));
+        //
+        //     [
+        //         "a10e9bd1-8f72-4cfe-9f1b-7f1c8a9bd8ee"
+        //     ]
         //
         return response;
     }
