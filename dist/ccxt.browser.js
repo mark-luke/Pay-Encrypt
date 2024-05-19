@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.16'
+const version = '1.27.17'
 
 Exchange.ccxtVersion = version
 
@@ -34260,23 +34260,27 @@ module.exports = class bybit extends Exchange {
         let symbol = undefined;
         let base = undefined;
         const marketId = this.safeString (trade, 'symbol');
+        let amount = this.safeFloat2 (trade, 'qty', 'exec_qty');
+        let cost = this.safeFloat (trade, 'exec_value');
+        const price = this.safeFloat2 (trade, 'price', 'exec_price');
         if (marketId in this.markets_by_id) {
             market = this.markets_by_id[marketId];
             symbol = market['symbol'];
             base = market['base'];
         }
-        if ((symbol === undefined) && (market !== undefined)) {
-            symbol = market['symbol'];
-            base = market['base'];
+        if (market !== undefined) {
+            if (symbol === undefined) {
+                symbol = market['symbol'];
+                base = market['base'];
+            }
+            // if private trade
+            if ('exec_fee' in trade) {
+                if (market['inverse']) {
+                    amount = this.safeFloat (trade, 'exec_value');
+                    cost = this.safeFloat (trade, 'exec_qty');
+                }
+            }
         }
-        let timestamp = this.parse8601 (this.safeString (trade, 'time'));
-        if (timestamp === undefined) {
-            timestamp = this.safeInteger (trade, 'trade_time_ms');
-        }
-        const side = this.safeStringLower (trade, 'side');
-        const price = this.safeFloat2 (trade, 'price', 'exec_price');
-        const amount = this.safeFloat2 (trade, 'qty', 'exec_qty');
-        let cost = this.safeFloat (trade, 'exec_value');
         if (cost === undefined) {
             if (amount !== undefined) {
                 if (price !== undefined) {
@@ -34284,6 +34288,11 @@ module.exports = class bybit extends Exchange {
                 }
             }
         }
+        let timestamp = this.parse8601 (this.safeString (trade, 'time'));
+        if (timestamp === undefined) {
+            timestamp = this.safeInteger (trade, 'trade_time_ms');
+        }
+        const side = this.safeStringLower (trade, 'side');
         const lastLiquidityInd = this.safeString (trade, 'last_liquidity_ind');
         const takerOrMaker = (lastLiquidityInd === 'AddedLiquidity') ? 'maker' : 'taker';
         const feeCost = this.safeFloat (trade, 'exec_fee');
@@ -68538,20 +68547,27 @@ module.exports = class kucoin extends Exchange {
     async fetchAccounts (params = {}) {
         const response = await this.privateGetAccounts (params);
         //
-        //     { code:   "200000",
-        //       data: [ {   balance: "0.00009788",
+        //     {
+        //         code: "200000",
+        //         data: [
+        //             {
+        //                 balance: "0.00009788",
         //                 available: "0.00009788",
-        //                     holds: "0",
-        //                  currency: "BTC",
-        //                        id: "5c6a4fd399a1d81c4f9cc4d0",
-        //                      type: "trade"                     },
-        //               ...,
-        //               {   balance: "0.00000001",
+        //                 holds: "0",
+        //                 currency: "BTC",
+        //                 id: "5c6a4fd399a1d81c4f9cc4d0",
+        //                 type: "trade"
+        //             },
+        //             {
+        //                 balance: "0.00000001",
         //                 available: "0.00000001",
-        //                     holds: "0",
-        //                  currency: "ETH",
-        //                        id: "5c6a49ec99a1d819392e8e9f",
-        //                      type: "trade"                     }  ] }
+        //                 holds: "0",
+        //                 currency: "ETH",
+        //                 id: "5c6a49ec99a1d819392e8e9f",
+        //                 type: "trade"
+        //             }
+        //         ]
+        //     }
         //
         const data = this.safeValue (response, 'data');
         const result = [];
