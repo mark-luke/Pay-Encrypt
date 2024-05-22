@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.35'
+const version = '1.29.37'
 
 Exchange.ccxtVersion = version
 
@@ -71329,6 +71329,7 @@ module.exports = class kraken extends Exchange {
                 'fetchLedgerEntry': true,
                 'fetchLedger': true,
                 'fetchOrderTrades': 'emulated',
+                'fetchTime': true,
             },
             'marketsByAltname': {},
             'timeframes': {
@@ -72800,6 +72801,22 @@ module.exports = class kraken extends Exchange {
         //                   status: "Success"                                                       } ] }
         //
         return this.parseTransactionsByType ('deposit', response['result'], code, since, limit);
+    }
+
+    async fetchTime (params = {}) {
+        // https://www.kraken.com/en-us/features/api#get-server-time
+        const response = await this.publicGetTime (params);
+        //
+        //    {
+        //        "error": [],
+        //        "result": {
+        //            "unixtime": 1591502873,
+        //            "rfc1123": "Sun,  7 Jun 20 04:07:53 +0000"
+        //        }
+        //    }
+        //
+        const result = this.safeValue (response, 'result', {});
+        return this.safeTimestamp (result, 'unixtime');
     }
 
     async fetchWithdrawals (code = undefined, since = undefined, limit = undefined, params = {}) {
@@ -82680,13 +82697,13 @@ module.exports = class okex extends Exchange {
             }
             return [
                 timestamp, // timestamp
-                parseFloat (ohlcv[1]),            // Open
-                parseFloat (ohlcv[2]),            // High
-                parseFloat (ohlcv[3]),            // Low
-                parseFloat (ohlcv[4]),            // Close
-                // parseFloat (ohlcv[5]),         // Quote Volume
-                // parseFloat (ohlcv[6]),         // Base Volume
-                parseFloat (ohlcv[volumeIndex]),  // Volume, okex will return base volume in the 7th element for future markets
+                this.safeFloat (ohlcv, 1),            // Open
+                this.safeFloat (ohlcv, 2),            // High
+                this.safeFloat (ohlcv, 3),            // Low
+                this.safeFloat (ohlcv, 4),            // Close
+                // this.safeFloat (ohlcv, 5),         // Quote Volume
+                // this.safeFloat (ohlcv, 6),         // Base Volume
+                this.safeFloat (ohlcv, volumeIndex),  // Volume, okex will return base volume in the 7th element for future markets
             ];
         } else {
             return [
@@ -89523,7 +89540,7 @@ module.exports = class rightbtc extends Exchange {
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
         return [
-            parseInt (ohlcv[0]),
+            this.safeInteger (ohlcv, 0),
             parseFloat (ohlcv[2]) / 1e8,
             parseFloat (ohlcv[3]) / 1e8,
             parseFloat (ohlcv[4]) / 1e8,
@@ -113646,12 +113663,12 @@ module.exports = class tidebit extends Exchange {
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
         return [
-            ohlcv[0] * 1000,
-            ohlcv[1],
-            ohlcv[2],
-            ohlcv[3],
-            ohlcv[4],
-            ohlcv[5],
+            this.asfeTimestamp (ohlcv, 0),
+            this.safeFloat (ohlcv, 1),
+            this.safeFloat (ohlcv, 2),
+            this.safeFloat (ohlcv, 3),
+            this.safeFloat (ohlcv, 4),
+            this.safeFloat (ohlcv, 5),
         ];
     }
 
@@ -118369,12 +118386,12 @@ module.exports = class whitebit extends Exchange {
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
         return [
-            ohlcv[0] * 1000, // timestamp
-            parseFloat (ohlcv[1]), // open
-            parseFloat (ohlcv[3]), // high
-            parseFloat (ohlcv[4]), // low
-            parseFloat (ohlcv[2]), // close
-            parseFloat (ohlcv[5]), // volume
+            this.safeTimestamp (ohlcv, 0), // timestamp
+            this.safeFloat (ohlcv, 1), // open
+            this.safeFloat (ohlcv, 3), // high
+            this.safeFloat (ohlcv, 4), // low
+            this.safeFloat (ohlcv, 2), // close
+            this.safeFloat (ohlcv, 5), // volume
         ];
     }
 
@@ -118689,12 +118706,12 @@ module.exports = class xbtce extends Exchange {
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
         return [
-            ohlcv['Timestamp'],
-            ohlcv['Open'],
-            ohlcv['High'],
-            ohlcv['Low'],
-            ohlcv['Close'],
-            ohlcv['Volume'],
+            this.safeInteger (ohlcv, 'Timestamp'),
+            this.safeFloat (ohlcv, 'Open'),
+            this.safeFloat (ohlcv, 'High'),
+            this.safeFloat (ohlcv, 'Low'),
+            this.safeFloat (ohlcv, 'Close'),
+            this.safeFloat (ohlcv, 'Volume'),
         ];
     }
 
