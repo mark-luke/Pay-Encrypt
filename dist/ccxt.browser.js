@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.38'
+const version = '1.31.39'
 
 Exchange.ccxtVersion = version
 
@@ -53810,6 +53810,7 @@ module.exports = class digifinex extends Exchange {
                 'fetchOpenOrders': true,
                 'fetchOrder': true,
                 'fetchTickers': true,
+                'fetchTime': true,
                 'fetchMyTrades': true,
                 'fetchLedger': true,
             },
@@ -54367,6 +54368,17 @@ module.exports = class digifinex extends Exchange {
             'takerOrMaker': takerOrMaker,
             'fee': fee,
         };
+    }
+
+    async fetchTime (params = {}) {
+        const response = await this.publicGetTime (params);
+        //
+        //     {
+        //         "server_time": 1589873762,
+        //         "code": 0
+        //     }
+        //
+        return this.safeTimestamp (response, 'server_time');
     }
 
     async fetchTrades (symbol, since = undefined, limit = undefined, params = {}) {
