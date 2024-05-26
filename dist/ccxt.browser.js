@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.41'
+const version = '1.29.42'
 
 Exchange.ccxtVersion = version
 
@@ -13327,24 +13327,27 @@ module.exports = class bitbay extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
-        // [
-        //     '1582399800000',
-        //     {
-        //         o: '0.0001428',
-        //         c: '0.0001428',
-        //         h: '0.0001428',
-        //         l: '0.0001428',
-        //         v: '4',
-        //         co: '1'
-        //     }
-        // ]
+        //
+        //     [
+        //         '1582399800000',
+        //         {
+        //             o: '0.0001428',
+        //             c: '0.0001428',
+        //             h: '0.0001428',
+        //             l: '0.0001428',
+        //             v: '4',
+        //             co: '1'
+        //         }
+        //     ]
+        //
+        const first = this.safeValue (ohlcv, 1, {});
         return [
             this.safeInteger (ohlcv, 0),
-            this.safeFloat (ohlcv[1], 'o'),
-            this.safeFloat (ohlcv[1], 'h'),
-            this.safeFloat (ohlcv[1], 'l'),
-            this.safeFloat (ohlcv[1], 'c'),
-            this.safeFloat (ohlcv[1], 'v'),
+            this.safeFloat (first, 'o'),
+            this.safeFloat (first, 'h'),
+            this.safeFloat (first, 'l'),
+            this.safeFloat (first, 'c'),
+            this.safeFloat (first, 'v'),
         ];
     }
 
@@ -13371,8 +13374,18 @@ module.exports = class bitbay extends Exchange {
             request['to'] = this.sum (request['from'], timerange);
         }
         const response = await this.v1_01PublicGetTradingCandleHistorySymbolResolution (this.extend (request, params));
-        const ohlcvs = this.safeValue (response, 'items', []);
-        return this.parseOHLCVs (ohlcvs, market, timeframe, since, limit);
+        //
+        //     {
+        //         "status":"Ok",
+        //         "items":[
+        //             ["1591503060000",{"o":"0.02509572","c":"0.02509438","h":"0.02509664","l":"0.02509438","v":"0.02082165","co":"17"}],
+        //             ["1591503120000",{"o":"0.02509606","c":"0.02509515","h":"0.02509606","l":"0.02509487","v":"0.04971703","co":"13"}],
+        //             ["1591503180000",{"o":"0.02509532","c":"0.02509589","h":"0.02509589","l":"0.02509454","v":"0.01332236","co":"7"}],
+        //         ]
+        //     }
+        //
+        const items = this.safeValue (response, 'items', []);
+        return this.parseOHLCVs (items, market);
     }
 
     parseTrade (trade, market = undefined) {
@@ -14686,6 +14699,16 @@ module.exports = class bitfinex extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         1457539800000,
+        //         0.02594,
+        //         0.02594,
+        //         0.02594,
+        //         0.02594,
+        //         0.1
+        //     ]
+        //
         return [
             this.safeInteger (ohlcv, 0),
             this.safeFloat (ohlcv, 1),
@@ -14713,7 +14736,14 @@ module.exports = class bitfinex extends Exchange {
             request['start'] = since;
         }
         const response = await this.v2GetCandlesTradeTimeframeSymbolHist (this.extend (request, params));
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        //
+        //     [
+        //         [1457539800000,0.02594,0.02594,0.02594,0.02594,0.1],
+        //         [1457547300000,0.02577,0.02577,0.02577,0.02577,0.01],
+        //         [1457550240000,0.0255,0.0253,0.0255,0.0252,3.2640000000000002],
+        //     ]
+        //
+        return this.parseOHLCVs (response, market);
     }
 
     getCurrencyName (code) {
@@ -15661,7 +15691,14 @@ module.exports = class bitfinex2 extends bitfinex {
             'limit': limit,
         };
         const response = await this.publicGetCandlesTradeTimeframeSymbolHist (this.extend (request, params));
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        //
+        //     [
+        //         [1591503840000,0.025069,0.025068,0.025069,0.025068,1.97828998],
+        //         [1591504500000,0.025065,0.025065,0.025065,0.025065,1.0164],
+        //         [1591504620000,0.025062,0.025062,0.025062,0.025062,0.5],
+        //     ]
+        //
+        return this.parseOHLCVs (response, market);
     }
 
     parseOrderStatus (status) {
@@ -17053,6 +17090,17 @@ module.exports = class bitforex extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     {
+        //         "close":0.02505143,
+        //         "currencyVol":0,
+        //         "high":0.02506422,
+        //         "low":0.02505143,
+        //         "open":0.02506095,
+        //         "time":1591508940000,
+        //         "vol":51.1869
+        //     }
+        //
         return [
             this.safeInteger (ohlcv, 'time'),
             this.safeFloat (ohlcv, 'open'),
@@ -17074,8 +17122,19 @@ module.exports = class bitforex extends Exchange {
             request['size'] = limit; // default 1, max 600
         }
         const response = await this.publicGetApiV1MarketKline (this.extend (request, params));
-        const ohlcvs = this.safeValue (response, 'data', []);
-        return this.parseOHLCVs (ohlcvs, market, timeframe, since, limit);
+        //
+        //     {
+        //         "data":[
+        //             {"close":0.02505143,"currencyVol":0,"high":0.02506422,"low":0.02505143,"open":0.02506095,"time":1591508940000,"vol":51.1869},
+        //             {"close":0.02503914,"currencyVol":0,"high":0.02506687,"low":0.02503914,"open":0.02505358,"time":1591509000000,"vol":9.1082},
+        //             {"close":0.02505172,"currencyVol":0,"high":0.02507466,"low":0.02503895,"open":0.02506371,"time":1591509060000,"vol":63.7431},
+        //         ],
+        //         "success":true,
+        //         "time":1591509427131
+        //     }
+        //
+        const data = this.safeValue (response, 'data', []);
+        return this.parseOHLCVs (data, market);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -18732,6 +18791,16 @@ module.exports = class bitmart extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     {
+        //         "timestamp":1525761000000,
+        //         "open_price":"0.010130",
+        //         "highest_price":"0.010130",
+        //         "lowest_price":"0.010130",
+        //         "current_price":"0.010130",
+        //         "volume":"0.000000"
+        //     }
+        //
         return [
             this.safeInteger (ohlcv, 'timestamp'),
             this.safeFloat (ohlcv, 'open_price'),
@@ -18775,7 +18844,7 @@ module.exports = class bitmart extends Exchange {
         //         }
         //     ]
         //
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        return this.parseOHLCVs (response, market);
     }
 
     async fetchBalance (params = {}) {
