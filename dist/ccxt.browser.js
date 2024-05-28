@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.97'
+const version = '1.28.98'
 
 Exchange.ccxtVersion = version
 
@@ -73625,7 +73625,7 @@ module.exports = class kuna extends acx {
     }
 
     async fetchMarkets (params = {}) {
-        const quotes = [ 'btc', 'eth', 'eurs', 'rub', 'uah', 'usd', 'usdt' ];
+        const quotes = [ 'btc', 'eth', 'eurs', 'rub', 'uah', 'usd', 'usdt', 'gol' ];
         const pricePrecisions = {
             'UAH': 0,
         };
