@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.77'
+const version = '1.35.78'
 
 Exchange.ccxtVersion = version
 
@@ -2230,6 +2230,10 @@ module.exports = class Exchange {
         console.log (... args)
     }
 
+    setHeaders (headers) {
+        return headers;
+    }
+
     fetch (url, method = 'GET', headers = undefined, body = undefined) {
 
         if (isNode && this.userAgent) {
@@ -2257,6 +2261,7 @@ module.exports = class Exchange {
         }
 
         headers = extend (this.headers, headers)
+        headers = this.setHeaders (headers)
 
         if (this.verbose) {
             this.print ("fetch:\n", this.id, method, url, "\nRequest:\n", headers, "\n", body, "\n")
@@ -2406,8 +2411,8 @@ module.exports = class Exchange {
             const allCurrencies = baseCurrencies.concat (quoteCurrencies)
             const groupedCurrencies = groupBy (allCurrencies, 'code')
             const currencies = Object.keys (groupedCurrencies).map ((code) =>
-                groupedCurrencies[code].reduce ((previous, current) =>
-                    ((previous.precision > current.precision) ? previous : current), groupedCurrencies[code][0]))
+                groupedCurrencies[code].reduce ((previous, current) => // eslint-disable-line implicit-arrow-linebreak
+                    ((previous.precision > current.precision) ? previous : current), groupedCurrencies[code][0])) // eslint-disable-line implicit-arrow-linebreak
             const sortedCurrencies = sortBy (flatten (currencies), 'code')
             this.currencies = deepExtend (indexBy (sortedCurrencies, 'code'), this.currencies)
         }
