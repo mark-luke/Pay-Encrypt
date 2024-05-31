@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.75'
+const version = '1.26.76'
 
 Exchange.ccxtVersion = version
 
@@ -67101,7 +67101,10 @@ module.exports = class kraken extends Exchange {
         const id = this.safeString (order, 'id');
         const clientOrderId = this.safeString (order, 'userref');
         const rawTrades = this.safeValue (order, 'trades');
-        const trades = this.parseTrades (rawTrades, market, undefined, undefined, { 'order': id });
+        let trades = undefined;
+        if (rawTrades !== undefined) {
+            trades = this.parseTrades (rawTrades, market, undefined, undefined, { 'order': id });
+        }
         return {
             'id': id,
             'clientOrderId': clientOrderId,
