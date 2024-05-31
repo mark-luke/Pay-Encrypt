@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.35'
+const version = '1.26.36'
 
 Exchange.ccxtVersion = version
 
@@ -70337,7 +70337,7 @@ module.exports = class latoken extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, DDoSProtection, AuthenticationError, InvalidOrder } = require ('./base/errors');
+const { ExchangeError, DDoSProtection, AuthenticationError, InvalidOrder, ArgumentsRequired } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -70673,10 +70673,10 @@ module.exports = class lbank extends Exchange {
         await this.loadMarkets ();
         const market = this.market (symbol);
         if (since === undefined) {
-            throw new ExchangeError (this.id + ' fetchOHLCV requires a `since` argument');
+            throw new ArgumentsRequired (this.id + ' fetchOHLCV requires a `since` argument');
         }
         if (limit === undefined) {
-            throw new ExchangeError (this.id + ' fetchOHLCV requires a `limit` argument');
+            throw new ArgumentsRequired (this.id + ' fetchOHLCV requires a `limit` argument');
         }
         const request = {
             'symbol': market['id'],
