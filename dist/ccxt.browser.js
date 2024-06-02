@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1073'
+const version = '1.18.1074'
 
 Exchange.ccxtVersion = version
 
@@ -44606,6 +44606,7 @@ module.exports = class fcoin extends Exchange {
                 '429': DDoSProtection, // Too Many Requests, exceed api request limit
                 '1002': ExchangeNotAvailable, // System busy
                 '1016': InsufficientFunds,
+                '2136': AuthenticationError, // The API key is expired
                 '3008': InvalidOrder,
                 '6004': InvalidNonce,
                 '6005': AuthenticationError, // Illegal API Signature
@@ -71987,7 +71988,7 @@ module.exports = class rightbtc extends Exchange {
         };
         const response = await this.publicGetTickerTradingPair (this.extend (request, params));
         const result = this.safeValue (response, 'result');
-        if (!Object.keys (result).length) {
+        if (result === undefined) {
             throw new ExchangeError (this.id + ' fetchTicker returned an empty response for symbol ' + symbol);
         }
         return this.parseTicker (result, market);
