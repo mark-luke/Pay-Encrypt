@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.5'
+const version = '1.27.10'
 
 Exchange.ccxtVersion = version
 
@@ -10449,7 +10449,7 @@ module.exports = class bigone extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, ExchangeNotAvailable, InsufficientFunds, OrderNotFound, InvalidOrder, DDoSProtection, InvalidNonce, AuthenticationError, InvalidAddress, RateLimitExceeded, PermissionDenied } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, ExchangeNotAvailable, InsufficientFunds, OrderNotFound, InvalidOrder, DDoSProtection, InvalidNonce, AuthenticationError, InvalidAddress, RateLimitExceeded, PermissionDenied, NotSupported } = require ('./base/errors');
 const { ROUND, TRUNCATE } = require ('./base/functions/number');
 
 //  ---------------------------------------------------------------------------
@@ -10781,6 +10781,14 @@ module.exports = class binance extends Exchange {
                 '-2015': AuthenticationError, // "Invalid API-key, IP, or permissions for action."
             },
         });
+    }
+
+    setSandboxMode (enabled) {
+        const type = this.safeString (this.options, 'defaultType', 'spot');
+        if (type !== 'future') {
+            throw new NotSupported (this.id + ' does not have a sandbox URL for ' + type + " markets, set exchange.options['defaultType'] = 'future' or don't use the sandbox for " + this.id);
+        }
+        return super.setSandboxMode (enabled);
     }
 
     nonce () {
@@ -11177,7 +11185,7 @@ module.exports = class binance extends Exchange {
 
     async fetchBidsAsks (symbols = undefined, params = {}) {
         await this.loadMarkets ();
-        const defaultType = this.safeString2 (this.options, 'fetchOpenOrders', 'defaultType', 'spot');
+        const defaultType = this.safeString2 (this.options, 'fetchBidsAsks', 'defaultType', 'spot');
         const type = this.safeString (params, 'type', defaultType);
         const query = this.omit (params, 'type');
         const method = (type === 'spot') ? 'publicGetTickerBookTicker' : 'fapiPublicGetTickerBookTicker';
@@ -11194,12 +11202,12 @@ module.exports = class binance extends Exchange {
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
         return [
-            ohlcv[0],
-            parseFloat (ohlcv[1]),
-            parseFloat (ohlcv[2]),
-            parseFloat (ohlcv[3]),
-            parseFloat (ohlcv[4]),
-            parseFloat (ohlcv[5]),
+            this.safeInteger (ohlcv, 0),
+            this.safeFloat (ohlcv, 1),
+            this.safeFloat (ohlcv, 2),
+            this.safeFloat (ohlcv, 3),
+            this.safeFloat (ohlcv, 4),
+            this.safeFloat (ohlcv, 5),
         ];
     }
 
@@ -33798,6 +33806,8 @@ module.exports = class bybit extends Exchange {
         //     }
         //
         const markets = this.safeValue (response, 'result', []);
+        const options = this.safeValue (this.options, 'fetchMarkets', {});
+        const linearQuoteCurrencies = this.safeValue (options, 'linear', { 'USDT': true });
         const result = [];
         for (let i = 0; i < markets.length; i++) {
             const market = markets[i];
@@ -33806,6 +33816,8 @@ module.exports = class bybit extends Exchange {
             const quoteId = this.safeString (market, 'quote_currency');
             const base = this.safeCurrencyCode (baseId);
             const quote = this.safeCurrencyCode (quoteId);
+            const linear = (quote in linearQuoteCurrencies);
+            const inverse = !linear;
             const symbol = base + '/' + quote;
             const lotSizeFilter = this.safeValue (market, 'lot_size_filter', {});
             const priceFilter = this.safeValue (market, 'price_filter', {});
@@ -33822,6 +33834,12 @@ module.exports = class bybit extends Exchange {
                 'precision': precision,
                 'taker': this.safeFloat (market, 'taker_fee'),
                 'maker': this.safeFloat (market, 'maker_fee'),
+                'type': 'future',
+                'spot': false,
+                'future': true,
+                'option': false,
+                'linear': linear,
+                'inverse': inverse,
                 'limits': {
                     'amount': {
                         'min': this.safeFloat (lotSizeFilter, 'min_trading_qty'),
@@ -33836,10 +33854,6 @@ module.exports = class bybit extends Exchange {
                         'max': undefined,
                     },
                 },
-                'type': 'future',
-                'spot': false,
-                'future': true,
-                'option': false,
                 'info': market,
             });
         }
@@ -34422,8 +34436,8 @@ module.exports = class bybit extends Exchange {
         //         "last_exec_time": 0,
         //         "last_exec_price": 0,
         //         "leaves_qty": 1,
-        //         "cum_exec_qty": 0,
-        //         "cum_exec_value": 0,
+        //         "cum_exec_qty": 0, // in contracts, where 1 contract = 1 quote currency unit (USD for inverse contracts)
+        //         "cum_exec_value": 0, // in contract's underlying currency (BTC for inverse contracts)
         //         "cum_exec_fee": 0,
         //         "reject_reason": "",
         //         "order_link_id": "",
@@ -34431,18 +34445,69 @@ module.exports = class bybit extends Exchange {
         //         "updated_at": "2019-11-30T11:03:43.455Z"
         //     }
         //
+        // fetchOrder
+        //
+        //     {
+        //         "user_id" : 599946,
+        //         "symbol" : "BTCUSD",
+        //         "side" : "Buy",
+        //         "order_type" : "Limit",
+        //         "price" : "7948",
+        //         "qty" : 10,
+        //         "time_in_force" : "GoodTillCancel",
+        //         "order_status" : "Filled",
+        //         "ext_fields" : {
+        //             "o_req_num" : -1600687220498,
+        //             "xreq_type" : "x_create"
+        //         },
+        //         "last_exec_time" : "1588150113.968422",
+        //         "last_exec_price" : "7948",
+        //         "leaves_qty" : 0,
+        //         "leaves_value" : "0",
+        //         "cum_exec_qty" : 10,
+        //         "cum_exec_value" : "0.00125817",
+        //         "cum_exec_fee" : "-0.00000031",
+        //         "reject_reason" : "",
+        //         "cancel_type" : "",
+        //         "order_link_id" : "",
+        //         "created_at" : "2020-04-29T08:45:24.399146Z",
+        //         "updated_at" : "2020-04-29T08:48:33.968422Z",
+        //         "order_id" : "dd2504b9-0157-406a-99e1-efa522373944"
+        //     }
+        //
+        const marketId = this.safeString (order, 'symbol');
+        let symbol = undefined;
+        let base = undefined;
+        if (marketId in this.markets_by_id) {
+            market = this.markets_by_id[marketId];
+        }
         const timestamp = this.parse8601 (this.safeString (order, 'created_at'));
         const id = this.safeString (order, 'order_id');
         const price = this.safeFloat (order, 'price');
         const average = this.safeFloat (order, 'average_price');
-        const amount = this.safeFloat (order, 'qty');
-        let filled = this.safeFloat (order, 'cum_exec_qty');
-        let remaining = this.safeFloat (order, 'leaves_qty');
+        let amount = undefined;
+        let cost = undefined;
+        let filled = undefined;
+        let remaining = undefined;
+        if (market !== undefined) {
+            symbol = market['symbol'];
+            base = market['base'];
+            if (market['inverse']) {
+                cost = this.safeFloat (order, 'cum_exec_qty');
+                filled = this.safeFloat (order, 'cum_exec_value');
+                remaining = this.safeFloat (order, 'leaves_value');
+                amount = this.sum (filled, remaining);
+            } else {
+                amount = this.safeFloat (order, 'qty');
+                cost = this.safeFloat (order, 'cum_exec_value');
+                filled = this.safeFloat (order, 'cum_exec_qty');
+                remaining = this.safeFloat (order, 'leaves_qty');
+            }
+        }
         let lastTradeTimestamp = this.safeTimestamp (order, 'last_exec_time');
         if (lastTradeTimestamp === 0) {
             lastTradeTimestamp = undefined;
         }
-        let cost = this.safeFloat (order, 'cum_exec_value');
         if ((filled === undefined) && (amount !== undefined) && (remaining !== undefined)) {
             filled = amount - remaining;
         }
@@ -34457,22 +34522,6 @@ module.exports = class bybit extends Exchange {
             }
         }
         const status = this.parseOrderStatus (this.safeString (order, 'order_status'));
-        const marketId = this.safeString (order, 'symbol');
-        let symbol = undefined;
-        let base = undefined;
-        if (marketId in this.markets_by_id) {
-            market = this.markets_by_id[marketId];
-            symbol = market['symbol'];
-            base = market['base'];
-        }
-        if (market !== undefined) {
-            if (symbol === undefined) {
-                symbol = market['symbol'];
-            }
-            if (base === undefined) {
-                base = market['base'];
-            }
-        }
         const side = this.safeStringLower (order, 'side');
         let feeCost = this.safeFloat (order, 'cum_exec_fee');
         let fee = undefined;
@@ -52742,9 +52791,9 @@ module.exports = class exmo extends Exchange {
         let fee = undefined;
         const feeCost = this.safeFloat (trade, 'commission_amount');
         if (feeCost !== undefined) {
-            const feeCurrencyId = this.safeString (trade, 'commision_currency');
+            const feeCurrencyId = this.safeString (trade, 'commission_currency');
             const feeCurrencyCode = this.safeCurrencyCode (feeCurrencyId);
-            let feeRate = this.safeFloat (trade, 'commision_percent');
+            let feeRate = this.safeFloat (trade, 'commission_percent');
             if (feeRate !== undefined) {
                 feeRate /= 1000;
             }
