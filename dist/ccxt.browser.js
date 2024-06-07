@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1366'
+const version = '1.18.1367'
 
 Exchange.ccxtVersion = version
 
@@ -30216,13 +30216,10 @@ module.exports = class bytetrade extends Exchange {
             throw new ArgumentsRequired ('fetchOrder requires this.apiKey or userid argument');
         }
         await this.loadMarkets ();
-        const request = {};
+        const request = {
+            'userid': this.apiKey,
+        };
         let market = undefined;
-        if ('userid' in params) {
-            request['userid'] = params['userid'];
-        } else {
-            request['userid'] = this.apiKey;
-        }
         if (symbol !== undefined) {
             market = this.markets[symbol];
             request['symbol'] = market['id'];
@@ -30237,13 +30234,10 @@ module.exports = class bytetrade extends Exchange {
             throw new ArgumentsRequired ('fetchOpenOrders requires this.apiKey or userid argument');
         }
         await this.loadMarkets ();
+        const request = {
+            'userid': this.apiKey,
+        };
         let market = undefined;
-        const request = {};
-        if ('userid' in params) {
-            request['userid'] = params['userid'];
-        } else {
-            request['userid'] = this.apiKey;
-        }
         if (symbol !== undefined) {
             market = this.market (symbol);
             request['symbol'] = market['id'];
@@ -30261,12 +30255,9 @@ module.exports = class bytetrade extends Exchange {
         }
         await this.loadMarkets ();
         let market = undefined;
-        const request = { };
-        if ('userid' in params) {
-            request['userid'] = params['userid'];
-        } else {
-            request['userid'] = this.apiKey;
-        }
+        const request = {
+            'userid': this.apiKey,
+        };
         if (symbol !== undefined) {
             market = this.market (symbol);
             request['symbol'] = market['id'];
@@ -30284,12 +30275,9 @@ module.exports = class bytetrade extends Exchange {
         }
         await this.loadMarkets ();
         let market = undefined;
-        const request = {};
-        if ('userid' in params) {
-            request['userid'] = params['userid'];
-        } else {
-            request['userid'] = this.apiKey;
-        }
+        const request = {
+            'userid': this.apiKey,
+        };
         if (symbol !== undefined) {
             market = this.market (symbol);
             request['symbol'] = market['id'];
@@ -30380,7 +30368,7 @@ module.exports = class bytetrade extends Exchange {
         const status = (statusCode === '0') ? 'canceled' : 'failed';
         return {
             'info': response,
-            'id': '',
+            'id': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -30503,12 +30491,9 @@ module.exports = class bytetrade extends Exchange {
         }
         await this.loadMarkets ();
         const market = this.market (symbol);
-        const request = {};
-        if ('userid' in params) {
-            request['userid'] = params['userid'];
-        } else {
-            request['userid'] = this.apiKey;
-        }
+        const request = {
+            'userid': this.apiKey,
+        };
         if (symbol !== undefined) {
             request['symbol'] = market['id'];
         }
@@ -30525,12 +30510,9 @@ module.exports = class bytetrade extends Exchange {
             throw new ArgumentsRequired ('fetchDeposits requires this.apiKey or userid argument');
         }
         let currency = undefined;
-        const request = { };
-        if ('userid' in params) {
-            request['userid'] = params['userid'];
-        } else {
-            request['userid'] = this.apiKey;
-        }
+        const request = {
+            'userid': this.apiKey,
+        };
         if (code !== undefined) {
             currency = this.currency (code);
             request['currency'] = currency['id'];
@@ -30551,12 +30533,9 @@ module.exports = class bytetrade extends Exchange {
             throw new ArgumentsRequired ('fetchWithdrawals requires this.apiKey or userid argument');
         }
         let currency = undefined;
-        const request = {};
-        if ('userid' in params) {
-            request['userid'] = params['userid'];
-        } else {
-            request['userid'] = this.apiKey;
-        }
+        const request = {
+            'userid': this.apiKey,
+        };
         if (code !== undefined) {
             currency = this.currency (code);
             request['currency'] = currency['id'];
@@ -30638,13 +30617,10 @@ module.exports = class bytetrade extends Exchange {
             throw new ArgumentsRequired ('fetchDepositAddress requires this.apiKey or userid argument');
         }
         const currency = this.currency (code);
-        const request = { };
-        if ('userid' in params) {
-            request['userid'] = params['userid'];
-        } else {
-            request['userid'] = this.apiKey;
-        }
-        request['code'] = currency['id'];
+        const request = {
+            'userid': this.apiKey,
+            'code': currency['id'],
+        };
         const response = await this.publicGetDepositaddress (request);
         const address = this.safeString (response[0], 'address');
         const tag = this.safeString (response[0], 'addressTag');
@@ -30761,9 +30737,9 @@ module.exports = class bytetrade extends Exchange {
         const signature = this.ecdsa (hash, this.secret, 'secp256k1', undefined, true);
         const recoveryParam = this.decode (this.binaryToBase16 (this.numberToLE (this.sum (signature['v'], 31), 1)));
         const mySignature = recoveryParam + signature['r'] + signature['s'];
-        let fatty = { };
-        let request = { };
-        let operation = { };
+        let fatty = undefined;
+        let request = undefined;
+        let operation = undefined;
         const chainContractAddress = this.safeString (currency['info'], 'chainContractAddress');
         if (chainTypeString === 'bitcoin') {
             operation = {
@@ -30850,7 +30826,7 @@ module.exports = class bytetrade extends Exchange {
     }
 
     handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
-        if ((code === 503)) {
+        if (code === 503) {
             throw new DDoSProtection (this.id + ' ' + code.toString () + ' ' + reason + ' ' + body);
         }
         if (response === undefined) {
