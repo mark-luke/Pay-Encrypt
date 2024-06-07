@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.94'
+const version = '1.25.96'
 
 Exchange.ccxtVersion = version
 
@@ -67173,6 +67173,7 @@ module.exports = class kucoin extends Exchange {
                         'market/stats',
                         'currencies',
                         'currencies/{currency}',
+                        'prices',
                     ],
                     'post': [
                         'bullet-public',
@@ -67184,6 +67185,9 @@ module.exports = class kucoin extends Exchange {
                         'accounts/{accountId}',
                         'accounts/{accountId}/ledgers',
                         'accounts/{accountId}/holds',
+                        'accounts/transferable',
+                        'sub-accounts',
+                        'sub-accounts/{subUserId}',
                         'deposit-addresses',
                         'deposits',
                         'hist-deposits',
@@ -67193,6 +67197,7 @@ module.exports = class kucoin extends Exchange {
                         'withdrawals/quotas',
                         'orders',
                         'orders/{orderId}',
+                        'limit/orders',
                         'fills',
                         'limit/fills',
                     ],
@@ -67203,10 +67208,12 @@ module.exports = class kucoin extends Exchange {
                         'deposit-addresses',
                         'withdrawals',
                         'orders',
+                        'orders/multi',
                         'bullet-private',
                     ],
                     'delete': [
                         'withdrawals/{withdrawalId}',
+                        'orders',
                         'orders/{orderId}',
                     ],
                 },
@@ -78399,12 +78406,12 @@ module.exports = class paymium extends Exchange {
                 },
                 'private': {
                     'get': [
-                        'merchant/get_payment/{UUID}',
+                        'merchant/get_payment/{uuid}',
                         'user',
                         'user/addresses',
                         'user/addresses/{btc_address}',
                         'user/orders',
-                        'user/orders/{UUID}',
+                        'user/orders/{uuid}',
                         'user/price_alerts',
                     ],
                     'post': [
@@ -78415,7 +78422,7 @@ module.exports = class paymium extends Exchange {
                         'merchant/create_payment',
                     ],
                     'delete': [
-                        'user/orders/{UUID}/cancel',
+                        'user/orders/{uuid}/cancel',
                         'user/price_alerts/{id}',
                     ],
                 },
@@ -78578,18 +78585,24 @@ module.exports = class paymium extends Exchange {
             this.checkRequiredCredentials ();
             const nonce = this.nonce ().toString ();
             let auth = nonce + url;
+            headers = {
+                'Api-Key': this.apiKey,
+                'Api-Nonce': nonce,
+            };
             if (method === 'POST') {
                 if (Object.keys (query).length) {
                     body = this.json (query);
                     auth += body;
+                    headers['Content-Type'] = 'application/json';
+                }
+            } else {
+                if (Object.keys (query).length) {
+                    const queryString = this.urlencode (query);
+                    auth += queryString;
+                    url += '?' + queryString;
                 }
             }
-            headers = {
-                'Api-Key': this.apiKey,
-                'Api-Signature': this.hmac (this.encode (auth), this.encode (this.secret)),
-                'Api-Nonce': nonce,
-                'Content-Type': 'application/json',
-            };
+            headers['Api-Signature'] = this.hmac (this.encode (auth), this.encode (this.secret));
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
     }
