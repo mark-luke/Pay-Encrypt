@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1234'
+const version = '1.18.1235'
 
 Exchange.ccxtVersion = version
 
@@ -24696,7 +24696,7 @@ module.exports = class braziliex extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, AuthenticationError, DDoSProtection, InvalidOrder } = require ('./base/errors');
+const { ExchangeError, AuthenticationError, DDoSProtection, InvalidOrder, InsufficientFunds } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -24797,6 +24797,12 @@ module.exports = class btcalpha extends Exchange {
             },
             'commonCurrencies': {
                 'CBC': 'Cashbery',
+            },
+            'exceptions': {
+                'exact': {},
+                'broad': {
+                    'Out of balance': InsufficientFunds, // {"date":1570599531.4814300537,"error":"Out of balance -9.99243661 BTC"}
+                },
             },
         });
     }
@@ -25125,16 +25131,31 @@ module.exports = class btcalpha extends Exchange {
         if (response === undefined) {
             return; // fallback to default error handler
         }
-        if (code < 400) {
-            return; // fallback to default error handler
+        //
+        //     {"date":1570599531.4814300537,"error":"Out of balance -9.99243661 BTC"}
+        //
+        const error = this.safeString (response, 'error');
+        const feedback = this.id + ' ' + body;
+        if (error !== undefined) {
+            const exact = this.exceptions['exact'];
+            if (error in exact) {
+                throw new exact[error] (feedback);
+            }
+            const broad = this.exceptions['broad'];
+            const broadKey = this.findBroadlyMatchedKey (broad, error);
+            if (broadKey !== undefined) {
+                throw new broad[broadKey] (feedback);
+            }
         }
-        const message = this.id + ' ' + this.safeValue (response, 'detail', body);
         if (code === 401 || code === 403) {
-            throw new AuthenticationError (message);
+            throw new AuthenticationError (feedback);
         } else if (code === 429) {
-            throw new DDoSProtection (message);
+            throw new DDoSProtection (feedback);
         }
-        throw new ExchangeError (message);
+        if (code < 400) {
+            return;
+        }
+        throw new ExchangeError (feedback);
     }
 };
 
