@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1099'
+const version = '1.18.1100'
 
 Exchange.ccxtVersion = version
 
@@ -14053,6 +14053,10 @@ module.exports = class bithumb extends Exchange {
         }
         const vwap = this.safeFloat (ticker, 'average_price');
         const baseVolume = this.safeFloat (ticker, 'volume_1day');
+        let quoteVolume = undefined;
+        if (vwap !== undefined && baseVolume !== undefined) {
+            quoteVolume = baseVolume * vwap;
+        }
         return {
             'symbol': symbol,
             'timestamp': timestamp,
@@ -14072,7 +14076,7 @@ module.exports = class bithumb extends Exchange {
             'percentage': percentage,
             'average': average,
             'baseVolume': baseVolume,
-            'quoteVolume': baseVolume * vwap,
+            'quoteVolume': quoteVolume,
             'info': ticker,
         };
     }
