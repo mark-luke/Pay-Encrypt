@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.77'
+const version = '1.28.79'
 
 Exchange.ccxtVersion = version
 
@@ -69524,7 +69524,7 @@ module.exports = class kraken extends Exchange {
     }
 
     parseOrders (orders, market = undefined, since = undefined, limit = undefined, params = {}) {
-        const result = [];
+        let result = [];
         const ids = Object.keys (orders);
         let symbol = undefined;
         if (market !== undefined) {
@@ -69535,6 +69535,7 @@ module.exports = class kraken extends Exchange {
             const order = this.extend ({ 'id': id }, orders[id]);
             result.push (this.extend (this.parseOrder (order, market), params));
         }
+        result = this.sortBy (result, 'timestamp');
         return this.filterBySymbolSinceLimit (result, symbol, since, limit);
     }
 
@@ -75940,6 +75941,7 @@ module.exports = class luno extends Exchange {
                         'accounts/{id}/pending',
                         'accounts/{id}/transactions',
                         'balance',
+                        'beneficiaries',
                         'fee_info',
                         'funding_address',
                         'listorders',
@@ -75961,6 +75963,7 @@ module.exports = class luno extends Exchange {
                         'oauth2/grant',
                     ],
                     'put': [
+                        'accounts/{id}/name',
                         'quotes/{id}',
                     ],
                     'delete': [
