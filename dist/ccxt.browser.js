@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.66'
+const version = '1.21.67'
 
 Exchange.ccxtVersion = version
 
@@ -39089,7 +39089,7 @@ module.exports = class coinex extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, AuthenticationError, DDoSProtection, ArgumentsRequired } = require ('./base/errors');
+const { ExchangeError, AuthenticationError, RateLimitExceeded, ArgumentsRequired } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -39508,7 +39508,7 @@ module.exports = class coinfalcon extends Exchange {
         }
         const ErrorClass = this.safeValue ({
             '401': AuthenticationError,
-            '429': DDoSProtection,
+            '429': RateLimitExceeded,
         }, code, ExchangeError);
         throw new ErrorClass (body);
     }
