@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.7'
+const version = '1.20.8'
 
 Exchange.ccxtVersion = version
 
@@ -945,10 +945,7 @@ module.exports = class acx extends Exchange {
             const error = this.safeValue (response, 'error');
             const errorCode = this.safeString (error, 'code');
             const feedback = this.id + ' ' + this.json (response);
-            const exceptions = this.exceptions;
-            if (errorCode in exceptions) {
-                throw new exceptions[errorCode] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions, errorCode, feedback);
             // fallback to default error handler
         }
     }
@@ -7209,10 +7206,8 @@ module.exports = class bcex extends Exchange {
                 //
                 const message = this.safeString (response, 'msg');
                 const feedback = this.id + ' ' + message;
-                const exceptions = this.exceptions;
-                if (message in exceptions) {
-                    throw new exceptions[message] (feedback);
-                } else if (message.indexOf ('请您重新挂单') >= 0) {  // minimum limit
+                this.throwExactlyMatchedException (this.exceptions, message, feedback);
+                if (message.indexOf ('请您重新挂单') >= 0) {  // minimum limit
                     throw new InvalidOrder (feedback);
                 } else {
                     throw new ExchangeError (feedback);
@@ -8199,12 +8194,8 @@ module.exports = class bibox extends Exchange {
             if ('code' in response['error']) {
                 const code = this.safeString (response['error'], 'code');
                 const feedback = this.id + ' ' + body;
-                const exceptions = this.exceptions;
-                if (code in exceptions) {
-                    throw new exceptions[code] (feedback);
-                } else {
-                    throw new ExchangeError (feedback);
-                }
+                this.throwExactlyMatchedException (this.exceptions, code, feedback);
+                throw new ExchangeError (feedback);
             }
             throw new ExchangeError (this.id + ' ' + body);
         }
@@ -13121,12 +13112,8 @@ module.exports = class bitbay extends Exchange {
             //
             const code = this.safeString (response, 'code'); // always an integer
             const feedback = this.id + ' ' + body;
-            const exceptions = this.exceptions;
-            if (code in this.exceptions) {
-                throw new exceptions[code] (feedback);
-            } else {
-                throw new ExchangeError (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions, code, feedback);
+            throw new ExchangeError (feedback);
         } else if ('status' in response) {
             //
             //      {"status":"Fail","errors":["OFFER_FUNDS_NOT_EXCEEDING_MINIMUMS"]}
@@ -13134,12 +13121,10 @@ module.exports = class bitbay extends Exchange {
             const status = this.safeString (response, 'status');
             if (status === 'Fail') {
                 const errors = this.safeValue (response, 'errors');
-                const feedback = this.id + ' ' + this.json (response);
+                const feedback = this.id + ' ' + body;
                 for (let i = 0; i < errors.length; i++) {
                     const error = errors[i];
-                    if (error in this.exceptions) {
-                        throw new this.exceptions[error] (feedback);
-                    }
+                    this.throwExactlyMatchedException (this.exceptions, error, feedback);
                 }
                 throw new ExchangeError (feedback);
             }
@@ -16007,11 +15992,8 @@ module.exports = class bitforex extends Exchange {
             if (success !== undefined) {
                 if (!success) {
                     const code = this.safeString (response, 'code');
-                    if (code in this.exceptions) {
-                        throw new this.exceptions[code] (feedback);
-                    } else {
-                        throw new ExchangeError (feedback);
-                    }
+                    this.throwExactlyMatchedException (this.exceptions, code, feedback);
+                    throw new ExchangeError (feedback);
                 }
             }
         }
@@ -16450,15 +16432,10 @@ module.exports = class bithumb extends Exchange {
                 if (status === '0000') {
                     return; // no error
                 }
-                const feedback = this.id + ' ' + this.json (response);
-                const exceptions = this.exceptions;
-                if (status in exceptions) {
-                    throw new exceptions[status] (feedback);
-                } else if (message in exceptions) {
-                    throw new exceptions[message] (feedback);
-                } else {
-                    throw new ExchangeError (feedback);
-                }
+                const feedback = this.id + ' ' + body;
+                this.throwExactlyMatchedException (this.exceptions, status, feedback);
+                this.throwExactlyMatchedException (this.exceptions, message, feedback);
+                throw new ExchangeError (feedback);
             }
         }
     }
@@ -20832,12 +20809,8 @@ module.exports = class bitso extends Exchange {
                     throw new ExchangeError (feedback);
                 }
                 const code = this.safeString (error, 'code');
-                const exceptions = this.exceptions;
-                if (code in exceptions) {
-                    throw new exceptions[code] (feedback);
-                } else {
-                    throw new ExchangeError (feedback);
-                }
+                this.throwExactlyMatchedException (this.exceptions, code, feedback);
+                throw new ExchangeError (feedback);
             }
         }
     }
