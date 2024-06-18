@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.47'
+const version = '1.22.48'
 
 Exchange.ccxtVersion = version
 
@@ -3931,7 +3931,7 @@ module.exports = class Exchange {
     async fetch2 (path, type = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
 
         if (this.enableRateLimit)
-            await this.throttle ()
+            await this.throttle (this.rateLimit)
 
         const request = this.sign (path, type, method, params, headers, body)
         return this.fetch (request.url, request.method, request.headers, request.body)
@@ -6048,7 +6048,7 @@ module.exports = {
 
         const queue = []
 
-        return Object.assign ((cost) => {
+        return Object.assign ((rateLimit, cost) => {
 
             if (queue.length > cfg.maxCapacity)
                 throw new Error ('Backlog is over max capacity of ' + cfg.maxCapacity)
@@ -6076,7 +6076,7 @@ module.exports = {
                             const t = now ()
                                 , elapsed = t - lastTimestamp
                             lastTimestamp = t
-                            numTokens = Math.min (cfg.capacity, numTokens + elapsed * cfg.refillRate)
+                            numTokens = Math.min (cfg.capacity, numTokens + elapsed * (1 / rateLimit))
                             await sleep (cfg.delay)
                         }
                         running = false
