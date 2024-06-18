@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.52'
+const version = '1.21.53'
 
 Exchange.ccxtVersion = version
 
@@ -16444,11 +16444,10 @@ module.exports = class bithumb extends Exchange {
             const code = codes[i];
             const account = this.account ();
             const currency = this.currency (code);
-            const currencyId = currency['id'];
-            const lowercase = currencyId.toLowerCase ();
-            account['total'] = this.safeFloat (balances, 'total_' + lowercase);
-            account['used'] = this.safeFloat (balances, 'in_use_' + lowercase);
-            account['free'] = this.safeFloat (balances, 'available_' + lowercase);
+            const lowerCurrencyId = this.safeStringLower (currency, 'id');
+            account['total'] = this.safeFloat (balances, 'total_' + lowerCurrencyId);
+            account['used'] = this.safeFloat (balances, 'in_use_' + lowerCurrencyId);
+            account['free'] = this.safeFloat (balances, 'available_' + lowerCurrencyId);
             result[code] = account;
         }
         return this.parseBalance (result);
@@ -22023,10 +22022,9 @@ module.exports = class bitstamp extends Exchange {
         const timestamp = this.parse8601 (this.safeString (order, 'datetime'));
         let lastTradeTimestamp = undefined;
         let symbol = undefined;
-        let marketId = this.safeString (order, 'currency_pair');
+        let marketId = this.safeStringLower (order, 'currency_pair');
         if (marketId !== undefined) {
             marketId = marketId.replace ('/', '');
-            marketId = marketId.toLowerCase ();
             if (marketId in this.markets_by_id) {
                 market = this.markets_by_id[marketId];
                 symbol = market['symbol'];
