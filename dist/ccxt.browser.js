@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.82'
+const version = '1.23.86'
 
 Exchange.ccxtVersion = version
 
@@ -4114,27 +4114,19 @@ module.exports = class Exchange {
         return this.setMarkets (markets, currencies)
     }
 
-    async loadMarkets (reload = false, params = {}) {
-        if (this.marketsLoaded) {
-            if (reload) {
-                return this.loadMarketsHelper (reload, params)
-            }
-            return this.markets
-        } else {
-            if (!this.marketsLoading) {
-                this.marketsLoading = new Promise (async (resolve, reject) => {
-                    try {
-                        const result = await this.loadMarketsHelper (reload, params)
-                        this.marketsLoaded = true
-                        this.marketsLoading = false
-                        resolve (result)
-                    } catch (e) {
-                        reject (e)
-                    }
-                })
-            }
-            return this.marketsLoading
+    // is async (returns a promise)
+    loadMarkets (reload = false, params = {}) {
+        if ((reload && !this.reloadingMarkets) || !this.marketsLoading) {
+            this.reloadingMarkets = true
+            this.marketsLoading = this.loadMarketsHelper (reload, params).then ((resolved) => {
+                this.reloadingMarkets = false
+                return resolved
+            }, (error) => {
+                this.reloadingMarkets = false
+                throw error
+            })
         }
+        return this.marketsLoading
     }
 
     async loadAccounts (reload = false, params = {}) {
@@ -12270,7 +12262,7 @@ module.exports = class bitbank extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { InvalidNonce, InsufficientFunds, AuthenticationError, InvalidOrder, ExchangeError, OrderNotFound, AccountSuspended, BadSymbol } = require ('./base/errors');
+const { InvalidNonce, InsufficientFunds, AuthenticationError, InvalidOrder, ExchangeError, OrderNotFound, AccountSuspended, BadSymbol, OrderImmediatelyFillable } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -12424,6 +12416,7 @@ module.exports = class bitbay extends Exchange {
                 'FUNDS_NOT_SUFFICIENT': InsufficientFunds,
                 'OFFER_FUNDS_NOT_EXCEEDING_MINIMUMS': InvalidOrder,
                 'OFFER_NOT_FOUND': OrderNotFound,
+                'OFFER_WOULD_HAVE_BEEN_PARTIALLY_FILLED': OrderImmediatelyFillable,
             },
         });
     }
@@ -18819,6 +18812,10 @@ module.exports = class bitmax extends Exchange {
                     '600503': InvalidOrder, // {"code":600503,"message":"Notional is too small."}
                 },
                 'broad': {},
+            },
+            'commonCurrencies': {
+                'BTCBEAR': 'BEAR',
+                'BTCBULL': 'BULL',
             },
         });
     }
