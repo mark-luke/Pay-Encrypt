@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.22'
+const version = '1.35.23'
 
 Exchange.ccxtVersion = version
 
@@ -30753,14 +30753,10 @@ module.exports = class bittrex extends Exchange {
     sign (path, api = 'v3', method = 'GET', params = {}, headers = undefined, body = undefined) {
         let url = this.implodeParams (this.urls['api'][api], {
             'hostname': this.hostname,
-        }) + '/' + this.version + '/';
-        if (api === 'public') {
-            url += this.implodeParams (path, params);
-            params = this.omit (params, this.extractParams (path));
-            if (Object.keys (params).length) {
-                url += '?' + this.urlencode (params);
-            }
-        } else if (api === 'private') {
+        }) + '/';
+        if (api === 'private') {
+            url += this.version + '/';
+            this.checkRequiredCredentials ();
             url += this.implodeParams (path, params);
             params = this.omit (params, this.extractParams (path));
             let hashString = '';
@@ -30793,18 +30789,14 @@ module.exports = class bittrex extends Exchange {
                 headers['Content-Type'] = 'application/json';
             }
         } else {
-            this.checkRequiredCredentials ();
-            url += api + '/';
-            const request = {
-                'apikey': this.apiKey,
-            };
-            const disableNonce = this.safeValue (this.options, 'disableNonce');
-            if ((disableNonce === undefined) || !disableNonce) {
-                request['nonce'] = this.nonce ();
+            if (api === 'public') {
+                url += this.version + '/';
             }
-            url += path + '?' + this.urlencode (this.extend (request, params));
-            const signature = this.hmac (this.encode (url), this.encode (this.secret), 'sha512');
-            headers = { 'apisign': signature };
+            url += this.implodeParams (path, params);
+            params = this.omit (params, this.extractParams (path));
+            if (Object.keys (params).length) {
+                url += '?' + this.urlencode (params);
+            }
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
     }
@@ -30885,10 +30877,6 @@ module.exports = class bittrex extends Exchange {
                 throw new ExchangeError (feedback);
             }
         }
-    }
-
-    async request (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
-        return await this.fetch2 (path, api, method, params, headers, body);
     }
 };
 
