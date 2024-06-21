@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.16'
+const version = '1.24.17'
 
 Exchange.ccxtVersion = version
 
@@ -76774,6 +76774,7 @@ module.exports = class okex extends okcoinusd {
 
 const Exchange = require ('./base/Exchange');
 const { ExchangeError, ExchangeNotAvailable, ArgumentsRequired, BadRequest, AccountSuspended, InvalidAddress, PermissionDenied, DDoSProtection, InsufficientFunds, InvalidNonce, CancelPending, InvalidOrder, OrderNotFound, AuthenticationError, RequestTimeout, NotSupported, BadSymbol } = require ('./base/errors');
+const { TICK_SIZE } = require ('./base/functions/number');
 
 //  ---------------------------------------------------------------------------
 
@@ -77259,6 +77260,7 @@ module.exports = class okex3 extends Exchange {
                 'broad': {
                 },
             },
+            'precisionMode': TICK_SIZE,
             'options': {
                 'createMarketBuyOrderRequiresPrice': true,
                 'fetchMarkets': [ 'spot', 'futures', 'swap', 'option' ],
@@ -77433,8 +77435,9 @@ module.exports = class okex3 extends Exchange {
         const base = this.safeCurrencyCode (baseId);
         const quote = this.safeCurrencyCode (quoteId);
         const symbol = spot ? (base + '/' + quote) : id;
+        const lotSize = this.safeFloat2 (market, 'lot_size', 'trade_increment');
         const precision = {
-            'amount': this.safeFloat (market, 'size_increment'),
+            'amount': this.safeFloat (market, 'size_increment', lotSize),
             'price': this.safeFloat (market, 'tick_size'),
         };
         const minAmount = this.safeFloat2 (market, 'min_size', 'base_min_size');
@@ -79632,7 +79635,7 @@ module.exports = class okex3 extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],120:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9,"./base/functions/number":15}],120:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
