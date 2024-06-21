@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.74'
+const version = '1.25.75'
 
 Exchange.ccxtVersion = version
 
@@ -34238,7 +34238,7 @@ module.exports = class bybit extends Exchange {
             request['p_r_qty'] = this.amountToPrecision (symbol, amount);
         }
         if (price !== undefined) {
-            request['p_r_price'] = this.priceToPrecision (symbol, amount);
+            request['p_r_price'] = this.priceToPrecision (symbol, price);
         }
         const response = await this[method] (this.extend (request, params));
         //
