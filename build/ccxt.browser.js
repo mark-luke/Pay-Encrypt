@@ -45,7 +45,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.17.376'
+const version = '1.17.378'
 
 Exchange.ccxtVersion = version
 
@@ -35702,6 +35702,8 @@ module.exports = class gdax extends Exchange {
             return 'canceled';
         } else if ('completed_at' in transaction && transaction['completed_at']) {
             return 'ok';
+        } else if (('canceled_at' in transaction && !transaction['canceled_at']) && ('completed_at' in transaction && !transaction['completed_at']) && ('processed_at' in transaction && !transaction['processed_at'])) {
+            return 'pending';
         } else if ('procesed_at' in transaction && transaction['procesed_at']) {
             return 'pending';
         } else {
@@ -50607,11 +50609,23 @@ module.exports = class poloniex extends Exchange {
                 for (let i = 0; i < ids.length; i++) {
                     let id = ids[i];
                     let market = undefined;
-                    if (id in this.markets_by_id)
+                    if (id in this.markets_by_id) {
                         market = this.markets_by_id[id];
-                    let trades = this.parseTrades (response[id], market);
-                    for (let j = 0; j < trades.length; j++) {
-                        result.push (trades[j]);
+                        let trades = this.parseTrades (response[id], market);
+                        for (let j = 0; j < trades.length; j++) {
+                            result.push (trades[j]);
+                        }
+                    } else {
+                        let [ baseId, quoteId ] = id.split ('_');
+                        let base = this.commonCurrencyCode (baseId);
+                        let quote = this.commonCurrencyCode (quoteId);
+                        let symbol = base + '/' + quote;
+                        let trades = response[id];
+                        for (let j = 0; j < trades.length; j++) {
+                            result.push (this.extend (this.parseTrade (trades[j]), {
+                                'symbol': symbol,
+                            }));
+                        }
                     }
                 }
             }
