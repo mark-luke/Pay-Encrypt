@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.98'
+const version = '1.26.99'
 
 Exchange.ccxtVersion = version
 
@@ -34079,13 +34079,25 @@ module.exports = class bybit extends Exchange {
         //         turnover: '162.32773718999994'
         //     },
         //
+        //     {
+        //         "id":143536,
+        //         "symbol":"BTCUSDT",
+        //         "period":"15",
+        //         "start_at":1587883500,
+        //         "volume":1.035,
+        //         "open":7540.5,
+        //         "high":7541,
+        //         "low":7540.5,
+        //         "close":7541
+        //     }
+        //
         return [
-            this.safeTimestamp (ohlcv, 'open_time', 'start_at'),
+            this.safeTimestamp2 (ohlcv, 'open_time', 'start_at'),
             this.safeFloat (ohlcv, 'open'),
             this.safeFloat (ohlcv, 'high'),
             this.safeFloat (ohlcv, 'low'),
             this.safeFloat (ohlcv, 'close'),
-            this.safeFloat (ohlcv, 'turnover'),
+            this.safeFloat2 (ohlcv, 'turnover', 'volume'),
         ];
     }
 
@@ -34115,6 +34127,8 @@ module.exports = class bybit extends Exchange {
         const method = (marketType === 'linear') ? 'publicLinearGetKline' : 'publicGetKlineList';
         const response = await this[method] (this.extend (request, params));
         //
+        // inverse perpetual BTC/USD
+        //
         //     {
         //         ret_code: 0,
         //         ret_msg: 'OK',
@@ -34134,6 +34148,29 @@ module.exports = class bybit extends Exchange {
         //             },
         //         ],
         //         time_now: '1583953082.397330'
+        //     }
+        //
+        // linear perpetual BTC/USDT
+        //
+        //     {
+        //         "ret_code":0,
+        //         "ret_msg":"OK",
+        //         "ext_code":"",
+        //         "ext_info":"",
+        //         "result":[
+        //             {
+        //                 "id":143536,
+        //                 "symbol":"BTCUSDT",
+        //                 "period":"15",
+        //                 "start_at":1587883500,
+        //                 "volume":1.035,
+        //                 "open":7540.5,
+        //                 "high":7541,
+        //                 "low":7540.5,
+        //                 "close":7541
+        //             }
+        //         ],
+        //         "time_now":"1587884120.168077"
         //     }
         //
         const result = this.safeValue (response, 'result', {});
