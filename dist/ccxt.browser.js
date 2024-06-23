@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1087'
+const version = '1.18.1088'
 
 Exchange.ccxtVersion = version
 
@@ -21524,7 +21524,7 @@ module.exports = class bl3p extends Exchange {
         return this.parseBalance (result);
     }
 
-    parseBidAsk (bidask, priceKey = 0, amountKey = 0) {
+    parseBidAsk (bidask, priceKey = 0, amountKey = 1) {
         return [
             bidask[priceKey] / 100000.0,
             bidask[amountKey] / 100000000.0,
