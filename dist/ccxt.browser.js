@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.34'
+const version = '1.33.35'
 
 Exchange.ccxtVersion = version
 
@@ -24381,7 +24381,7 @@ module.exports = class bitpanda extends Exchange {
                 },
             },
             'commonCurrencies': {
-                'MIOTA': 'IOTA',
+                'MIOTA': 'IOTA', // https://github.com/ccxt/ccxt/issues/7487
             },
         });
     }
@@ -82158,6 +82158,7 @@ module.exports = class liquid extends Exchange {
             'commonCurrencies': {
                 'WIN': 'WCOIN',
                 'HOT': 'HOT Token',
+                'MIOTA': 'IOTA', // https://github.com/ccxt/ccxt/issues/7487
             },
             'options': {
                 'cancelOrderException': true,
