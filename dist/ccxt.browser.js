@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.28'
+const version = '1.24.29'
 
 Exchange.ccxtVersion = version
 
@@ -9765,6 +9765,13 @@ module.exports = class binance extends Exchange {
                 const stepSize = this.safeString (filter, 'stepSize');
                 entry['precision']['amount'] = this.precisionFromString (stepSize);
                 entry['limits']['amount'] = {
+                    'min': this.safeFloat (filter, 'minQty'),
+                    'max': this.safeFloat (filter, 'maxQty'),
+                };
+            }
+            if ('MARKET_LOT_SIZE' in filters) {
+                const filter = this.safeValue (filters, 'MARKET_LOT_SIZE', {});
+                entry['limits']['market'] = {
                     'min': this.safeFloat (filter, 'minQty'),
                     'max': this.safeFloat (filter, 'maxQty'),
                 };
