@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.62'
+const version = '1.20.63'
 
 Exchange.ccxtVersion = version
 
@@ -30478,7 +30478,7 @@ module.exports = class bw extends Exchange {
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/69436317-31128c80-0d52-11ea-91d1-eb7bb5818812.jpg',
                 'api': 'https://www.{hostname}',
-                'www': 'https://www.{hostname}',
+                'www': 'https://www.bw.com',
                 'doc': 'https://github.com/bw-exchange/api_docs_en/wiki',
                 'fees': 'https://www.bw.com/feesRate',
             },
