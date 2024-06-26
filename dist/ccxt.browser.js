@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1206'
+const version = '1.18.1207'
 
 Exchange.ccxtVersion = version
 
@@ -32758,11 +32758,15 @@ module.exports = class coinex extends Exchange {
             const key = keys[i];
             const market = markets[key];
             const id = this.safeString (market, 'name');
-            const baseId = this.safeString (market, 'trading_name');
+            const tradingName = this.safeString (market, 'trading_name');
+            const baseId = tradingName;
             const quoteId = this.safeString (market, 'pricing_name');
             const base = this.safeCurrencyCode (baseId);
             const quote = this.safeCurrencyCode (quoteId);
-            const symbol = base + '/' + quote;
+            let symbol = base + '/' + quote;
+            if (tradingName === id) {
+                symbol = id;
+            }
             const precision = {
                 'amount': this.safeInteger (market, 'trading_decimal'),
                 'price': this.safeInteger (market, 'pricing_decimal'),
