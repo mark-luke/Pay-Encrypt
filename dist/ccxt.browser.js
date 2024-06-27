@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.14'
+const version = '1.34.15'
 
 Exchange.ccxtVersion = version
 
@@ -8019,6 +8019,14 @@ module.exports = class binance extends Exchange {
                         'margin/isolated/pair',
                         'margin/isolated/allPairs',
                         'futures/transfer',
+                        'futures/loan/borrow/history',
+                        'futures/loan/repay/history',
+                        'futures/loan/wallet',
+                        'futures/loan/configs',
+                        'futures/loan/calcAdjustLevel',
+                        'futures/loan/calcMaxAdjustAmount',
+                        'futures/loan/adjustCollateral/history',
+                        'futures/loan/liquidationHistory',
                         // https://binance-docs.github.io/apidocs/spot/en/#withdraw-sapi
                         'capital/config/getall', // get networks for withdrawing USDT ERC20 vs USDT Omni
                         'capital/deposit/address',
@@ -8029,8 +8037,10 @@ module.exports = class binance extends Exchange {
                         'sub-account/futures/account',
                         'sub-account/futures/accountSummary',
                         'sub-account/futures/positionRisk',
+                        'sub-account/futures/internalTransfer',
                         'sub-account/margin/account',
                         'sub-account/margin/accountSummary',
+                        'sub-account/spotSummary',
                         'sub-account/status',
                         'sub-account/transfer/subUserHistory',
                         // lending endpoints
@@ -8064,12 +8074,20 @@ module.exports = class binance extends Exchange {
                         'margin/order',
                         'margin/isolated/create',
                         'margin/isolated/transfer',
+                        'sub-account/margin/transfer',
                         'sub-account/margin/enable',
                         'sub-account/margin/enable',
                         'sub-account/futures/enable',
+                        'sub-account/futures/transfer',
+                        'sub-account/futures/internalTransfer',
+                        'sub-account/transfer/subToSub',
+                        'sub-account/transfer/subToMaster',
                         'userDataStream',
                         'userDataStream/isolated',
                         'futures/transfer',
+                        'futures/loan/borrow',
+                        'futures/loan/repay',
+                        'futures/loan/adjustCollateral',
                         // lending
                         'lending/customizedFixed/purchase',
                         'lending/daily/purchase',
