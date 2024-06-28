@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.34'
+const version = '1.35.35'
 
 Exchange.ccxtVersion = version
 
@@ -124548,9 +124548,8 @@ module.exports = class therock extends Exchange {
         //                         currency: "EUR",
         //                         trade_id:  440492                     }   ] }
         //
-        if (!market) {
-            market = this.markets_by_id[trade['fund_id']];
-        }
+        const marketId = this.safeString (trade, 'fund_id');
+        const symbol = this.safeSymbol (marketId, market);
         const timestamp = this.parse8601 (this.safeString (trade, 'date'));
         const id = this.safeString (trade, 'id');
         const orderId = this.safeString (trade, 'order_id');
@@ -124579,10 +124578,6 @@ module.exports = class therock extends Exchange {
                 'cost': feeCost,
                 'currency': market['quote'],
             };
-        }
-        let symbol = undefined;
-        if (market !== undefined) {
-            symbol = market['symbol'];
         }
         return {
             'info': trade,
@@ -125132,12 +125127,8 @@ module.exports = class therock extends Exchange {
         //     }
         //
         const id = this.safeString (order, 'id');
-        let symbol = undefined;
         const marketId = this.safeString (order, 'fund_id');
-        if (marketId in this.markets_by_id) {
-            market = this.markets_by_id[marketId];
-            symbol = market['symbol'];
-        }
+        const symbol = this.safeSymbol (marketId, market);
         const status = this.parseOrderStatus (this.safeString (order, 'status'));
         const timestamp = this.parse8601 (this.safeString (order, 'date'));
         const type = this.safeString (order, 'type');
