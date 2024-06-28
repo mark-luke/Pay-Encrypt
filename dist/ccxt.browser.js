@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.94'
+const version = '1.30.95'
 
 Exchange.ccxtVersion = version
 
@@ -16570,7 +16570,7 @@ module.exports = class bitforex extends Exchange {
                 '1M': '1month',
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/44310033-69e9e600-a3d8-11e8-873d-54d74d1bc4e4.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87295553-1160ec00-c50e-11ea-8ea0-df79276a9646.jpg',
                 'api': 'https://api.bitforex.com',
                 'www': 'https://www.bitforex.com',
                 'doc': 'https://github.com/githubdev2020/API_Doc_en/wiki',
@@ -22184,7 +22184,7 @@ module.exports = class bitso extends Exchange {
                 'fetchOrder': true,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27766335-715ce7aa-5ed5-11e7-88a8-173a27bb30fe.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87295554-11f98280-c50e-11ea-80d6-15b3bafa8cbf.jpg',
                 'api': 'https://api.bitso.com',
                 'www': 'https://bitso.com',
                 'doc': 'https://bitso.com/api_info',
@@ -70553,7 +70553,7 @@ module.exports = class indodax extends Exchange {
             },
             'version': '2.0', // as of 9 April 2018
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/37443283-2fddd0e4-281c-11e8-9741-b4f1419001b5.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87295556-12921900-c50e-11ea-84ae-fa4d8d8df551.jpg',
                 'api': {
                     'public': 'https://indodax.com/api',
                     'private': 'https://indodax.com/tapi',
@@ -73492,7 +73492,7 @@ module.exports = class kucoin extends Exchange {
                 'fetchLedger': true,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/57369448-3cc3aa80-7196-11e9-883e-5ebeb35e4f57.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87295558-132aaf80-c50e-11ea-9801-a2fb0c57c799.jpg',
                 'referral': 'https://www.kucoin.com/?rcode=E5wkqe',
                 'api': {
                     'public': 'https://openapi-v2.kucoin.com',
@@ -82012,7 +82012,7 @@ module.exports = class okcoin extends okex {
             'hostname': 'okcoin.com',
             'pro': true,
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27766791-89ffb502-5ee5-11e7-8a5b-c5950b68ac65.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87295551-102fbf00-c50e-11ea-90a9-462eebba5829.jpg',
                 'www': 'https://www.okcoin.com',
                 'doc': 'https://www.okcoin.com/docs/en/',
                 'fees': 'https://www.okcoin.com/coin-fees',
