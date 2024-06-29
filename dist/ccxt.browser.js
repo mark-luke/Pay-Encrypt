@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1190'
+const version = '1.18.1191'
 
 Exchange.ccxtVersion = version
 
@@ -35605,7 +35605,7 @@ module.exports = class coinmarketcap extends Exchange {
             'E-Dinar Coin': 'E-Dinar Coin', // conflict with EDR Endor Protocol and EDRCoin
             'EDRcoin': 'EDRcoin', // conflict with EDR Endor Protocol and E-Dinar Coin
             'ENTCash': 'ENTCash', // conflict with ENT (Eternity)
-            'FairGame': 'FairGame',
+            'FairCoin': 'FairCoin', // conflict with FAIR (FairGame) https://github.com/ccxt/ccxt/pull/5865
             'Fabric Token': 'Fabric Token',
             'GET Protocol': 'GET Protocol',
             'Global Tour Coin': 'Global Tour Coin', // conflict with GTC (Game.com)
