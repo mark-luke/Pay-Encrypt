@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.50'
+const version = '1.23.51'
 
 Exchange.ccxtVersion = version
 
@@ -52959,6 +52959,7 @@ module.exports = class gateio extends Exchange {
                         'pairs',
                         'marketinfo',
                         'marketlist',
+                        'coininfo',
                         'tickers',
                         'ticker/{id}',
                         'orderBook/{id}',
@@ -52980,6 +52981,7 @@ module.exports = class gateio extends Exchange {
                         'getOrder',
                         'openOrders',
                         'tradeHistory',
+                        'feelist',
                         'withdraw',
                     ],
                 },
