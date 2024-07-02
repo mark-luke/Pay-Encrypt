@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.65'
+const version = '1.21.66'
 
 Exchange.ccxtVersion = version
 
@@ -22867,24 +22867,30 @@ module.exports = class bittrex extends Exchange {
                 },
             },
             'exceptions': {
-                // 'Call to Cancel was throttled. Try again in 60 seconds.': DDoSProtection,
-                // 'Call to GetBalances was throttled. Try again in 60 seconds.': DDoSProtection,
-                'APISIGN_NOT_PROVIDED': AuthenticationError,
-                'INVALID_SIGNATURE': AuthenticationError,
-                'INVALID_CURRENCY': ExchangeError,
-                'INVALID_PERMISSION': AuthenticationError,
-                'INSUFFICIENT_FUNDS': InsufficientFunds,
-                'QUANTITY_NOT_PROVIDED': InvalidOrder,
-                'MIN_TRADE_REQUIREMENT_NOT_MET': InvalidOrder,
-                'ORDER_NOT_OPEN': OrderNotFound,
-                'INVALID_ORDER': InvalidOrder,
-                'UUID_INVALID': OrderNotFound,
-                'RATE_NOT_PROVIDED': InvalidOrder, // createLimitBuyOrder ('ETH/BTC', 1, 0)
-                'INVALID_MARKET': BadSymbol, // {"success":false,"message":"INVALID_MARKET","result":null,"explanation":null}
-                'WHITELIST_VIOLATION_IP': PermissionDenied,
-                'DUST_TRADE_DISALLOWED_MIN_VALUE': InvalidOrder,
-                'RESTRICTED_MARKET': BadSymbol,
-                'We are down for scheduled maintenance, but we\u2019ll be back up shortly.': OnMaintenance, // {"success":false,"message":"We are down for scheduled maintenance, but we\u2019ll be back up shortly.","result":null,"explanation":null}
+                'exact': {
+                    // 'Call to Cancel was throttled. Try again in 60 seconds.': DDoSProtection,
+                    // 'Call to GetBalances was throttled. Try again in 60 seconds.': DDoSProtection,
+                    'APISIGN_NOT_PROVIDED': AuthenticationError,
+                    'INVALID_SIGNATURE': AuthenticationError,
+                    'INVALID_CURRENCY': ExchangeError,
+                    'INVALID_PERMISSION': AuthenticationError,
+                    'INSUFFICIENT_FUNDS': InsufficientFunds,
+                    'QUANTITY_NOT_PROVIDED': InvalidOrder,
+                    'MIN_TRADE_REQUIREMENT_NOT_MET': InvalidOrder,
+                    'ORDER_NOT_OPEN': OrderNotFound,
+                    'INVALID_ORDER': InvalidOrder,
+                    'UUID_INVALID': OrderNotFound,
+                    'RATE_NOT_PROVIDED': InvalidOrder, // createLimitBuyOrder ('ETH/BTC', 1, 0)
+                    'INVALID_MARKET': BadSymbol, // {"success":false,"message":"INVALID_MARKET","result":null,"explanation":null}
+                    'WHITELIST_VIOLATION_IP': PermissionDenied,
+                    'DUST_TRADE_DISALLOWED_MIN_VALUE': InvalidOrder,
+                    'RESTRICTED_MARKET': BadSymbol,
+                    'We are down for scheduled maintenance, but we\u2019ll be back up shortly.': OnMaintenance, // {"success":false,"message":"We are down for scheduled maintenance, but we\u2019ll be back up shortly.","result":null,"explanation":null}
+                },
+                'broad': {
+                    'throttled': DDoSProtection,
+                    'problem': ExchangeNotAvailable,
+                },
             },
             'options': {
                 'parseOrderStatus': false,
@@ -24027,7 +24033,8 @@ module.exports = class bittrex extends Exchange {
         if (body[0] === '{') {
             let success = this.safeValue (response, 'success');
             if (success === undefined) {
-                throw new ExchangeError (this.id + ': malformed response: ' + this.json (response));
+                // throw new ExchangeError (this.id + ' malformed response ' + this.json (response));
+                return;
             }
             if (typeof success === 'string') {
                 // bleutrade uses string instead of boolean
@@ -24080,14 +24087,9 @@ module.exports = class bittrex extends Exchange {
                         }
                     }
                 }
-                this.throwExactlyMatchedException (this.exceptions, message, feedback);
+                this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
                 if (message !== undefined) {
-                    if (message.indexOf ('throttled. Try again') >= 0) {
-                        throw new DDoSProtection (feedback);
-                    }
-                    if (message.indexOf ('problem') >= 0) {
-                        throw new ExchangeNotAvailable (feedback); // 'There was a problem processing your request.  If this problem persists, please contact...')
-                    }
+                    this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
                 }
                 throw new ExchangeError (feedback);
             }
@@ -25725,9 +25727,11 @@ module.exports = class bleutrade extends bittrex {
                 'EPC': 'Epacoin',
             },
             'exceptions': {
-                'Insufficient funds!': InsufficientFunds,
-                'Invalid Order ID': InvalidOrder,
-                'Invalid apikey or apisecret': AuthenticationError,
+                'exact': {
+                    'Insufficient funds!': InsufficientFunds,
+                    'Invalid Order ID': InvalidOrder,
+                    'Invalid apikey or apisecret': AuthenticationError,
+                },
             },
             'options': {
                 // price precision by quote currency code
