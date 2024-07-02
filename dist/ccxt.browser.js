@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1260'
+const version = '1.18.1261'
 
 Exchange.ccxtVersion = version
 
@@ -16281,7 +16281,7 @@ module.exports = class bitmart extends Exchange {
                 'trading': {
                     'tierBased': true,
                     'percentage': true,
-                    'taker': 0.001,
+                    'taker': 0.002,
                     'maker': 0.001,
                     'tiers': {
                         'taker': [
