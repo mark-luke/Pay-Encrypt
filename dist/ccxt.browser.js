@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1294'
+const version = '1.18.1295'
 
 Exchange.ccxtVersion = version
 
@@ -23178,6 +23178,7 @@ module.exports = class bitz extends Exchange {
                 'BOX': 'BOX Token',
                 'XRB': 'NANO',
                 'PXC': 'Pixiecoin',
+                'VTC': 'VoteCoin',
             },
             'exceptions': {
                 // '200': Success
