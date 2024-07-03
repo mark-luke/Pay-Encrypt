@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.79'
+const version = '1.30.80'
 
 Exchange.ccxtVersion = version
 
@@ -121081,7 +121081,7 @@ module.exports = class wavesexchange extends Exchange {
             const assetId = priceAssets[i];
             const code = this.safeCurrencyCode (assetId);
             const balance = this.safeValue (this.safeValue (balances, code, {}), 'free');
-            if (balance > rates[assetId] * wavesMatcherFee) {
+            if ((balance !== undefined) && (balance > rates[assetId] * wavesMatcherFee)) {
                 matcherFeeAssetId = assetId;
             }
         }
