@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1098'
+const version = '1.18.1099'
 
 Exchange.ccxtVersion = version
 
@@ -61554,7 +61554,7 @@ module.exports = class livecoin extends Exchange {
             },
             'commonCurrencies': {
                 'BTCH': 'Bithash',
-                'CPC': 'CapriCoin',
+                'CPC': 'Capricoin',
                 'EDR': 'E-Dinar Coin', // conflicts with EDR for Endor Protocol and EDRCoin
                 'eETT': 'EETT',
                 'FirstBlood': '1ST',
