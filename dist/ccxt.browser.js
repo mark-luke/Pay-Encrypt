@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.22'
+const version = '1.20.23'
 
 Exchange.ccxtVersion = version
 
@@ -77060,6 +77060,7 @@ module.exports = class okex3 extends Exchange {
             id = withdrawalId;
             address = addressTo;
         } else {
+            // the payment_id will appear on new deposits but appears to be removed from the response after 2 months
             id = this.safeString (transaction, 'payment_id');
             type = 'deposit';
             address = addressTo;
