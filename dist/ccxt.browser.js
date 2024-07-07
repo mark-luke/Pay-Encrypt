@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.12'
+const version = '1.25.13'
 
 Exchange.ccxtVersion = version
 
@@ -33115,9 +33115,14 @@ module.exports = class bybit extends Exchange {
             };
         }
         const type = this.safeStringLower (order, 'order_type');
+        let clientOrderId = this.safeString (order, 'order_link_id');
+        if ((clientOrderId !== undefined) && (clientOrderId.length < 1)) {
+            clientOrderId = undefined;
+        }
         return {
             'info': order,
             'id': id,
+            'clientOrderId': clientOrderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
