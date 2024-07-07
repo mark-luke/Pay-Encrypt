@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.10'
+const version = '1.20.11'
 
 Exchange.ccxtVersion = version
 
@@ -55706,7 +55706,7 @@ module.exports = class hitbtc extends Exchange {
         const error = this.safeValue (response, 'error');
         if (error) {
             const code = this.safeValue (error, 'code');
-            const feedback = this.id + ' ' + this.json (response);
+            const feedback = this.id + ' ' + body;
             this.throwExactlyMatchedException (this.exceptions['exact'], code, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], error, feedback);
             throw new ExchangeError (feedback); // unknown error
@@ -57203,11 +57203,8 @@ module.exports = class hitbtc2 extends hitbtc {
             // {"error":{"code":20002,"message":"Order not found","description":""}}
             if (body[0] === '{') {
                 if ('error' in response) {
-                    const code = this.safeString (response['error'], 'code');
-                    const exceptions = this.exceptions;
-                    if (code in exceptions) {
-                        throw new exceptions[code] (feedback);
-                    }
+                    const errorCode = this.safeString (response['error'], 'code');
+                    this.throwExactlyMatchedException (this.exceptions, errorCode, feedback);
                     const message = this.safeString (response['error'], 'message');
                     if (message === 'Duplicate clientOrderId') {
                         throw new InvalidOrder (feedback);
@@ -58282,15 +58279,10 @@ module.exports = class huobipro extends Exchange {
             const status = this.safeString (response, 'status');
             if (status === 'error') {
                 const code = this.safeString (response, 'err-code');
-                const feedback = this.id + ' ' + this.json (response);
-                const exceptions = this.exceptions['exact'];
-                if (code in exceptions) {
-                    throw new exceptions[code] (feedback);
-                }
+                const feedback = this.id + ' ' + body;
+                this.throwExactlyMatchedException (this.exceptions['exact'], code, feedback);
                 const message = this.safeString (response, 'err-msg');
-                if (message in exceptions) {
-                    throw new exceptions[message] (feedback);
-                }
+                this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
                 throw new ExchangeError (feedback);
             }
         }
@@ -63572,11 +63564,10 @@ module.exports = class kraken extends Exchange {
                 if ('error' in response) {
                     const numErrors = response['error'].length;
                     if (numErrors) {
-                        const message = this.id + ' ' + this.json (response);
+                        const message = this.id + ' ' + body;
                         for (let i = 0; i < response['error'].length; i++) {
-                            if (response['error'][i] in this.exceptions) {
-                                throw new this.exceptions[response['error'][i]] (message);
-                            }
+                            const error = response['error'][i];
+                            this.throwExactlyMatchedException (this.exceptions, error, message);
                         }
                         throw new ExchangeError (message);
                     }
@@ -65183,10 +65174,8 @@ module.exports = class kucoin extends Exchange {
         //
         const errorCode = this.safeString (response, 'code');
         const message = this.safeString (response, 'msg');
-        const ExceptionClass = this.safeValue2 (this.exceptions, message, errorCode);
-        if (ExceptionClass !== undefined) {
-            throw new ExceptionClass (this.id + ' ' + message);
-        }
+        this.throwExactlyMatchedException (this.exceptions, message, message);
+        this.throwExactlyMatchedException (this.exceptions, errorCode, message);
     }
 };
 
@@ -68097,14 +68086,10 @@ module.exports = class liquid extends Exchange {
         if (code >= 200 && code < 300) {
             return;
         }
-        const exceptions = this.exceptions;
         if (code === 401) {
             // expected non-json response
-            if (body in exceptions) {
-                throw new exceptions[body] (this.id + ' ' + body);
-            } else {
-                return;
-            }
+            this.throwExactlyMatchedException (this.exceptions, body, body);
+            return;
         }
         if (code === 429) {
             throw new DDoSProtection (this.id + ' ' + body);
@@ -68119,9 +68104,7 @@ module.exports = class liquid extends Exchange {
             //
             //  { "message": "Order not found" }
             //
-            if (message in exceptions) {
-                throw new exceptions[message] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions, message, feedback);
         } else if (errors !== undefined) {
             //
             //  { "errors": { "user": ["not_enough_free_balance"] }}
@@ -68134,9 +68117,7 @@ module.exports = class liquid extends Exchange {
                 const errorMessages = errors[type];
                 for (let j = 0; j < errorMessages.length; j++) {
                     const message = errorMessages[j];
-                    if (message in exceptions) {
-                        throw new exceptions[message] (feedback);
-                    }
+                    this.throwExactlyMatchedException (this.exceptions, message, feedback);
                 }
             }
         } else {
@@ -74793,17 +74774,13 @@ module.exports = class okcoinusd extends Exchange {
         }
         if ('error_code' in response) {
             const error = this.safeString (response, 'error_code');
-            const message = this.id + ' ' + this.json (response);
-            if (error in this.exceptions) {
-                const ExceptionClass = this.exceptions[error];
-                throw new ExceptionClass (message);
-            } else {
-                throw new ExchangeError (message);
-            }
+            const message = this.id + ' ' + body;
+            this.throwExactlyMatchedException (this.exceptions, error, message);
+            throw new ExchangeError (message);
         }
         if ('result' in response) {
             if (!response['result']) {
-                throw new ExchangeError (this.id + ' ' + this.json (response));
+                throw new ExchangeError (this.id + ' ' + body);
             }
         }
     }
@@ -79961,11 +79938,8 @@ module.exports = class rightbtc extends Exchange {
             const success = this.safeString (status, 'success');
             if (success !== '1') {
                 const message = this.safeString (status, 'message');
-                const feedback = this.id + ' ' + this.json (response);
-                const exceptions = this.exceptions;
-                if (message in exceptions) {
-                    throw new exceptions[message] (feedback);
-                }
+                const feedback = this.id + ' ' + body;
+                this.throwExactlyMatchedException (this.exceptions, message, feedback);
                 throw new ExchangeError (feedback);
             }
         }
@@ -102031,23 +102005,21 @@ module.exports = class theocean extends Exchange {
         if (body === "'Authentication failed'") {
             throw new AuthenticationError (this.id + ' ' + body);
         }
-        if ((body[0] === '{') || (body[0] === '[')) {
-            const message = this.safeString (response, 'message');
-            if (message !== undefined) {
-                //
-                // {"message":"Schema validation failed for 'query'","errors":[{"name":"required","argument":"startTime","message":"requires property \"startTime\"","instance":{"baseTokenAddress":"0x6ff6c0ff1d68b964901f986d4c9fa3ac68346570","quoteTokenAddress":"0xd0a1e359811322d97991e03f863a0c30c2cf029c","interval":"300"},"property":"instance"}]}
-                // {"message":"Logic validation failed for 'query'","errors":[{"message":"startTime should be between 0 and current date","type":"startTime"}]}
-                // {"message":"Order not found","errors":[]}
-                // {"message":"Orderbook exhausted for intent MARKET_INTENT:8yjjzd8b0e8yjjzd8b0fjjzd8b0g"}
-                // {"message":"Intent validation failed.","errors":[{"message":"Greater than available wallet balance.","type":"walletBaseTokenAmount"}]}
-                // {"message":"Schema validation failed for 'body'","errors":[{"name":"anyOf","argument":["[subschema 0]","[subschema 1]","[subschema 2]"],"message":"is not any of [subschema 0],[subschema 1],[subschema 2]","instance":{"signedTargetOrder":{"error":{"message":"Unsigned target order validation failed.","errors":[{"message":"Greater than available wallet balance.","type":"walletBaseTokenAmount"}]},"maker":"0x1709c02cd7327d391a39a7671af8a91a1ef8a47b","orderHash":"0xda007ea8b5eca71ac96fe4072f7c1209bb151d898a9cc89bbeaa594f0491ee49","ecSignature":{"v":27,"r":"0xb23ce6c4a7b5d51d77e2d00f6d1d472a3b2e72d5b2be1510cfeb122f9366b79e","s":"0x07d274e6d7a00b65fc3026c2f9019215b1e47a5ac4d1f05e03f90550d27109be"}}},"property":"instance"}]}
-                // {"message":"Schema validation failed for 'params'","errors":[{"name":"pattern","argument":"^0x[0-9a-fA-F]{64}$","message":"does not match pattern \"^0x[0-9a-fA-F]{64}$\"","instance":"1","property":"instance.orderHash"}]}
-                //
-                const feedback = this.id + ' ' + body;
-                this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
-                this.throwBroadlyMatchedException (this.exceptions['broad'], body, feedback);
-                throw new ExchangeError (feedback); // unknown message
-            }
+        const message = this.safeString (response, 'message');
+        if (message !== undefined) {
+            //
+            // {"message":"Schema validation failed for 'query'","errors":[{"name":"required","argument":"startTime","message":"requires property \"startTime\"","instance":{"baseTokenAddress":"0x6ff6c0ff1d68b964901f986d4c9fa3ac68346570","quoteTokenAddress":"0xd0a1e359811322d97991e03f863a0c30c2cf029c","interval":"300"},"property":"instance"}]}
+            // {"message":"Logic validation failed for 'query'","errors":[{"message":"startTime should be between 0 and current date","type":"startTime"}]}
+            // {"message":"Order not found","errors":[]}
+            // {"message":"Orderbook exhausted for intent MARKET_INTENT:8yjjzd8b0e8yjjzd8b0fjjzd8b0g"}
+            // {"message":"Intent validation failed.","errors":[{"message":"Greater than available wallet balance.","type":"walletBaseTokenAmount"}]}
+            // {"message":"Schema validation failed for 'body'","errors":[{"name":"anyOf","argument":["[subschema 0]","[subschema 1]","[subschema 2]"],"message":"is not any of [subschema 0],[subschema 1],[subschema 2]","instance":{"signedTargetOrder":{"error":{"message":"Unsigned target order validation failed.","errors":[{"message":"Greater than available wallet balance.","type":"walletBaseTokenAmount"}]},"maker":"0x1709c02cd7327d391a39a7671af8a91a1ef8a47b","orderHash":"0xda007ea8b5eca71ac96fe4072f7c1209bb151d898a9cc89bbeaa594f0491ee49","ecSignature":{"v":27,"r":"0xb23ce6c4a7b5d51d77e2d00f6d1d472a3b2e72d5b2be1510cfeb122f9366b79e","s":"0x07d274e6d7a00b65fc3026c2f9019215b1e47a5ac4d1f05e03f90550d27109be"}}},"property":"instance"}]}
+            // {"message":"Schema validation failed for 'params'","errors":[{"name":"pattern","argument":"^0x[0-9a-fA-F]{64}$","message":"does not match pattern \"^0x[0-9a-fA-F]{64}$\"","instance":"1","property":"instance.orderHash"}]}
+            //
+            const feedback = this.id + ' ' + body;
+            this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
+            this.throwBroadlyMatchedException (this.exceptions['broad'], body, feedback);
+            throw new ExchangeError (feedback); // unknown message
         }
     }
 };
@@ -103767,12 +103739,9 @@ module.exports = class tidebit extends Exchange {
             if (response === undefined) {
                 throw new ExchangeError (feedback);
             }
-            const error = this.safeValue (response, 'error');
+            const error = this.safeValue (response, 'error', {});
             const errorCode = this.safeString (error, 'code');
-            const exceptions = this.exceptions;
-            if (errorCode in exceptions) {
-                throw new exceptions[errorCode] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions, errorCode, feedback);
             // fallback to default error handler
         }
     }
@@ -109752,10 +109721,8 @@ module.exports = class zb extends Exchange {
             const feedback = this.id + ' ' + body;
             if ('code' in response) {
                 const code = this.safeString (response, 'code');
-                if (code in this.exceptions) {
-                    const ExceptionClass = this.exceptions[code];
-                    throw new ExceptionClass (feedback);
-                } else if (code !== '1000') {
+                this.throwExactlyMatchedException (this.exceptions, code, feedback);
+                if (code !== '1000') {
                     throw new ExchangeError (feedback);
                 }
             }
