@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.43'
+const version = '1.32.44'
 
 Exchange.ccxtVersion = version
 
@@ -7333,11 +7333,11 @@ module.exports = class bigone extends Exchange {
             // 'immediate_or_cancel': false, // limit orders only, must be false when post_only is true
             // 'post_only': false, // limit orders only, must be false when immediate_or_cancel is true
         };
-        if (type === 'LIMIT') {
+        if (uppercaseType === 'LIMIT') {
             request['price'] = this.priceToPrecision (symbol, price);
         } else {
-            const isStopLimit = (type === 'STOP_LIMIT');
-            const isStopMarket = (type === 'STOP_MARKET');
+            const isStopLimit = (uppercaseType === 'STOP_LIMIT');
+            const isStopMarket = (uppercaseType === 'STOP_MARKET');
             if (isStopLimit || isStopMarket) {
                 const stopPrice = this.safeFloat (params, 'stop_price');
                 if (stopPrice === undefined) {
