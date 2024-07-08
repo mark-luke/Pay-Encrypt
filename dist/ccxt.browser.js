@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.93'
+const version = '1.35.94'
 
 Exchange.ccxtVersion = version
 
@@ -80068,11 +80068,11 @@ module.exports = class kraken extends Exchange {
         for (let i = 0; i < ids.length; i++) {
             trades[ids[i]]['id'] = ids[i];
         }
-        const result = this.parseTrades (trades, undefined, since, limit);
-        if (symbol === undefined) {
-            return result;
+        let market = undefined;
+        if (symbol !== undefined) {
+            market = this.market (symbol);
         }
-        return this.filterBySymbol (result, symbol);
+        return this.parseTrades (trades, market, since, limit);
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
@@ -80100,11 +80100,13 @@ module.exports = class kraken extends Exchange {
             request['start'] = parseInt (since / 1000);
         }
         const response = await this.privatePostOpenOrders (this.extend (request, params));
-        const orders = this.parseOrders (response['result']['open'], undefined, since, limit);
-        if (symbol === undefined) {
-            return orders;
+        let market = undefined;
+        if (symbol !== undefined) {
+            market = this.market (symbol);
         }
-        return this.filterBySymbol (orders, symbol);
+        const result = this.safeValue (response, 'result', {});
+        const orders = this.safeValue (result, 'open', []);
+        return this.parseOrders (orders, market, since, limit);
     }
 
     async fetchClosedOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -80114,11 +80116,13 @@ module.exports = class kraken extends Exchange {
             request['start'] = parseInt (since / 1000);
         }
         const response = await this.privatePostClosedOrders (this.extend (request, params));
-        const orders = this.parseOrders (response['result']['closed'], undefined, since, limit);
-        if (symbol === undefined) {
-            return orders;
+        let market = undefined;
+        if (symbol !== undefined) {
+            market = this.market (symbol);
         }
-        return this.filterBySymbol (orders, symbol);
+        const result = this.safeValue (response, 'result', {});
+        const orders = this.safeValue (result, 'closed', []);
+        return this.parseOrders (orders, market, since, limit);
     }
 
     async fetchDepositMethods (code, params = {}) {
@@ -80128,7 +80132,7 @@ module.exports = class kraken extends Exchange {
             'asset': currency['id'],
         };
         const response = await this.privatePostDepositMethods (this.extend (request, params));
-        return response['result'];
+        return this.safeValue (response, 'result');
     }
 
     parseTransactionStatus (status) {
