@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.75'
+const version = '1.34.76'
 
 Exchange.ccxtVersion = version
 
@@ -515,13 +515,8 @@ module.exports = class acx extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
-        let symbol = undefined;
-        if (market !== undefined) {
-            symbol = market['symbol'];
-        } else {
-            const marketId = this.safeString (order, 'market');
-            symbol = this.markets_by_id[marketId]['symbol'];
-        }
+        const marketId = this.safeString (order, 'market');
+        const symbol = this.safeSymbol (marketId, market);
         const timestamp = this.parse8601 (this.safeString (order, 'created_at'));
         const status = this.parseOrderStatus (this.safeString (order, 'state'));
         const type = this.safeString (order, 'type');
