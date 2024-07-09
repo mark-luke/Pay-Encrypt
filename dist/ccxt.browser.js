@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.67'
+const version = '1.28.72'
 
 Exchange.ccxtVersion = version
 
@@ -51604,7 +51604,6 @@ module.exports = class eterbase extends Exchange {
             filled = Math.max (0, amount - remaining);
         }
         const cost = this.safeFloat (order, 'cost');
-        // Math.round (price * filled, market.precision.cost);
         if (type === 'market') {
             if (price === 0.0) {
                 if ((cost !== undefined) && (filled !== undefined)) {
@@ -51617,12 +51616,13 @@ module.exports = class eterbase extends Exchange {
         let average = undefined;
         if (cost !== undefined) {
             if (filled) {
-                average = Math.round (cost / filled, market.precision.qty);
+                average = cost / filled;
             }
         }
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -81946,7 +81946,7 @@ module.exports = class poloniex extends Exchange {
                 'www': 'https://www.poloniex.com',
                 'doc': 'https://docs.poloniex.com',
                 'fees': 'https://poloniex.com/fees',
-                'referral': 'https://www.poloniex.com/?utm_source=ccxt&utm_medium=web',
+                'referral': 'https://poloniex.com/signup?c=UBFZJRPJ',
             },
             'api': {
                 'public': {
@@ -85380,6 +85380,7 @@ module.exports = class qtrade extends Exchange {
             const code = this.safeCurrencyCode (currencyId);
             const account = (code in result) ? result[code] : this.account ();
             account['free'] = this.safeFloat (balance, 'balance');
+            account['used'] = 0;
             result[code] = account;
         }
         balances = this.safeValue (data, 'order_balances', []);
