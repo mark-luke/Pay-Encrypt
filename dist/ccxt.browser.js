@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.46'
+const version = '1.22.47'
 
 Exchange.ccxtVersion = version
 
@@ -14008,6 +14008,7 @@ module.exports = class bitfinex extends Exchange {
         if (timestamp !== undefined) {
             timestamp *= 1000;
         }
+        timestamp = parseInt (timestamp);
         let symbol = undefined;
         if (market !== undefined) {
             symbol = market['symbol'];
