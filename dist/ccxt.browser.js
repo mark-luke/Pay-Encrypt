@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.9'
+const version = '1.32.10'
 
 Exchange.ccxtVersion = version
 
@@ -33257,10 +33257,14 @@ module.exports = class btcmarkets extends Exchange {
                 'api': {
                     'public': 'https://api.btcmarkets.net',
                     'private': 'https://api.btcmarkets.net',
+                    'privateV3': 'https://api.btcmarkets.net/v3',
                     'web': 'https://btcmarkets.net/data',
                 },
                 'www': 'https://btcmarkets.net',
-                'doc': 'https://github.com/BTCMarkets/API',
+                'doc': [
+                    'https://api.btcmarkets.net/doc/v3#section/API-client-libraries',
+                    'https://github.com/BTCMarkets/API',
+                ],
             },
             'api': {
                 'public': {
@@ -33271,6 +33275,14 @@ module.exports = class btcmarkets extends Exchange {
                         'v2/market/{id}/tickByTime/{timeframe}',
                         'v2/market/{id}/trades',
                         'v2/market/active',
+                        'v3/markets',
+                        'v3/markets/{marketId}/ticker',
+                        'v3/markets/{marketId}/trades',
+                        'v3/markets/{marketId}/orderbook',
+                        'v3/markets/{marketId}/candles',
+                        'v3/markets/tickers',
+                        'v3/markets/orderbooks',
+                        'v3/time',
                     ],
                 },
                 'private': {
@@ -33294,6 +33306,43 @@ module.exports = class btcmarkets extends Exchange {
                         'order/trade/history',
                         'order/createBatch', // they promise it's coming soon...
                         'order/detail',
+                    ],
+                },
+                'privateV3': {
+                    'get': [
+                        'orders',
+                        'orders/{id}',
+                        'batchorders/{ids}',
+                        'trades',
+                        'trades/{id}',
+                        'withdrawals',
+                        'withdrawals/{id}',
+                        'deposits',
+                        'deposits/{id}',
+                        'transfers',
+                        'transfers/{id}',
+                        'addresses',
+                        'withdrawal-fees',
+                        'assets',
+                        'accounts/me/trading-fees',
+                        'accounts/me/withdrawal-limits',
+                        'accounts/me/balances',
+                        'accounts/me/transactions',
+                        'reports/{id}',
+                    ],
+                    'post': [
+                        'orders',
+                        'batchorders',
+                        'withdrawals',
+                        'reports',
+                    ],
+                    'delete': [
+                        'orders',
+                        'orders/{id}',
+                        'batchorders/{ids}',
+                    ],
+                    'put': [
+                        'orders/{id}',
                     ],
                 },
                 'web': {
@@ -33441,27 +33490,23 @@ module.exports = class btcmarkets extends Exchange {
     }
 
     async fetchMarkets (params = {}) {
-        const response = await this.publicGetV2MarketActive (params);
+        const response = await this.publicGetV3Markets (params);
         const result = [];
-        const markets = this.safeValue (response, 'markets');
-        for (let i = 0; i < markets.length; i++) {
-            const market = markets[i];
-            const baseId = this.safeString (market, 'instrument');
-            const quoteId = this.safeString (market, 'currency');
-            const id = baseId + '/' + quoteId;
+        for (let i = 0; i < response.length; i++) {
+            const market = response[i];
+            const baseId = this.safeString (market, 'baseAssetName');
+            const quoteId = this.safeString (market, 'quoteAssetName');
+            const id = this.safeString (market, 'marketId');
             const base = this.safeCurrencyCode (baseId);
             const quote = this.safeCurrencyCode (quoteId);
             const symbol = base + '/' + quote;
             const fees = this.safeValue (this.safeValue (this.options, 'fees', {}), quote, this.fees);
-            let pricePrecision = 2;
-            let amountPrecision = 4;
-            const minAmount = 0.001; // where does it come from?
+            const pricePrecision = this.safeFloat (market, 'priceDecimals');
+            const amountPrecision = this.safeFloat (market, 'amountDecimals');
+            const minAmount = this.safeFloat (market, 'minOrderAmount');
+            const maxAmount = this.safeFloat (market, 'maxOrderAmount');
             let minPrice = undefined;
             if (quote === 'AUD') {
-                if ((base === 'XRP') || (base === 'OMG')) {
-                    pricePrecision = 4;
-                }
-                amountPrecision = -Math.log10 (minAmount);
                 minPrice = Math.pow (10, -pricePrecision);
             }
             const precision = {
@@ -33471,7 +33516,7 @@ module.exports = class btcmarkets extends Exchange {
             const limits = {
                 'amount': {
                     'min': minAmount,
-                    'max': undefined,
+                    'max': maxAmount,
                 },
                 'price': {
                     'min': minPrice,
@@ -33961,6 +34006,28 @@ module.exports = class btcmarkets extends Exchange {
             const secret = this.base64ToBinary (this.secret);
             const signature = this.hmac (this.encode (auth), secret, 'sha512', 'base64');
             headers['signature'] = this.decode (signature);
+        } else if (api === 'privateV3') {
+            this.checkRequiredCredentials ();
+            const nonce = this.nonce ().toString ();
+            const secret = this.base64ToBinary (this.secret); // or stringToBase64
+            const pathWithLeadingSlash = '/v3/' + path;
+            const auth = method + pathWithLeadingSlash + nonce;
+            const signature = this.hmac (this.encode (auth), secret, 'sha512', 'base64');
+            if (method === 'GET') {
+                if (Object.keys (params).length) {
+                    url += '?' + this.urlencode (params);
+                }
+            } else {
+                body = this.json (params);
+            }
+            headers = {
+                'Accept': 'application/json',
+                'Accept-Charset': 'UTF-8',
+                'Content-Type': 'application/json',
+                'BM-AUTH-APIKEY': this.apiKey,
+                'BM-AUTH-TIMESTAMP': nonce,
+                'BM-AUTH-SIGNATURE': signature,
+            };
         } else {
             if (Object.keys (params).length) {
                 url += '?' + this.urlencode (params);
