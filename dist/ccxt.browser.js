@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.75'
+const version = '1.30.98'
 
 Exchange.ccxtVersion = version
 
@@ -7767,6 +7767,7 @@ module.exports = class bigone extends Exchange {
                 'fetchOpenOrders': true,
                 'fetchClosedOrders': true,
                 'fetchTickers': true,
+                'fetchTime': true,
                 'fetchWithdrawals': true,
                 'withdraw': true,
             },
@@ -8104,6 +8105,20 @@ module.exports = class bigone extends Exchange {
             result[symbol] = ticker;
         }
         return result;
+    }
+
+    async fetchTime (params = {}) {
+        const response = await this.publicGetPing (params);
+        //
+        //     {
+        //         "data": {
+        //             "timestamp": 1527665262168391000
+        //         }
+        //     }
+        //
+        const data = this.safeValue (response, 'data', {});
+        const timestamp = this.safeInteger (data, 'timestamp');
+        return parseInt (timestamp / 1000000);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -16033,6 +16048,7 @@ module.exports = class bitflyer extends Exchange {
             'countries': [ 'JP' ],
             'version': 'v1',
             'rateLimit': 1000, // their nonce-timestamp is in seconds...
+            'hostname': 'bitflyer.com', // or bitflyer.com
             'has': {
                 'CORS': false,
                 'withdraw': true,
@@ -16044,8 +16060,8 @@ module.exports = class bitflyer extends Exchange {
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/28051642-56154182-660e-11e7-9b0d-6042d1e6edd8.jpg',
-                'api': 'https://api.bitflyer.jp',
-                'www': 'https://bitflyer.jp',
+                'api': 'https://api.{hostname}',
+                'www': 'https://bitflyer.com',
                 'doc': 'https://lightning.bitflyer.com/docs?lang=en',
             },
             'api': {
@@ -16485,7 +16501,8 @@ module.exports = class bitflyer extends Exchange {
                 request += '?' + this.urlencode (params);
             }
         }
-        const url = this.urls['api'] + request;
+        const baseUrl = this.implodeParams (this.urls['api'], { 'hostname': this.hostname });
+        const url = baseUrl + request;
         if (api === 'private') {
             this.checkRequiredCredentials ();
             const nonce = this.nonce ().toString ();
@@ -16553,7 +16570,7 @@ module.exports = class bitforex extends Exchange {
                 '1M': '1month',
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/44310033-69e9e600-a3d8-11e8-873d-54d74d1bc4e4.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87295553-1160ec00-c50e-11ea-8ea0-df79276a9646.jpg',
                 'api': 'https://api.bitforex.com',
                 'www': 'https://www.bitforex.com',
                 'doc': 'https://github.com/githubdev2020/API_Doc_en/wiki',
@@ -17975,6 +17992,7 @@ module.exports = class bitkk extends zb {
 
 const Exchange = require ('./base/Exchange');
 const { AuthenticationError, ArgumentsRequired, ExchangeError, InvalidOrder, BadRequest, OrderNotFound, DDoSProtection, BadSymbol } = require ('./base/errors');
+
 //  ---------------------------------------------------------------------------
 
 module.exports = class bitmart extends Exchange {
@@ -18158,7 +18176,7 @@ module.exports = class bitmart extends Exchange {
     }
 
     async fetchMarkets (params = {}) {
-        const markets = await this.publicGetSymbolsDetails (params);
+        const response = await this.publicGetSymbolsDetails (params);
         //
         //     [
         //         {
@@ -18175,8 +18193,8 @@ module.exports = class bitmart extends Exchange {
         //     ]
         //
         const result = [];
-        for (let i = 0; i < markets.length; i++) {
-            const market = markets[i];
+        for (let i = 0; i < response.length; i++) {
+            const market = response[i];
             const id = this.safeString (market, 'id');
             const baseId = this.safeString (market, 'base_currency');
             const quoteId = this.safeString (market, 'quote_currency');
@@ -18353,29 +18371,30 @@ module.exports = class bitmart extends Exchange {
         await this.loadMarkets ();
         const tickers = await this.publicGetTicker (params);
         //
-        //         [
-        //             {
-        //                 "priceChange":"0%",
-        //                 "symbolId":1066,
-        //                 "website":"https://www.bitmart.com/trade?symbol=1SG_BTC",
-        //                 "depthEndPrecision":6,
-        //                 "ask_1":"0.000095",
-        //                 "anchorId":2,
-        //                 "anchorName":"BTC",
-        //                 "pair":"1SG_BTC",
-        //                 "volume":"0.0",
-        //                 "coinId":2029,
-        //                 "depthStartPrecision":4,
-        //                 "high_24h":"0.000035",
-        //                 "low_24h":"0.000035",
-        //                 "new_24h":"0.000035",
-        //                 "closeTime":1589389249342,
-        //                 "bid_1":"0.000035",
-        //                 "coinName":"1SG",
-        //                 "baseVolume":"0.0",
-        //                 "openTime":1589302849342
-        //             },
-        //         ]
+        //
+        //     [
+        //         {
+        //             "priceChange":"0%",
+        //             "symbolId":1066,
+        //             "website":"https://www.bitmart.com/trade?symbol=1SG_BTC",
+        //             "depthEndPrecision":6,
+        //             "ask_1":"0.000095",
+        //             "anchorId":2,
+        //             "anchorName":"BTC",
+        //             "pair":"1SG_BTC",
+        //             "volume":"0.0",
+        //             "coinId":2029,
+        //             "depthStartPrecision":4,
+        //             "high_24h":"0.000035",
+        //             "low_24h":"0.000035",
+        //             "new_24h":"0.000035",
+        //             "closeTime":1589389249342,
+        //             "bid_1":"0.000035",
+        //             "coinName":"1SG",
+        //             "baseVolume":"0.0",
+        //             "openTime":1589302849342
+        //         },
+        //     ]
         //
         const result = {};
         for (let i = 0; i < tickers.length; i++) {
@@ -18387,7 +18406,7 @@ module.exports = class bitmart extends Exchange {
     }
 
     async fetchCurrencies (params = {}) {
-        const currencies = await this.publicGetCurrencies (params);
+        const response = await this.publicGetCurrencies (params);
         //
         //     [
         //         {
@@ -18399,16 +18418,16 @@ module.exports = class bitmart extends Exchange {
         //     ]
         //
         const result = {};
-        for (let i = 0; i < currencies.length; i++) {
-            const currency = currencies[i];
-            const currencyId = this.safeString (currency, 'id');
-            const code = this.safeCurrencyCode (currencyId);
+        for (let i = 0; i < response.length; i++) {
+            const currency = response[i];
+            const id = this.safeString (currency, 'id');
+            const code = this.safeCurrencyCode (id);
             const name = this.safeString (currency, 'name');
             const withdrawEnabled = this.safeValue (currency, 'withdraw_enabled');
             const depositEnabled = this.safeValue (currency, 'deposit_enabled');
             const active = withdrawEnabled && depositEnabled;
             result[code] = {
-                'id': currencyId,
+                'id': id,
                 'code': code,
                 'name': name,
                 'info': currency, // the original payload
@@ -22166,7 +22185,7 @@ module.exports = class bitso extends Exchange {
                 'fetchOrder': true,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27766335-715ce7aa-5ed5-11e7-88a8-173a27bb30fe.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87295554-11f98280-c50e-11ea-80d6-15b3bafa8cbf.jpg',
                 'api': 'https://api.bitso.com',
                 'www': 'https://bitso.com',
                 'doc': 'https://bitso.com/api_info',
@@ -24323,6 +24342,7 @@ module.exports = class bittrex extends Exchange {
                 'fetchOrder': true,
                 'fetchOpenOrders': true,
                 'fetchTickers': true,
+                'fetchTime': true,
                 'withdraw': true,
                 'fetchDeposits': true,
                 'fetchWithdrawals': true,
@@ -24336,7 +24356,7 @@ module.exports = class bittrex extends Exchange {
             },
             'hostname': 'bittrex.com',
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27766352-cf0b3c26-5ed5-11e7-82b7-f3826b7a97d8.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87153921-edf53180-c2c0-11ea-96b9-f2a9a95a455b.jpg',
                 'api': {
                     'public': 'https://{hostname}/api',
                     'account': 'https://{hostname}/api',
@@ -24890,6 +24910,16 @@ module.exports = class bittrex extends Exchange {
             'cost': cost,
             'fee': undefined,
         };
+    }
+
+    async fetchTime (params = {}) {
+        const response = await this.v3GetPing (params);
+        //
+        //     {
+        //         "serverTime": 1594596023162
+        //     }
+        //
+        return this.safeInteger (response, 'serverTime');
     }
 
     async fetchTrades (symbol, since = undefined, limit = undefined, params = {}) {
@@ -27414,6 +27444,7 @@ module.exports = class bitz extends Exchange {
                 'fetchOrder': true,
                 'createMarketOrder': false,
                 'fetchDeposits': true,
+                'fetchTime': true,
                 'fetchWithdrawals': true,
                 'fetchTransactions': false,
             },
@@ -27451,6 +27482,7 @@ module.exports = class bitz extends Exchange {
                         'tickerall',
                         'kline',
                         'symbolList',
+                        'getServerTime',
                         'currencyRate',
                         'currencyCoinRate',
                         'coinRate',
@@ -27902,6 +27934,21 @@ module.exports = class bitz extends Exchange {
             }
         }
         return result;
+    }
+
+    async fetchTime (params = {}) {
+        const response = await this.marketGetGetServerTime (params);
+        //
+        //     {
+        //         "status":200,
+        //         "msg":"",
+        //         "data":[],
+        //         "time":1555490875,
+        //         "microtime":"0.35994200 1555490875",
+        //         "source":"api"
+        //     }
+        //
+        return this.safeTimestamp (response, 'time');
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -28622,10 +28669,7 @@ module.exports = class bl3p extends Exchange {
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/28501752-60c21b82-6feb-11e7-818b-055ee6d0e754.jpg',
                 'api': 'https://api.bl3p.eu',
-                'www': [
-                    'https://bl3p.eu',
-                    'https://bitonic.nl',
-                ],
+                'www': 'https://bl3p.eu', // 'https://bitonic.nl'
                 'doc': [
                     'https://github.com/BitonicNL/bl3p-api/tree/master/docs',
                     'https://bl3p.eu/api',
@@ -28883,7 +28927,7 @@ module.exports = class bleutrade extends Exchange {
                     'v3Private': 'https://{hostname}/api/v3/private',
                     'v3Public': 'https://{hostname}/api/v3/public',
                 },
-                'www': ['https://bleutrade.com'],
+                'www': 'https://bleutrade.com',
                 'doc': [
                     'https://app.swaggerhub.com/apis-docs/bleu/white-label/3.0.0',
                 ],
@@ -32450,7 +32494,7 @@ module.exports = class btcturk extends Exchange {
                 '1d': '1d',
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27992709-18e15646-64a3-11e7-9fa2-b0950ec7712f.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87153926-efbef500-c2c0-11ea-9842-05b63612c4b9.jpg',
                 'api': 'https://www.btcturk.com/api',
                 'www': 'https://www.btcturk.com',
                 'doc': 'https://github.com/BTCTrader/broker-api-docs',
@@ -41801,7 +41845,7 @@ module.exports = class coincheck extends Exchange {
                 'fetchMyTrades': true,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27766464-3b5c3c74-5ed9-11e7-840e-31b32968e1da.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87182088-1d6d6380-c2ec-11ea-9c64-8ab9f9b289f5.jpg',
                 'api': 'https://coincheck.com/api',
                 'www': 'https://coincheck.com',
                 'doc': 'https://coincheck.com/documents/exchange/api',
@@ -42765,7 +42809,7 @@ module.exports = class coinex extends Exchange {
                 '1w': '1week',
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/38046312-0b450aac-32c8-11e8-99ab-bc6b136b6cc7.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87182089-1e05fa00-c2ec-11ea-8da9-cc73b45abbbc.jpg',
                 'api': 'https://api.coinex.com',
                 'www': 'https://www.coinex.com',
                 'doc': 'https://github.com/coinexcom/coinex_exchange_api/wiki',
@@ -44133,7 +44177,7 @@ module.exports = class coinfloor extends Exchange {
                 'fetchOpenOrders': true,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/28246081-623fc164-6a1c-11e7-913f-bac0d5576c90.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87153925-ef265e80-c2c0-11ea-91b5-020c804b90e0.jpg',
                 'api': 'https://webapi.coinfloor.co.uk/bist',
                 'www': 'https://www.coinfloor.co.uk',
                 'doc': [
@@ -45038,7 +45082,7 @@ module.exports = class coinmarketcap extends Exchange {
                 'fetchCurrencies': true,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/28244244-9be6312a-69ed-11e7-99c1-7c1797275265.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87182086-1cd4cd00-c2ec-11ea-9ec4-d0cf2a2abf62.jpg',
                 'api': {
                     'public': 'https://api.coinmarketcap.com',
                     'files': 'https://files.coinmarketcap.com',
@@ -68513,10 +68557,7 @@ module.exports = class ice3x extends Exchange {
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/38012176-11616c32-3269-11e8-9f05-e65cf885bb15.jpg',
                 'api': 'https://ice3x.com/api',
-                'www': [
-                    'https://ice3x.com',
-                    'https://ice3x.co.za',
-                ],
+                'www': 'https://ice3x.com', // 'https://ice3x.co.za',
                 'doc': 'https://ice3x.co.za/ice-cubed-bitcoin-exchange-api-documentation-1-june-2017',
                 'fees': [
                     'https://help.ice3.com/support/solutions/articles/11000033293-trading-fees',
@@ -70086,7 +70127,7 @@ module.exports = class independentreserve extends Exchange {
                 'CORS': false,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/30521662-cf3f477c-9bcb-11e7-89bc-d1ac85012eda.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87182090-1e9e9080-c2ec-11ea-8e49-563db9a38f37.jpg',
                 'api': {
                     'public': 'https://api.independentreserve.com/Public',
                     'private': 'https://api.independentreserve.com/Private',
@@ -70530,7 +70571,7 @@ module.exports = class indodax extends Exchange {
             },
             'version': '2.0', // as of 9 April 2018
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/37443283-2fddd0e4-281c-11e8-9741-b4f1419001b5.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87295556-12921900-c50e-11ea-84ae-fa4d8d8df551.jpg',
                 'api': {
                     'public': 'https://indodax.com/api',
                     'private': 'https://indodax.com/tapi',
@@ -73469,7 +73510,7 @@ module.exports = class kucoin extends Exchange {
                 'fetchLedger': true,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/57369448-3cc3aa80-7196-11e9-883e-5ebeb35e4f57.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87295558-132aaf80-c50e-11ea-9801-a2fb0c57c799.jpg',
                 'referral': 'https://www.kucoin.com/?rcode=E5wkqe',
                 'api': {
                     'public': 'https://openapi-v2.kucoin.com',
@@ -75275,7 +75316,7 @@ module.exports = class kuna extends acx {
             'timeframes': undefined,
             'urls': {
                 'referral': 'https://kuna.io?r=kunaid-gvfihe8az7o4',
-                'logo': 'https://user-images.githubusercontent.com/1294454/31697638-912824fa-b3c1-11e7-8c36-cf9606eb94ac.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87153927-f0578b80-c2c0-11ea-84b6-74612568e9e1.jpg',
                 'api': 'https://kuna.io',
                 'www': 'https://kuna.io',
                 'doc': 'https://kuna.io/documents/api',
@@ -77486,6 +77527,7 @@ module.exports = class liquid extends Exchange {
                 'not_enough_free_balance': InsufficientFunds,
                 'must_be_positive': InvalidOrder,
                 'less_than_order_size': InvalidOrder,
+                'price_too_high': InvalidOrder,
             },
             'commonCurrencies': {
                 'WIN': 'WCOIN',
@@ -79342,7 +79384,7 @@ module.exports = class luno extends Exchange {
             'urls': {
                 'referral': 'https://www.luno.com/invite/44893A',
                 'logo': 'https://user-images.githubusercontent.com/1294454/27766607-8c1a69d8-5ede-11e7-930c-540b5eb9be24.jpg',
-                'api': 'https://api.mybitx.com/api',
+                'api': 'https://api.luno.com/api',
                 'www': 'https://www.luno.com',
                 'doc': [
                     'https://www.luno.com/en/api',
@@ -79377,6 +79419,7 @@ module.exports = class luno extends Exchange {
                     ],
                     'post': [
                         'accounts',
+                        'accounts/{id}/name',
                         'postorder',
                         'marketorder',
                         'stoporder',
@@ -81988,7 +82031,7 @@ module.exports = class okcoin extends okex {
             'hostname': 'okcoin.com',
             'pro': true,
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27766791-89ffb502-5ee5-11e7-8a5b-c5950b68ac65.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87295551-102fbf00-c50e-11ea-90a9-462eebba5829.jpg',
                 'www': 'https://www.okcoin.com',
                 'doc': 'https://www.okcoin.com/docs/en/',
                 'fees': 'https://www.okcoin.com/coin-fees',
@@ -85262,7 +85305,7 @@ module.exports = class paymium extends Exchange {
                 'cancelOrder': true,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27790564-a945a9d4-5ff9-11e7-9d2d-b635763f2f24.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87153930-f0f02200-c2c0-11ea-9c0a-40337375ae89.jpg',
                 'api': 'https://paymium.com/api',
                 'www': 'https://www.paymium.com',
                 'fees': 'https://www.paymium.com/page/help/fees',
@@ -92163,7 +92206,7 @@ module.exports = class rightbtc extends Exchange {
                 '1w': 'week',
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/42633917-7d20757e-85ea-11e8-9f53-fffe9fbb7695.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87182092-1f372700-c2ec-11ea-8f9e-01b4d3ff8941.jpg',
                 'api': 'https://www.rightbtc.com/api',
                 'www': 'https://www.rightbtc.com',
                 'doc': [
@@ -120444,6 +120487,9 @@ module.exports = class wavesexchange extends Exchange {
                         'matcher/orders/{address}',  // can't get the orders endpoint to work with the matcher api
                         'matcher/orders/{address}/{orderId}',
                     ],
+                    'post': [
+                        'matcher/orders/{wavesAddress}/cancel',
+                    ],
                 },
                 'market': {
                     'get': [
@@ -120656,9 +120702,10 @@ module.exports = class wavesexchange extends Exchange {
 
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
         const query = this.omit (params, this.extractParams (path));
+        const isCancelOrder = path === 'matcher/orders/{wavesAddress}/cancel';
         path = this.implodeParams (path, params);
         let url = this.urls['api'][api] + '/' + path;
-        const queryString = this.urlencode (query);
+        let queryString = this.urlencode (query);
         if ((api === 'private') || (api === 'forward')) {
             headers = {
                 'Accept': 'application/json',
@@ -120667,8 +120714,14 @@ module.exports = class wavesexchange extends Exchange {
             if (accessToken) {
                 headers['Authorization'] = 'Bearer ' + accessToken;
             }
-            if (method !== 'POST') {
+            if (method === 'POST') {
+                headers['content-type'] = 'application/json';
+            } else {
                 headers['content-type'] = 'application/x-www-form-urlencoded';
+            }
+            if (isCancelOrder) {
+                body = this.json ([query['orderId']]);
+                queryString = '';
             }
             if (queryString.length > 0) {
                 url += '?' + queryString;
@@ -121057,7 +121110,6 @@ module.exports = class wavesexchange extends Exchange {
         const dynamic = this.safeValue (orderFee, 'dynamic');
         const baseMatcherFee = this.safeInteger (dynamic, 'baseFee');
         const rates = this.safeValue (dynamic, 'rates');
-        const priceAssets = Object.keys (rates);
         // { '34N9YcEETLWn93qYQ64EsP1x89tSruJU44RrEMSXXEPJ': 1.23762376,
         //   '62LyMjcr2DtiyF5yVXFhoQ2q414VPPJXjsNYp72SuDCH': 0.01101575,
         //   HZk1mbfuJpmxU1Fs4AX5MWLVYtctsNcg6e2C6VKqK8zk: 0.04266412,
@@ -121070,18 +121122,25 @@ module.exports = class wavesexchange extends Exchange {
         //   '5WvPKSJXzVE2orvbkJ8wsQmmQKqTv9sGBPksV4adViw3': 0.02873582,
         //   WAVES: 1,
         //   BrjUWjndUanm5VsJkbUip8VRYy6LWJePtxya3FNv4TQa: 0.03614366 }
+        const priceAssets = Object.keys (rates);
         let matcherFeeAssetId = undefined;
-        const balances = await this.fetchBalance ();
-        const wavesMatcherFee = this.currencyFromPrecision ('WAVES', baseMatcherFee);
-        if (balances['WAVES']['free'] > wavesMatcherFee) {
-            matcherFeeAssetId = 'WAVES';
-        }
-        for (let i = 0; i < priceAssets.length; i++) {
-            const assetId = priceAssets[i];
-            const code = this.safeCurrencyCode (assetId);
-            const balance = this.safeValue (this.safeValue (balances, code, {}), 'free');
-            if (balance > rates[assetId] * wavesMatcherFee) {
-                matcherFeeAssetId = assetId;
+        if ('feeAssetId' in params) {
+            matcherFeeAssetId = params['feeAssetId'];
+        } else if ('feeAssetId' in this.options) {
+            matcherFeeAssetId = this.options['feeAssetId'];
+        } else {
+            const balances = await this.fetchBalance ();
+            const wavesMatcherFee = this.currencyFromPrecision ('WAVES', baseMatcherFee);
+            if (balances['WAVES']['free'] > wavesMatcherFee) {
+                matcherFeeAssetId = 'WAVES';
+            }
+            for (let i = 0; i < priceAssets.length; i++) {
+                const assetId = priceAssets[i];
+                const code = this.safeCurrencyCode (assetId);
+                const balance = this.safeValue (this.safeValue (balances, code, {}), 'free');
+                if ((balance !== undefined) && (balance > rates[assetId] * wavesMatcherFee)) {
+                    matcherFeeAssetId = assetId;
+                }
             }
         }
         if (matcherFeeAssetId === undefined) {
@@ -121154,30 +121213,21 @@ module.exports = class wavesexchange extends Exchange {
     async cancelOrder (id, symbol = undefined, params = {}) {
         this.checkRequiredDependencies ();
         this.checkRequiredKeys ();
-        await this.loadMarkets ();
-        if (symbol === undefined) {
-            throw new ArgumentsRequired (this.id + ' symbol is required for cancelOrder');
-        }
-        const market = this.market (symbol);
-        const byteArray = [
-            this.base58ToBinary (this.apiKey),
-            this.base58ToBinary (id),
-        ];
-        const binary = this.binaryConcatArray (byteArray);
-        const hexSecret = this.binaryToBase16 (this.base58ToBinary (this.secret));
-        const signature = this.eddsa (this.binaryToBase16 (binary), hexSecret, 'ed25519');
-        const request = {
-            'sender': this.apiKey,
+        await this.getAccessToken ();
+        const wavesAddress = await this.getWavesAddress ();
+        const response = await this.forwardPostMatcherOrdersWavesAddressCancel ({
+            'wavesAddress': wavesAddress,
             'orderId': id,
-            'signature': signature,
-            'baseId': market['baseId'],
-            'quoteId': market['quoteId'],
-        };
-        const response = await this.matcherPostMatcherOrderbookBaseIdQuoteIdCancel (this.extend (request, params));
-        // { orderId: 'Do7cDJMf2MJuFyorvxNNuzS42MXSGGEq1r1hGDn1PHiS',
-        //   success: true,
-        //   status: 'OrderCanceled' }
-        const returnedId = this.safeString (response, 'orderId');
+        });
+        //  {
+        //    "success":true,
+        //    "message":[[{"orderId":"EBpJeGM36KKFz5gTJAUKDBm89V8wqxKipSFBdU35AN3c","success":true,"status":"OrderCanceled"}]],
+        //    "status":"BatchCancelCompleted"
+        //  }
+        const message = this.safeValue (response, 'message');
+        const firstMessage = this.safeValue (message, 0);
+        const firstOrder = this.safeValue (firstMessage, 0);
+        const returnedId = this.safeString (firstOrder, 'orderId');
         return {
             'info': response,
             'id': returnedId,
