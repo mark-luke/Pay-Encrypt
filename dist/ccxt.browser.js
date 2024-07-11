@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.31'
+const version = '1.19.32'
 
 Exchange.ccxtVersion = version
 
@@ -100980,10 +100980,13 @@ module.exports = class tidebit extends Exchange {
     }
 
     handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
-        if (code === 400) {
+        if ((code === 400) || (response === undefined)) {
+            const feedback = this.id + ' ' + body;
+            if (response === undefined) {
+                throw new ExchangeError (feedback);
+            }
             const error = this.safeValue (response, 'error');
             const errorCode = this.safeString (error, 'code');
-            const feedback = this.id + ' ' + this.json (response);
             const exceptions = this.exceptions;
             if (errorCode in exceptions) {
                 throw new exceptions[errorCode] (feedback);
