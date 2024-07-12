@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.33'
+const version = '1.32.34'
 
 Exchange.ccxtVersion = version
 
@@ -37718,7 +37718,10 @@ module.exports = class bybit extends Exchange {
                 'recv_window': this.options['recvWindow'],
                 'timestamp': timestamp,
             });
-            const auth = this.rawencode (this.keysort (query));
+            let auth = this.rawencode (this.keysort (query));
+            // fix https://github.com/ccxt/ccxt/issues/7377
+            // bybit encodes whole floats as integers without .0
+            auth = auth.replace ('.0&', '&');
             const signature = this.hmac (this.encode (auth), this.encode (this.secret));
             if (method === 'POST') {
                 body = this.json (this.extend (query, {
