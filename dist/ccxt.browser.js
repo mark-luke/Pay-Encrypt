@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1097'
+const version = '1.18.1098'
 
 Exchange.ccxtVersion = version
 
@@ -52834,7 +52834,8 @@ module.exports = class idex extends Exchange {
         for (let i = 0; i < keys.length; i++) {
             const currency = keys[i];
             const balance = response[currency];
-            result[currency] = {
+            const code = this.safeCurrencyCode (currency);
+            result[code] = {
                 'free': this.safeFloat (balance, 'available'),
                 'used': this.safeFloat (balance, 'onOrders'),
             };
@@ -52843,7 +52844,7 @@ module.exports = class idex extends Exchange {
     }
 
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
-        this.checkRequiredCredentials ();
+        this.checkRequiredDependencies ();
         await this.loadMarkets ();
         const market = this.market (symbol);
         if (type === 'limit') {
@@ -52977,7 +52978,6 @@ module.exports = class idex extends Exchange {
     }
 
     async cancelOrder (orderId, symbol = undefined, params = {}) {
-        this.checkRequiredCredentials ();
         const nonce = await this.getNonce ();
         const orderToHash = {
             'orderHash': orderId,
@@ -53425,7 +53425,7 @@ module.exports = class idex extends Exchange {
     }
 
     async withdraw (code, amount, address, tag = undefined, params = {}) {
-        this.checkRequiredCredentials ();
+        this.checkRequiredDependencies ();
         this.checkAddress (address);
         await this.loadMarkets ();
         const currency = this.currency (code);
@@ -53462,6 +53462,10 @@ module.exports = class idex extends Exchange {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
         };
+        if (api === 'private') {
+            this.checkRequiredCredentials ();
+            headers['API-Key'] = this.apiKey;
+        }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
     }
 
