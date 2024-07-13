@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1299'
+const version = '1.18.1300'
 
 Exchange.ccxtVersion = version
 
@@ -16684,7 +16684,7 @@ module.exports = class bitmart extends Exchange {
             'symbol': market['id'],
             // 'offset': 0, // current page, starts from 0
         };
-        if (limit === undefined) {
+        if (limit !== undefined) {
             request['limit'] = limit; // default 500, max 1000
         }
         const response = await this.privateGetTrades (this.extend (request, params));
