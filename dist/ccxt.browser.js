@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.44'
+const version = '1.26.45'
 
 Exchange.ccxtVersion = version
 
@@ -65764,7 +65764,7 @@ module.exports = class kraken extends Exchange {
                 'api': {
                     'public': 'https://api.kraken.com',
                     'private': 'https://api.kraken.com',
-                    'zendesk': 'https://support.kraken.com/hc/en-us/articles',
+                    'zendesk': 'https://kraken.zendesk.com/api/v2/help_center/en-us/articles', // use the public zendesk api to receive article bodies and bypass new anti-spam protections
                 },
                 'www': 'https://www.kraken.com',
                 'doc': 'https://www.kraken.com/features/api',
@@ -65859,9 +65859,9 @@ module.exports = class kraken extends Exchange {
                     'get': [
                         // we should really refrain from putting fixed fee numbers and stop hardcoding
                         // we will be using their web APIs to scrape all numbers from these articles
-                        '205893708-What-is-the-minimum-order-size-',
-                        '201396777-What-are-the-deposit-fees-',
-                        '201893608-What-are-the-withdrawal-fees-',
+                        '205893708', // -What-is-the-minimum-order-size-
+                        '360000292886', // -What-are-the-deposit-fees-
+                        '201893608', // -What-are-the-withdrawal-fees-
                     ],
                 },
                 'public': {
@@ -65916,7 +65916,7 @@ module.exports = class kraken extends Exchange {
                 'delistedMarketsById': {},
                 // cannot withdraw/deposit these
                 'inactiveCurrencies': [ 'CAD', 'USD', 'JPY', 'GBP' ],
-                'fetchMinOrderAmounts': false,
+                'fetchMinOrderAmounts': true,
             },
             'exceptions': {
                 'EQuery:Invalid asset pair': BadSymbol, // {"error":["EQuery:Invalid asset pair"]}
@@ -65944,8 +65944,10 @@ module.exports = class kraken extends Exchange {
         return this.decimalToPrecision (fee, TRUNCATE, this.markets[symbol]['precision']['amount'], DECIMAL_PLACES);
     }
 
-    async fetchMinOrderAmounts (params) {
-        const html = await this.zendeskGet205893708WhatIsTheMinimumOrderSize (params);
+    async fetchMinOrderAmounts (params = {}) {
+        const response = await this.zendeskGet205893708 (params);
+        const article = this.safeValue (response, 'article');
+        const html = this.safeString (article, 'body');
         const parts = html.split ('<td class="wysiwyg-text-align-right">');
         const numParts = parts.length;
         if (numParts < 3) {
