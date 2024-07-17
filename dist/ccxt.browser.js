@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.88'
+const version = '1.22.89'
 
 Exchange.ccxtVersion = version
 
@@ -3483,17 +3483,13 @@ const BN = require ('../static_dependencies/BN/bn')
 // ----------------------------------------------------------------------------
 // web3 / 0x imports
 
-let Web3 = undefined
-    , ethAbi = undefined
+let ethAbi = undefined
     , ethUtil = undefined
-    , BigNumber = undefined
 
 try {
     const requireFunction = require;
-    Web3      = requireFunction ('web3') // eslint-disable-line global-require
     ethAbi    = requireFunction ('ethereumjs-abi') // eslint-disable-line global-require
     ethUtil   = requireFunction ('ethereumjs-util') // eslint-disable-line global-require
-    BigNumber = requireFunction ('bignumber.js') // eslint-disable-line global-require
     // we prefer bignumber.js over BN.js
     // BN        = requireFunction ('bn.js') // eslint-disable-line global-require
 } catch (e) {
@@ -3711,8 +3707,6 @@ module.exports = class Exchange {
         this.last_json_response    = undefined
         this.last_response_headers = undefined
 
-        this.arrayConcat = (a, b) => a.concat (b)
-
         const unCamelCaseProperties = (obj = this) => {
             if (obj !== null) {
                 for (const k of Object.getOwnPropertyNames (obj)) {
@@ -3750,11 +3744,6 @@ module.exports = class Exchange {
 
         if (this.markets)
             this.setMarkets (this.markets)
-
-        if (this.requiresWeb3 && !this.web3 && Web3) {
-            const provider = (this.web3ProviderURL) ? new Web3.providers.HttpProvider (this.web3ProviderURL) : new Web3.providers.HttpProvider ()
-            this.web3 = new Web3 (Web3.givenProvider || provider)
-        }
     }
 
     defaults () {
@@ -4682,97 +4671,32 @@ module.exports = class Exchange {
     // ------------------------------------------------------------------------
     // web3 / 0x methods
     static hasWeb3 () {
-        return Web3 && ethUtil && ethAbi && BigNumber
+        return ethUtil && ethAbi
     }
 
     checkRequiredDependencies () {
         if (!Exchange.hasWeb3 ()) {
-            throw new ExchangeError ("Required dependencies missing: \nnpm i web3 ethereumjs-util ethereumjs-abi bignumber.js --no-save");
+            throw new ExchangeError ('Required dependencies missing: \nnpm i ethereumjs-util ethereumjs-abi --no-save');
         }
-    }
-
-    ethDecimals (unit = 'ether') {
-        const units = {
-            'wei': 0,          // 1
-            'kwei': 3,         // 1000
-            'babbage': 3,      // 1000
-            'femtoether': 3,   // 1000
-            'mwei': 6,         // 1000000
-            'lovelace': 6,     // 1000000
-            'picoether': 6,    // 1000000
-            'gwei': 9,         // 1000000000
-            'shannon': 9,      // 1000000000
-            'nanoether': 9,    // 1000000000
-            'nano': 9,         // 1000000000
-            'szabo': 12,       // 1000000000000
-            'microether': 12,  // 1000000000000
-            'micro': 12,       // 1000000000000
-            'finney': 15,      // 1000000000000000
-            'milliether': 15,  // 1000000000000000
-            'milli': 15,       // 1000000000000000
-            'ether': 18,       // 1000000000000000000
-            'kether': 21,      // 1000000000000000000000
-            'grand': 21,       // 1000000000000000000000
-            'mether': 24,      // 1000000000000000000000000
-            'gether': 27,      // 1000000000000000000000000000
-            'tether': 30,      // 1000000000000000000000000000000
-        }
-        return this.safeValue (units, unit)
-    }
-
-    ethUnit (decimals = 18) {
-        const units = {
-            0: 'wei',      // 1000000000000000000
-            3: 'kwei',     // 1000000000000000
-            6: 'mwei',     // 1000000000000
-            9: 'gwei',     // 1000000000
-            12: 'szabo',   // 1000000
-            15: 'finney',  // 1000
-            18: 'ether',   // 1
-            21: 'kether',  // 0.001
-            24: 'mether',  // 0.000001
-            27: 'gether',  // 0.000000001
-            30: 'tether',  // 0.000000000001
-        }
-        return this.safeValue (units, decimals)
-    }
-
-    fromWei (amount, unit = 'ether', decimals = 18) {
-        if (amount === undefined) {
-            return amount
-        }
-        if (decimals !== 18) {
-            amount = new BigNumber (amount).times (new BigNumber (10 ** (18 - decimals))).toFixed ()
-        } else {
-            amount = new BigNumber (amount).toFixed ()
-        }
-        return parseFloat (this.web3.utils.fromWei (amount, unit))
-    }
-
-    toWei (amount, unit = 'ether', decimals = 18) {
-        if (amount === undefined) {
-            return amount
-        }
-        if (decimals !== 18) {
-            amount = new BigNumber (this.numberToString (amount)).div (new BigNumber (10 ** (18 - decimals))).toFixed ()
-        } else {
-            amount = this.numberToString (amount)
-        }
-        return this.web3.utils.toWei (amount, unit)
     }
 
     soliditySha3 (array) {
-        const values = this.solidityValues (array);
-        const types = this.solidityTypes (values);
-        return '0x' +  ethAbi.soliditySHA3 (types, values).toString ('hex')
-    }
-
-    solidityTypes (array) {
-        return array.map (value => (this.web3.utils.isAddress (value) ? 'address' : 'uint256'))
-    }
-
-    solidityValues (array) {
-        return array.map (value => (this.web3.utils.isAddress (value) ? value : (new BigNumber (value).toFixed ())))
+        // we only support address, uint256, and string solidity types
+        const encoded = []
+        for (const value of array) {
+            if (Number.isInteger (value) || value.match (/^[0-9]+$/)) {
+                encoded.push (this.numberToBE (this.numberToString (value), 32))
+            } else {
+                const noPrefix = Exchange.remove0xPrefix (value)
+                if (noPrefix.length === 40 && noPrefix.toLowerCase ().match (/^[0-9a-f]+$/)) { // check if it is an address
+                    encoded.push (this.base16ToBinary (noPrefix))
+                } else {
+                    encoded.push (this.stringToBinary (noPrefix))
+                }
+            }
+        }
+        const concated = this.binaryConcatArray (encoded)
+        return '0x' + this.hash (concated, 'keccak', 'hex')
     }
 
     getZeroExOrderHash (order) {
@@ -4856,15 +4780,6 @@ module.exports = class Exchange {
             domainStructHash,
             orderStructHash
         ])).toString ('hex');
-    }
-
-    signZeroExOrder (order, privateKey) {
-        const orderHash = this.getZeroExOrderHash (order);
-        const signature = this.signMessage (orderHash, privateKey);
-        return this.extend (order, {
-            'orderHash': orderHash,
-            'ecSignature': signature, // todo fix v if needed
-        })
     }
 
     signZeroExOrderV2 (order, privateKey) {
@@ -5323,6 +5238,7 @@ module.exports =
     , index
     , ordered: x => x // a stub to keep assoc keys in order (in JS it does nothing, it's mostly for Python)
     , unique:  x => Array.from (index (x))
+    , arrayConcat: (a, b) => a.concat (b)
 
     /*  .............................................   */
 
@@ -5491,7 +5407,7 @@ module.exports =
 
             return out
         }
-        
+
         return x
     }
 
@@ -5951,10 +5867,33 @@ const decimalToPrecision = (x, roundingMode
     return String.fromCharCode (...out)
 }
 
+// toWei / fromWei
+
+function fromWei (amount, decimals = 18) {
+    if (amount === undefined) {
+        return amount
+    }
+    const exponential = Math.floor (amount).toExponential () // wei must be whole numbers
+    const [ n, exponent ] = exponential.split ('e')
+    const newExponent = parseInt (exponent) - decimals
+    return numberToString (parseFloat (n + 'e' + newExponent))
+}
+
+function toWei (amount, decimals = 18) {
+    if (amount === undefined) {
+        return amount
+    }
+    const exponential = parseFloat (amount).toExponential ()
+    const [ n, exponent ] = exponential.split ('e')
+    const newExponent = parseInt (exponent) + decimals
+    return numberToString (Math.floor (parseFloat (n + 'e' + newExponent))) // wei must be whole numbers
+}
+
 /*  ------------------------------------------------------------------------ */
 
 module.exports = {
-
+    toWei,
+    fromWei,
     numberToString,
     precisionFromString,
     decimalToPrecision,
@@ -32839,11 +32778,11 @@ module.exports = class bytetrade extends Exchange {
         const baseId = market['baseId'];
         const baseCurrency = this.currency (market['base']);
         const amountTruncated = this.amountToPrecision (symbol, amount);
-        const amountChain = this.toWei (amountTruncated, 'ether', baseCurrency['precision']['amount']);
+        const amountChain = this.toWei (amountTruncated, baseCurrency['precision']['amount']);
         const quoteId = market['quoteId'];
         const quoteCurrency = this.currency (market['quote']);
         const priceRounded = this.priceToPrecision (symbol, price);
-        const priceChain = this.toWei (priceRounded, 'ether', quoteCurrency['precision']['amount']);
+        const priceChain = this.toWei (priceRounded, quoteCurrency['precision']['amount']);
         const now = this.milliseconds ();
         const expiration = this.milliseconds ();
         let datetime = this.iso8601 (now);
@@ -33170,7 +33109,7 @@ module.exports = class bytetrade extends Exchange {
         await this.loadMarkets ();
         const currency = this.currency (code);
         const amountTruncate = this.decimalToPrecision (amount, TRUNCATE, currency['info']['transferPrecision'], DECIMAL_PLACES, NO_PADDING);
-        const amountChain = this.toWei (amountTruncate, 'ether', currency['precision']['amount']);
+        const amountChain = this.toWei (amountTruncate, currency['precision']['amount']);
         const assetType = parseInt (currency['id']);
         const now = this.milliseconds ();
         const expiration = now;
@@ -33442,7 +33381,7 @@ module.exports = class bytetrade extends Exchange {
         const currency = this.currency (code);
         const coinId = currency['id'];
         const amountTruncate = this.decimalToPrecision (amount, TRUNCATE, currency['info']['transferPrecision'], DECIMAL_PLACES, NO_PADDING);
-        const amountChain = this.toWei (amountTruncate, 'ether', currency['info']['externalPrecision']);
+        const amountChain = this.toWei (amountTruncate, currency['info']['externalPrecision']);
         const eightBytes = this.integerPow ('2', '64');
         let assetFee = 0;
         let byteStringArray = [];
@@ -58993,13 +58932,13 @@ module.exports = class idex extends Exchange {
             if (side === 'buy') {
                 tokenBuy = market['baseId'];
                 tokenSell = market['quoteId'];
-                amountBuy = this.toWei (amount, 'ether', market['precision']['amount']);
-                amountSell = this.toWei (quoteAmount, 'ether', 18);
+                amountBuy = this.toWei (amount, market['precision']['amount']);
+                amountSell = this.toWei (quoteAmount, 18);
             } else {
                 tokenBuy = market['quoteId'];
                 tokenSell = market['baseId'];
-                amountBuy = this.toWei (quoteAmount, 'ether', 18);
-                amountSell = this.toWei (amount, 'ether', market['precision']['amount']);
+                amountBuy = this.toWei (quoteAmount, 18);
+                amountSell = this.toWei (amount, market['precision']['amount']);
             }
             const nonce = await this.getNonce ();
             const orderToHash = {
@@ -59599,7 +59538,7 @@ module.exports = class idex extends Exchange {
         const currency = this.currency (code);
         const tokenAddress = currency['id'];
         const nonce = await this.getNonce ();
-        amount = this.toWei (amount, 'ether', currency['precision']);
+        amount = this.toWei (amount, currency['precision']);
         const requestToHash = {
             'contractAddress': await this.getContractAddress (),
             'token': tokenAddress,
@@ -98954,16 +98893,16 @@ module.exports = class theocean extends Exchange {
                 'price': -parseInt (quoteToken['precision']),
             };
             const amountLimits = {
-                'min': this.fromWei (this.safeString (baseToken, 'minAmount'), 'ether', baseDecimals),
-                'max': this.fromWei (this.safeString (baseToken, 'maxAmount'), 'ether', baseDecimals),
+                'min': this.fromWei (this.safeString (baseToken, 'minAmount'), baseDecimals),
+                'max': this.fromWei (this.safeString (baseToken, 'maxAmount'), baseDecimals),
             };
             const priceLimits = {
                 'min': undefined,
                 'max': undefined,
             };
             const costLimits = {
-                'min': this.fromWei (this.safeString (quoteToken, 'minAmount'), 'ether', quoteDecimals),
-                'max': this.fromWei (this.safeString (quoteToken, 'maxAmount'), 'ether', quoteDecimals),
+                'min': this.fromWei (this.safeString (quoteToken, 'minAmount'), quoteDecimals),
+                'max': this.fromWei (this.safeString (quoteToken, 'maxAmount'), quoteDecimals),
             };
             const limits = {
                 'amount': amountLimits,
@@ -98995,7 +98934,7 @@ module.exports = class theocean extends Exchange {
             this.safeFloat (ohlcv, 'high'),
             this.safeFloat (ohlcv, 'low'),
             this.safeFloat (ohlcv, 'close'),
-            this.fromWei (this.safeString (ohlcv, 'baseVolume'), 'ether', baseDecimals),
+            this.fromWei (this.safeString (ohlcv, 'baseVolume'), baseDecimals),
         ];
     }
 
@@ -99052,9 +98991,9 @@ module.exports = class theocean extends Exchange {
         //     {"available":"0","committed":"0","total":"0"}
         //
         const decimals = this.safeInteger (this.options['decimals'], code, 18);
-        const free = this.fromWei (this.safeString (response, 'available'), 'ether', decimals);
-        const used = this.fromWei (this.safeString (response, 'committed'), 'ether', decimals);
-        const total = this.fromWei (this.safeString (response, 'total'), 'ether', decimals);
+        const free = this.fromWei (this.safeString (response, 'available'), decimals);
+        const used = this.fromWei (this.safeString (response, 'committed'), decimals);
+        const total = this.fromWei (this.safeString (response, 'total'), decimals);
         return {
             'free': free,
             'used': used,
@@ -99165,7 +99104,7 @@ module.exports = class theocean extends Exchange {
             base = market['base'];
         }
         const baseDecimals = this.safeInteger (this.options['decimals'], base, 18);
-        const baseVolume = this.fromWei (this.safeString (ticker, 'volume'), 'ether', baseDecimals);
+        const baseVolume = this.fromWei (this.safeString (ticker, 'volume'), baseDecimals);
         const last = this.safeFloat (ticker, 'last');
         return {
             'symbol': symbol,
@@ -99272,7 +99211,7 @@ module.exports = class theocean extends Exchange {
             base = market['base'];
         }
         const baseDecimals = this.safeInteger (this.options['decimals'], base, 18);
-        const amount = this.fromWei (this.safeString (trade, 'amount'), 'ether', baseDecimals);
+        const amount = this.fromWei (this.safeString (trade, 'amount'), baseDecimals);
         let cost = undefined;
         if (amount !== undefined && price !== undefined) {
             cost = amount * price;
@@ -99357,7 +99296,7 @@ module.exports = class theocean extends Exchange {
             'baseTokenAddress': market['baseId'], // Base token address
             'quoteTokenAddress': market['quoteId'], // Quote token address
             'side': side, // "buy" or "sell"
-            'amount': this.toWei (this.amountToPrecision (symbol, amount), 'ether', baseDecimals), // Base token amount in wei
+            'amount': this.toWei (this.amountToPrecision (symbol, amount), baseDecimals), // Base token amount in wei
         };
         let method = undefined;
         if (type === 'limit') {
@@ -99443,13 +99382,13 @@ module.exports = class theocean extends Exchange {
         }
         const baseDecimals = this.safeInteger (this.options['decimals'], base, 18);
         const price = this.safeFloat (order, 'price');
-        const filledAmount = this.fromWei (this.safeString (order, 'filledAmount'), 'ether', baseDecimals);
-        const settledAmount = this.fromWei (this.safeString (order, 'settledAmount'), 'ether', baseDecimals);
-        const confirmedAmount = this.fromWei (this.safeString (order, 'confirmedAmount'), 'ether', baseDecimals);
-        const failedAmount = this.fromWei (this.safeString (order, 'failedAmount'), 'ether', baseDecimals);
-        const deadAmount = this.fromWei (this.safeString (order, 'deadAmount'), 'ether', baseDecimals);
-        const prunedAmount = this.fromWei (this.safeString (order, 'prunedAmount'), 'ether', baseDecimals);
-        const amount = this.fromWei (this.safeString (order, 'initialAmount'), 'ether', baseDecimals);
+        const filledAmount = this.fromWei (this.safeString (order, 'filledAmount'), baseDecimals);
+        const settledAmount = this.fromWei (this.safeString (order, 'settledAmount'), baseDecimals);
+        const confirmedAmount = this.fromWei (this.safeString (order, 'confirmedAmount'), baseDecimals);
+        const failedAmount = this.fromWei (this.safeString (order, 'failedAmount'), baseDecimals);
+        const deadAmount = this.fromWei (this.safeString (order, 'deadAmount'), baseDecimals);
+        const prunedAmount = this.fromWei (this.safeString (order, 'prunedAmount'), baseDecimals);
+        const amount = this.fromWei (this.safeString (order, 'initialAmount'), baseDecimals);
         const filled = this.sum (filledAmount, settledAmount, confirmedAmount);
         let remaining = undefined;
         let lastTradeTimestamp = undefined;
@@ -99509,7 +99448,7 @@ module.exports = class theocean extends Exchange {
             }
             const feeDecimals = this.safeInteger (this.options['decimals'], feeCurrency, 18);
             fee = {
-                'cost': this.fromWei (feeCost, 'ether', feeDecimals),
+                'cost': this.fromWei (feeCost, feeDecimals),
                 'currency': feeCurrency,
             };
         }
