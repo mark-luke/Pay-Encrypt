@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.2'
+const version = '1.31.3'
 
 Exchange.ccxtVersion = version
 
@@ -22181,6 +22181,7 @@ module.exports = class bitpanda extends Exchange {
             'version': 'v1',
             // new metainfo interface
             'has': {
+                'createDepositAddress': true,
                 'fetchBalance': true,
                 'fetchCurrencies': true,
                 'fetchMarkets': true,
@@ -22976,6 +22977,32 @@ module.exports = class bitpanda extends Exchange {
             result[code] = account;
         }
         return this.parseBalance (result);
+    }
+
+    async createDepositAddress (code, params = {}) {
+        await this.loadMarkets ();
+        const currency = this.currency (code);
+        const request = {
+            'currency': currency['id'],
+        };
+        const response = await this.privatePostAccountDepositCrypto (this.extend (request, params));
+        //
+        //     {
+        //         "address":"rBnNhk95FrdNisZtXcStzriFS8vEzz53DM",
+        //         "destination_tag":"865690307",
+        //         "enabled":true,
+        //         "is_smart_contract":false
+        //     }
+        //
+        const address = this.safeString (response, 'address');
+        const tag = this.safeString (response, 'destination_tag');
+        this.checkAddress (address);
+        return {
+            'currency': code,
+            'address': address,
+            'tag': tag,
+            'info': response,
+        };
     }
 
     handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
