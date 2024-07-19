@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.43'
+const version = '1.31.44'
 
 Exchange.ccxtVersion = version
 
@@ -81731,12 +81731,19 @@ module.exports = class lykke extends Exchange {
             'has': {
                 'CORS': false,
                 'fetchOHLCV': false,
-                'fetchTrades': true,
                 'fetchOpenOrders': true,
                 'fetchClosedOrders': true,
                 'fetchOrder': true,
                 'fetchOrders': true,
+                'fetchTrades': true,
                 'fetchMyTrades': true,
+                'createOrder': true,
+                'cancelOrder': true,
+                'cancelAllOrders': true,
+                'fetchBalance': true,
+                'fetchMarkets': true,
+                'fetchOrderBook': true,
+                'fetchTicker': true,
             },
             'timeframes': {
                 '1m': 'Minute',
@@ -81823,6 +81830,10 @@ module.exports = class lykke extends Exchange {
                         'Orders/v2/limit',
                         'Orders/stoplimit',
                         'Orders/bulk',
+                    ],
+                    'delete': [
+                        'Orders',
+                        'Orders/{id}',
                     ],
                 },
             },
@@ -81973,7 +81984,19 @@ module.exports = class lykke extends Exchange {
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
-        return await this.privatePostOrdersIdCancel ({ 'id': id });
+        const request = { 'id': id };
+        return await this.privateDeleteOrdersId (this.extend (request, params));
+    }
+
+    async cancelAllOrders (symbol = undefined, params = {}) {
+        await this.loadMarkets ();
+        const request = {};
+        let market = undefined;
+        if (symbol !== undefined) {
+            market = this.market (symbol);
+            request['assetPairId'] = market['id'];
+        }
+        return await this.privateDeleteOrders (this.extend (request, params));
     }
 
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
@@ -81989,11 +82012,42 @@ module.exports = class lykke extends Exchange {
         } else if (type === 'limit') {
             query['Price'] = price;
         }
-        const method = 'privatePostOrders' + this.capitalize (type);
+        const method = 'privatePostOrdersV2' + this.capitalize (type);
         const result = await this[method] (this.extend (query, params));
+        //
+        // market
+        //
+        //     {
+        //         "Price": 0
+        //     }
+        //
+        // limit
+        //
+        //     {
+        //         "Id":"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        //     }
+        //
+        const id = this.safeString (result, 'Id');
+        price = this.safeFloat (result, 'Price');
         return {
-            'id': undefined,
+            'id': id,
             'info': result,
+            'clientOrderId': undefined,
+            'timestamp': undefined,
+            'datetime': undefined,
+            'lastTradeTimestamp': undefined,
+            'symbol': symbol,
+            'type': type,
+            'side': side,
+            'price': price,
+            'amount': amount,
+            'cost': undefined,
+            'average': undefined,
+            'filled': undefined,
+            'remaining': undefined,
+            'status': undefined,
+            'fee': undefined,
+            'trades': undefined,
         };
     }
 
@@ -82262,7 +82316,7 @@ module.exports = class lykke extends Exchange {
                 url += '?' + this.urlencode (query);
             }
         } else if (api === 'private') {
-            if (method === 'GET') {
+            if ((method === 'GET') || (method === 'DELETE')) {
                 if (Object.keys (query).length) {
                     url += '?' + this.urlencode (query);
                 }
