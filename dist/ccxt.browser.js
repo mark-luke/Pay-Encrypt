@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1117'
+const version = '1.18.1119'
 
 Exchange.ccxtVersion = version
 
@@ -33322,7 +33322,7 @@ module.exports = class coinfloor extends Exchange {
             'limit': limit,
         };
         const response = await this.privatePostIdUserTransactions (this.extend (request, params));
-        return this.parseLedger (response, undefined, since, limit);
+        return this.parseLedger (response, undefined, since, undefined);
     }
 
     parseLedgerEntryStatus (status) {
@@ -63100,6 +63100,9 @@ module.exports = class lykke extends Exchange {
                         'BTC': 0,
                     },
                 },
+            },
+            'commonCurrencies': {
+                'XPD': 'Lykke XPD',
             },
         });
     }
