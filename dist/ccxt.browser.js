@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1218'
+const version = '1.18.1219'
 
 Exchange.ccxtVersion = version
 
@@ -6294,7 +6294,12 @@ class TimedOut extends Error {
 /*  ------------------------------------------------------------------------ */
 
 const iso8601 = (timestamp) => {
-    const _timestampNumber = parseInt (timestamp, 10);
+    let _timestampNumber;
+    if (typeof timestamp === 'number') {
+        _timestampNumber = Math.floor (timestamp);
+    } else {
+        _timestampNumber = parseInt (timestamp, 10);
+    }
 
     // undefined, null and lots of nasty non-numeric values yield NaN
     if (Number.isNaN (_timestampNumber) || _timestampNumber < 0) {
