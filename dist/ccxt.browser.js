@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.45'
+const version = '1.31.46'
 
 Exchange.ccxtVersion = version
 
@@ -113930,6 +113930,7 @@ module.exports = class stex extends Exchange {
                 'fetchMarkets': true,
                 'fetchTicker': true,
                 'fetchTickers': true,
+                'fetchTime': true,
                 'fetchOrderBook': true,
                 'fetchOHLCV': true,
                 'fetchBalance': true,
@@ -114316,6 +114317,26 @@ module.exports = class stex extends Exchange {
         //
         const ticker = this.safeValue (response, 'data', {});
         return this.parseTicker (ticker, market);
+    }
+
+    async fetchTime (params = {}) {
+        const response = await this.publicGetPing (params);
+        //
+        //     {
+        //         "success": true,
+        //         "data": {
+        //             "server_datetime": {
+        //                 "date": "2019-01-22 15:13:34.233796",
+        //                 "timezone_type": 3,
+        //                 "timezone": "UTC"
+        //             },
+        //             "server_timestamp": 1548170014
+        //         }
+        //     }
+        //
+        const data = this.safeValue (response, 'data', {});
+        const serverDatetime = this.safeValue (data, 'server_datetime', {});
+        return this.parse8601 (this.safeString (serverDatetime, 'date'));
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
