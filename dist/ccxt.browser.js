@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.33'
+const version = '1.20.34'
 
 Exchange.ccxtVersion = version
 
@@ -31752,18 +31752,9 @@ module.exports = class bytetrade extends Exchange {
                 },
                 'fee': undefined,
                 'limits': {
-                    'amount': {
-                        'min': undefined,
-                        'max': undefined,
-                    },
-                    'price': {
-                        'min': undefined,
-                        'max': undefined,
-                    },
-                    'cost': {
-                        'min': undefined,
-                        'max': undefined,
-                    },
+                    'amount': { 'min': undefined, 'max': undefined },
+                    'price': { 'min': undefined, 'max': undefined },
+                    'cost': { 'min': undefined, 'max': undefined },
                     'deposit': {
                         'min': this.safeFloat (deposit, 'min'),
                         'max': maxDeposit,
@@ -31796,14 +31787,10 @@ module.exports = class bytetrade extends Exchange {
                 quote = this.commonCurrencies[quoteId];
             }
             const symbol = base + '/' + quote;
-            const amountMin = this.safeFloat (market['limits']['amount'], 'min');
-            const amountMax = this.safeFloat (market['limits']['amount'], 'max');
-            const priceMin = this.safeFloat (market['limits']['price'], 'min');
-            const priceMax = this.safeFloat (market['limits']['price'], 'max');
-            const precision = {
-                'amount': this.safeInteger (market['precision'], 'amount'),
-                'price': this.safeInteger (market['precision'], 'price'),
-            };
+            const limits = this.safeValue (market, 'limits', {});
+            const amount = this.safeValue (limits, 'amount', {});
+            const price = this.safeValue (limits, 'price', {});
+            const precision = this.safeValue (market, 'precision', {});
             const active = this.safeString (market, 'active');
             const normalBase = base.split ('@')[0];
             const normalQuote = quote.split ('@')[0];
@@ -31817,16 +31804,19 @@ module.exports = class bytetrade extends Exchange {
                 'quoteId': quoteId,
                 'info': market,
                 'active': active,
-                'precision': precision,
+                'precision': {
+                    'amount': this.safeInteger (precision, 'amount'),
+                    'price': this.safeInteger (precision, 'price'),
+                },
                 'normalSymbol': normalSymbol,
                 'limits': {
                     'amount': {
-                        'min': amountMin,
-                        'max': amountMax,
+                        'min': this.safeFloat (amount, 'min'),
+                        'max': this.safeFloat (amount, 'max'),
                     },
                     'price': {
-                        'min': priceMin,
-                        'max': priceMax,
+                        'min': this.safeFloat (price, 'min'),
+                        'max': this.safeFloat (price, 'max'),
                     },
                     'cost': {
                         'min': undefined,
