@@ -28,7 +28,7 @@ index = 4  # use close price from each ohlcv candle
 
 def print_chart(exchange, symbol, timeframe):
 
-    print("\n" + exchange.name + ' ' + timeframe + ' chart:')
+    print("\n" + exchange.name + ' ' + symbol + ' ' + timeframe + ' chart:')
 
     # get a list of ohlcv candles
     ohlcv = exchange.fetch_ohlcv(symbol, timeframe)
