@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.98'
+const version = '1.20.99'
 
 Exchange.ccxtVersion = version
 
@@ -77192,10 +77192,11 @@ module.exports = class poloniex extends Exchange {
         await this.loadMarkets ();
         const method = 'privatePost' + this.capitalize (side);
         const market = this.market (symbol);
+        amount = this.amountToPrecision (symbol, amount);
         const request = {
             'currencyPair': market['id'],
             'rate': this.priceToPrecision (symbol, price),
-            'amount': this.amountToPrecision (symbol, amount),
+            'amount': amount,
         };
         // remember the timestamp before issuing the request
         const timestamp = this.milliseconds ();
