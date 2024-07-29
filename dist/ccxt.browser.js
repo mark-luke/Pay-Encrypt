@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1085'
+const version = '1.18.1086'
 
 Exchange.ccxtVersion = version
 
@@ -4596,6 +4596,8 @@ const NO_PADDING    = 0             // zero-padding mode
 const precisionConstants = {
     ROUND,
     TRUNCATE,
+    ROUND_UP,
+    ROUND_DOWN,
     DECIMAL_PLACES,
     SIGNIFICANT_DIGITS,
     TICK_SIZE,
