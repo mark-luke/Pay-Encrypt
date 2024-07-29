@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.74'
+const version = '1.19.75'
 
 Exchange.ccxtVersion = version
 
@@ -58984,7 +58984,7 @@ module.exports = class huobipro extends Exchange {
             url += this.version;
         }
         url += '/' + this.implodeParams (path, params);
-        let query = this.omit (params, this.extractParams (path));
+        const query = this.omit (params, this.extractParams (path));
         if (api === 'private') {
             this.checkRequiredCredentials ();
             const timestamp = this.ymdhms (this.milliseconds (), 'T');
@@ -58995,7 +58995,7 @@ module.exports = class huobipro extends Exchange {
                 'Timestamp': timestamp,
             };
             if (method !== 'POST') {
-                query = this.extend (request, query);
+                request = this.extend (request, query);
             }
             request = this.keysort (request);
             let auth = this.urlencode (request);
