@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.78'
+const version = '1.30.79'
 
 Exchange.ccxtVersion = version
 
@@ -24337,7 +24337,7 @@ module.exports = class bittrex extends Exchange {
             },
             'hostname': 'bittrex.com',
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27766352-cf0b3c26-5ed5-11e7-82b7-f3826b7a97d8.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87153921-edf53180-c2c0-11ea-96b9-f2a9a95a455b.jpg',
                 'api': {
                     'public': 'https://{hostname}/api',
                     'account': 'https://{hostname}/api',
@@ -32451,7 +32451,7 @@ module.exports = class btcturk extends Exchange {
                 '1d': '1d',
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27992709-18e15646-64a3-11e7-9fa2-b0950ec7712f.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87153926-efbef500-c2c0-11ea-9842-05b63612c4b9.jpg',
                 'api': 'https://www.btcturk.com/api',
                 'www': 'https://www.btcturk.com',
                 'doc': 'https://github.com/BTCTrader/broker-api-docs',
@@ -44134,7 +44134,7 @@ module.exports = class coinfloor extends Exchange {
                 'fetchOpenOrders': true,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/28246081-623fc164-6a1c-11e7-913f-bac0d5576c90.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87153925-ef265e80-c2c0-11ea-91b5-020c804b90e0.jpg',
                 'api': 'https://webapi.coinfloor.co.uk/bist',
                 'www': 'https://www.coinfloor.co.uk',
                 'doc': [
@@ -75276,7 +75276,7 @@ module.exports = class kuna extends acx {
             'timeframes': undefined,
             'urls': {
                 'referral': 'https://kuna.io?r=kunaid-gvfihe8az7o4',
-                'logo': 'https://user-images.githubusercontent.com/1294454/31697638-912824fa-b3c1-11e7-8c36-cf9606eb94ac.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87153927-f0578b80-c2c0-11ea-84b6-74612568e9e1.jpg',
                 'api': 'https://kuna.io',
                 'www': 'https://kuna.io',
                 'doc': 'https://kuna.io/documents/api',
@@ -85263,7 +85263,7 @@ module.exports = class paymium extends Exchange {
                 'cancelOrder': true,
             },
             'urls': {
-                'logo': 'https://user-images.githubusercontent.com/1294454/27790564-a945a9d4-5ff9-11e7-9d2d-b635763f2f24.jpg',
+                'logo': 'https://user-images.githubusercontent.com/51840849/87153930-f0f02200-c2c0-11ea-9c0a-40337375ae89.jpg',
                 'api': 'https://paymium.com/api',
                 'www': 'https://www.paymium.com',
                 'fees': 'https://www.paymium.com/page/help/fees',
