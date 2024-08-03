@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.54'
+const version = '1.21.55'
 
 Exchange.ccxtVersion = version
 
@@ -22700,6 +22700,8 @@ module.exports = class bittrex extends Exchange {
                 'v2': {
                     'get': [
                         'currencies/GetBTCPrice',
+                        'currencies/GetWalletHealth',
+                        'general/GetLatestAlert',
                         'market/GetTicks',
                         'market/GetLatestTick',
                         'Markets/GetMarketSummaries',
