@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.24.74'
+const version = '1.24.75'
 
 Exchange.ccxtVersion = version
 
@@ -54562,7 +54562,10 @@ module.exports = class ftx extends Exchange {
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/67149189-df896480-f2b0-11e9-8816-41593e17f9ec.jpg',
                 'www': 'https://ftx.com',
-                'api': 'https://ftx.com',
+                'api': {
+                    'public': 'https://ftx.com',
+                    'private': 'https://ftx.com',
+                },
                 'doc': 'https://github.com/ftexchange/ftx',
                 'fees': 'https://ftexchange.zendesk.com/hc/en-us/articles/360024479432-Fees',
                 'referral': 'https://ftx.com/#a=1623029',
@@ -55879,7 +55882,7 @@ module.exports = class ftx extends Exchange {
     sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
         let request = '/api/' + this.implodeParams (path, params);
         const query = this.omit (params, this.extractParams (path));
-        let url = this.urls['api'] + request;
+        let url = this.urls['api'][api] + request;
         if (method !== 'POST') {
             if (Object.keys (query).length) {
                 const suffix = '?' + this.urlencode (query);
