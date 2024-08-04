@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1269'
+const version = '1.18.1270'
 
 Exchange.ccxtVersion = version
 
@@ -54495,8 +54495,8 @@ module.exports = class ice3x extends Exchange {
             },
             'fees': {
                 'trading': {
-                    'maker': 0.01,
-                    'taker': 0.01,
+                    'maker': 0.005,
+                    'taker': 0.005,
                 },
             },
             'precision': {
