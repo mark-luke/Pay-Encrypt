@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.72'
+const version = '1.21.73'
 
 Exchange.ccxtVersion = version
 
@@ -3671,6 +3671,7 @@ module.exports = class Exchange {
                 'fetchOrderBook': true,
                 'fetchOrderBooks': false,
                 'fetchOrders': false,
+                'fetchOrderTrades': false,
                 'fetchStatus': 'emulated',
                 'fetchTicker': true,
                 'fetchTickers': false,
