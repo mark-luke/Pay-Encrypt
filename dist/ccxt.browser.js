@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.29'
+const version = '1.28.30'
 
 Exchange.ccxtVersion = version
 
@@ -10387,8 +10387,16 @@ module.exports = class binance extends Exchange {
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
         await this.loadMarkets ();
         const market = this.market (symbol);
+        const defaultType = this.safeString2 (this.options, 'createOrder', 'defaultType', market['type']);
+        const orderType = this.safeString (params, 'type', defaultType);
+        params = this.omit (params, 'type');
+        let method = 'privatePostOrder';
+        if (orderType === 'future') {
+            method = 'fapiPrivatePostOrder';
+        } else if (orderType === 'margin') {
+            method = 'sapiPostMarginOrder';
+        }
         // the next 5 lines are added to support for testing orders
-        let method = market['spot'] ? 'privatePostOrder' : 'fapiPrivatePostOrder';
         if (market['spot']) {
             const test = this.safeValue (params, 'test', false);
             if (test) {
