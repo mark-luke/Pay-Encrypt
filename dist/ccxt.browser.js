@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.28'
+const version = '1.21.29'
 
 Exchange.ccxtVersion = version
 
@@ -3899,7 +3899,9 @@ module.exports = class Exchange {
     }
 
     checkRequiredCredentials (error = true) {
-        Object.keys (this.requiredCredentials).forEach ((key) => {
+        const keys = Object.keys (this.requiredCredentials)
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i]
             if (this.requiredCredentials[key] && !this[key]) {
                 if (error) {
                     throw new AuthenticationError (this.id + ' requires `' + key + '` credential')
@@ -3907,7 +3909,7 @@ module.exports = class Exchange {
                     return error
                 }
             }
-        })
+        }
         return true
     }
 
