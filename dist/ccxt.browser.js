@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.64'
+const version = '1.35.65'
 
 Exchange.ccxtVersion = version
 
@@ -15578,16 +15578,8 @@ module.exports = class bitflyer extends Exchange {
         const status = this.parseOrderStatus (this.safeString (order, 'child_order_state'));
         const type = this.safeStringLower (order, 'child_order_type');
         const side = this.safeStringLower (order, 'side');
-        let symbol = undefined;
-        if (market === undefined) {
-            const marketId = this.safeString (order, 'product_code');
-            if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[marketId];
-            }
-        }
-        if (market !== undefined) {
-            symbol = market['symbol'];
-        }
+        const marketId = this.safeString (order, 'product_code');
+        const symbol = this.safeSymbol (marketId, market);
         let fee = undefined;
         const feeCost = this.safeFloat (order, 'total_commission');
         if (feeCost !== undefined) {
