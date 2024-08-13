@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.70'
+const version = '1.22.71'
 
 Exchange.ccxtVersion = version
 
@@ -274,6 +274,7 @@ module.exports = class _1btcxe extends Exchange {
     }
 
     async fetchBalance (params = {}) {
+        await this.loadMarkets ();
         const response = await this.privatePostBalancesAndInfo (params);
         const balance = response['balances-and-info'];
         const result = { 'info': balance };
@@ -291,6 +292,7 @@ module.exports = class _1btcxe extends Exchange {
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
+        await this.loadMarkets ();
         const request = {
             'currency': this.marketId (symbol),
         };
@@ -299,6 +301,7 @@ module.exports = class _1btcxe extends Exchange {
     }
 
     async fetchTicker (symbol, params = {}) {
+        await this.loadMarkets ();
         const request = {
             'currency': this.marketId (symbol),
         };
@@ -341,6 +344,7 @@ module.exports = class _1btcxe extends Exchange {
     }
 
     async fetchOHLCV (symbol, timeframe = '1d', since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
         const market = this.market (symbol);
         const response = await this.publicGetHistoricalPrices (this.extend ({
             'currency': market['id'],
@@ -385,6 +389,7 @@ module.exports = class _1btcxe extends Exchange {
     }
 
     async fetchTrades (symbol, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
         const market = this.market (symbol);
         const request = {
             'currency': market['id'],
@@ -398,6 +403,7 @@ module.exports = class _1btcxe extends Exchange {
     }
 
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
+        await this.loadMarkets ();
         const request = {
             'side': side,
             'type': type,
@@ -415,6 +421,7 @@ module.exports = class _1btcxe extends Exchange {
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
+        await this.loadMarkets ();
         const request = {
             'id': id,
         };
@@ -971,7 +978,7 @@ module.exports = class adara extends Exchange {
             'certified': false,
             // new metainfo interface
             'has': {
-                'CORS': true,
+                'CORS': false,
                 'fetchCurrencies': true,
                 'fetchOrderBooks': false,
                 'createMarketOrder': false,
@@ -14605,7 +14612,7 @@ module.exports = class bitfinex2 extends bitfinex {
             'certified': false,
             // new metainfo interface
             'has': {
-                'CORS': true,
+                'CORS': false,
                 'createLimitOrder': false,
                 'createMarketOrder': false,
                 'createOrder': false,
@@ -20627,7 +20634,7 @@ module.exports = class bitso extends Exchange {
             'rateLimit': 2000, // 30 requests per minute
             'version': 'v3',
             'has': {
-                'CORS': true,
+                'CORS': false,
                 'fetchMyTrades': true,
                 'fetchOpenOrders': true,
                 'fetchOrder': true,
@@ -22637,7 +22644,7 @@ module.exports = class bittrex extends Exchange {
             'certified': true,
             // new metainfo interface
             'has': {
-                'CORS': true,
+                'CORS': false,
                 'createMarketOrder': false,
                 'fetchDepositAddress': true,
                 'fetchClosedOrders': true,
@@ -27862,7 +27869,7 @@ module.exports = class btcchina extends Exchange {
             'rateLimit': 1500,
             'version': 'v1',
             'has': {
-                'CORS': true,
+                'CORS': false,
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/27766368-465b3286-5ed6-11e7-9a11-0f6467e1d82b.jpg',
@@ -29061,7 +29068,7 @@ module.exports = class btctradeua extends Exchange {
             'countries': [ 'UA' ], // Ukraine,
             'rateLimit': 3000,
             'has': {
-                'CORS': true,
+                'CORS': false,
                 'createMarketOrder': false,
                 'fetchOpenOrders': true,
             },
@@ -33108,7 +33115,7 @@ module.exports = class cex extends Exchange {
             'countries': [ 'GB', 'EU', 'CY', 'RU' ],
             'rateLimit': 1500,
             'has': {
-                'CORS': true,
+                'CORS': false,
                 'fetchCurrencies': true,
                 'fetchTickers': true,
                 'fetchOHLCV': true,
@@ -50188,7 +50195,7 @@ module.exports = class flowbtc extends Exchange {
             'version': 'v1',
             'rateLimit': 1000,
             'has': {
-                'CORS': true,
+                'CORS': false,
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/28162465-cd815d4c-67cf-11e7-8e57-438bea0523a2.jpg',
@@ -54837,7 +54844,7 @@ module.exports = class hitbtc2 extends hitbtc {
             'has': {
                 'createDepositAddress': true,
                 'fetchDepositAddress': true,
-                'CORS': true,
+                'CORS': false,
                 'editOrder': true,
                 'fetchCurrencies': true,
                 'fetchOHLCV': true,
@@ -100441,7 +100448,7 @@ module.exports = class tidebit extends Exchange {
             'version': 'v2',
             'has': {
                 'fetchDepositAddress': true,
-                'CORS': true,
+                'CORS': false,
                 'fetchTickers': true,
                 'fetchOHLCV': true,
                 'withdraw': true,
