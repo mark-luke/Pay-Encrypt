@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.73'
+const version = '1.33.74'
 
 Exchange.ccxtVersion = version
 
@@ -1097,12 +1097,8 @@ module.exports = class aofex extends Exchange {
         const baseVolume = this.safeFloat (ticker, 'amount');
         const quoteVolume = this.safeFloat (ticker, 'vol');
         let vwap = undefined;
-        if (quoteVolume !== undefined) {
-            if (baseVolume !== undefined) {
-                if (baseVolume > 0) {
-                    vwap = parseFloat (this.priceToPrecision (symbol, quoteVolume / baseVolume));
-                }
-            }
+        if ((baseVolume !== undefined) && (quoteVolume !== undefined) && (baseVolume > 0)) {
+            vwap = parseFloat (this.priceToPrecision (symbol, quoteVolume / baseVolume));
         }
         return {
             'symbol': symbol,
@@ -17353,7 +17349,7 @@ module.exports = class bitget extends Exchange {
         const baseVolume = this.safeFloat2 (ticker, 'amount', 'volume_24h');
         const quoteVolume = this.safeFloat (ticker, 'vol');
         let vwap = undefined;
-        if ((baseVolume !== undefined) && (quoteVolume !== undefined)) {
+        if ((baseVolume !== undefined) && (quoteVolume !== undefined) && (baseVolume > 0)) {
             vwap = quoteVolume / baseVolume;
         }
         let change = undefined;
@@ -19356,7 +19352,7 @@ module.exports = class bithumb extends Exchange {
         const baseVolume = this.safeFloat (ticker, 'units_traded_24H');
         const quoteVolume = this.safeFloat (ticker, 'acc_trade_value_24H');
         let vwap = undefined;
-        if (quoteVolume !== undefined && baseVolume !== undefined) {
+        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume > 0)) {
             vwap = quoteVolume / baseVolume;
         }
         return {
@@ -39577,7 +39573,7 @@ module.exports = class bybit extends Exchange {
         const baseVolume = this.safeFloat (ticker, 'turnover_24h');
         const quoteVolume = this.safeFloat (ticker, 'volume_24h');
         let vwap = undefined;
-        if (quoteVolume !== undefined && baseVolume !== undefined) {
+        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume > 0)) {
             vwap = quoteVolume / baseVolume;
         }
         return {
@@ -59417,7 +59413,7 @@ module.exports = class eterbase extends Exchange {
         const baseVolume = this.safeFloat (ticker, 'volumeBase');
         const quoteVolume = this.safeFloat (ticker, 'volume');
         let vwap = undefined;
-        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && baseVolume) {
+        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume > 0)) {
             vwap = quoteVolume / baseVolume;
         }
         const percentage = this.safeFloat (ticker, 'change');
@@ -66703,7 +66699,7 @@ module.exports = class gemini extends Exchange {
         const baseVolume = this.safeFloat (volume, baseId);
         const quoteVolume = this.safeFloat (volume, quoteId);
         let vwap = undefined;
-        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume !== 0)) {
+        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume > 0)) {
             vwap = quoteVolume / baseVolume;
         }
         return {
@@ -68808,7 +68804,7 @@ module.exports = class hbtc extends Exchange {
         const quoteVolume = this.safeFloat (ticker, 'quoteVolume');
         const baseVolume = this.safeFloat (ticker, 'volume');
         let vwap = undefined;
-        if (baseVolume !== undefined && quoteVolume !== undefined && baseVolume > 0) {
+        if ((baseVolume !== undefined) && (quoteVolume !== undefined) && (baseVolume > 0)) {
             vwap = quoteVolume / baseVolume;
         }
         return {
