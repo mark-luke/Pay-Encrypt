@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.65'
+const version = '1.22.66'
 
 Exchange.ccxtVersion = version
 
@@ -33083,7 +33083,7 @@ module.exports = class bytetrade extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, NullResponse, InvalidOrder, NotSupported, InsufficientFunds, InvalidNonce, OrderNotFound, RateLimitExceeded } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, AuthenticationError, NullResponse, InvalidOrder, NotSupported, InsufficientFunds, InvalidNonce, OrderNotFound, RateLimitExceeded } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -33206,6 +33206,8 @@ module.exports = class cex extends Exchange {
                     'Invalid Order': InvalidOrder,
                     'Order not found': OrderNotFound,
                     'Rate limit exceeded': RateLimitExceeded,
+                    'Invalid API key': AuthenticationError,
+                    'There was an error while placing your order': InvalidOrder,
                 },
             },
             'options': {
