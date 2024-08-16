@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.93'
+const version = '1.28.94'
 
 Exchange.ccxtVersion = version
 
@@ -3584,6 +3584,7 @@ module.exports = class Exchange {
         this.trades       = {}
         this.transactions = {}
         this.ohlcvs       = {}
+        this.myTrades     = undefined
 
         this.requiresWeb3 = false
         this.precision = {}
