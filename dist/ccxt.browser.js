@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1187'
+const version = '1.18.1188'
 
 Exchange.ccxtVersion = version
 
@@ -55120,7 +55120,7 @@ module.exports = class idex extends Exchange {
         if (symbol === undefined && market !== undefined) {
             symbol = market['symbol'];
         }
-        const id = this.safeString (order, 'orderHash');
+        const id = this.safeString (order, 'orderNumber');
         const status = this.parseOrderStatus (this.safeString (order, 'status'));
         return {
             'info': order,
