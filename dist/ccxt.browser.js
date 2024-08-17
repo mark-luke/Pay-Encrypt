@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.46'
+const version = '1.28.64'
 
 Exchange.ccxtVersion = version
 
@@ -10391,7 +10391,8 @@ module.exports = class binance extends Exchange {
         const market = this.market (symbol);
         const defaultType = this.safeString2 (this.options, 'createOrder', 'defaultType', market['type']);
         const orderType = this.safeString (params, 'type', defaultType);
-        params = this.omit (params, 'type');
+        const clientOrderId = this.safeString2 (params, 'newClientOrderId', 'clientOrderId');
+        params = this.omit (params, [ 'type', 'newClientOrderId', 'clientOrderId' ]);
         let method = 'privatePostOrder';
         if (orderType === 'future') {
             method = 'fapiPrivatePostOrder';
@@ -10416,6 +10417,9 @@ module.exports = class binance extends Exchange {
             'type': uppercaseType,
             'side': side.toUpperCase (),
         };
+        if (clientOrderId !== undefined) {
+            request['newClientOrderId'] = clientOrderId;
+        }
         const quoteOrderQty = this.safeValue (this.options, 'quoteOrderQty', false);
         if (uppercaseType === 'MARKET' && quoteOrderQty) {
             const quoteOrderQty = this.safeFloat (params, 'quoteOrderQty');
@@ -10496,13 +10500,13 @@ module.exports = class binance extends Exchange {
         const request = {
             'symbol': market['id'],
         };
-        const origClientOrderId = this.safeValue (params, 'origClientOrderId');
-        if (origClientOrderId !== undefined) {
-            request['origClientOrderId'] = origClientOrderId;
+        const clientOrderId = this.safeValue2 (params, 'origClientOrderId', 'clientOrderId');
+        if (clientOrderId !== undefined) {
+            request['origClientOrderId'] = clientOrderId;
         } else {
             request['orderId'] = parseInt (id);
         }
-        const query = this.omit (params, 'type');
+        const query = this.omit (params, [ 'type', 'clientOrderId', 'origClientOrderId' ]);
         const response = await this[method] (this.extend (request, query));
         return this.parseOrder (response, market);
     }
@@ -10602,7 +10606,7 @@ module.exports = class binance extends Exchange {
             query = this.omit (params, 'type');
         }
         let method = 'privateGetOpenOrders';
-        if (type === 'futures') {
+        if (type === 'future') {
             method = 'fapiPrivateGetOpenOrders';
         } else if (type === 'margin') {
             method = 'sapiGetMarginOpenOrders';
@@ -15652,6 +15656,11 @@ module.exports = class bitfinex2 extends bitfinex {
         if (type !== 'market') {
             request['price'] = this.numberToString (price);
         }
+        const clientOrderId = this.safeValue2 (params, 'cid', 'clientOrderId');
+        if (clientOrderId !== undefined) {
+            request['cid'] = clientOrderId;
+            params = this.omit (params, [ 'cid', 'clientOrderId' ]);
+        }
         const response = await this.privatePostAuthWOrderSubmit (this.extend (request, params));
         //
         //     [
@@ -15721,17 +15730,18 @@ module.exports = class bitfinex2 extends bitfinex {
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
-        const cid = this.safeValue (params, 'cid'); // client order id
+        const cid = this.safeValue2 (params, 'cid', 'clientOrderId'); // client order id
         let request = undefined;
         if (cid !== undefined) {
             const cidDate = this.safeValue (params, 'cidDate'); // client order id date
             if (cidDate === undefined) {
-                throw new InvalidOrder (this.id + " canceling an order by client order id ('cid') requires both 'cid' and 'cid_date' ('YYYY-MM-DD')");
+                throw new InvalidOrder (this.id + " canceling an order by clientOrderId ('cid') requires both 'cid' and 'cid_date' ('YYYY-MM-DD')");
             }
             request = {
                 'cid': cid,
                 'cid_date': cidDate,
             };
+            params = this.omit (params, [ 'cid', 'clientOrderId' ]);
         } else {
             request = {
                 'id': parseInt (id),
@@ -21390,6 +21400,11 @@ module.exports = class bitmex extends Exchange {
         if (price !== undefined) {
             request['price'] = price;
         }
+        const clientOrderId = this.safeString2 (params, 'clOrdID', 'clientOrderId');
+        if (clientOrderId !== undefined) {
+            request['clOrdID'] = clientOrderId;
+            params = this.omit (params, [ 'clOrdID', 'clientOrderId' ]);
+        }
         const response = await this.privatePostOrder (this.extend (request, params));
         const order = this.parseOrder (response);
         const id = this.safeString (order, 'id');
@@ -21399,9 +21414,16 @@ module.exports = class bitmex extends Exchange {
 
     async editOrder (id, symbol, type, side, amount = undefined, price = undefined, params = {}) {
         await this.loadMarkets ();
-        const request = {
-            'orderID': id,
-        };
+        const request = {};
+        const origClOrdID = this.safeString2 (params, 'origClOrdID', 'clientOrderId');
+        if (origClOrdID !== undefined) {
+            request['origClOrdID'] = origClOrdID;
+            const clientOrderId = this.safeString (params, 'clOrdID', 'clientOrderId');
+            if (clientOrderId !== undefined) {
+                request['clOrdID'] = clientOrderId;
+            }
+            params = this.omit (params, [ 'origClOrdID', 'clOrdID', 'clientOrderId' ]);
+        }
         if (amount !== undefined) {
             request['orderQty'] = amount;
         }
@@ -21417,15 +21439,16 @@ module.exports = class bitmex extends Exchange {
     async cancelOrder (id, symbol = undefined, params = {}) {
         await this.loadMarkets ();
         // https://github.com/ccxt/ccxt/issues/6507
-        const clOrdID = this.safeValue (params, 'clOrdID');
+        const clientOrderId = this.safeString2 (params, 'clOrdID', 'clientOrderId');
         const request = {};
-        if (clOrdID === undefined) {
+        if (clientOrderId === undefined) {
             request['orderID'] = id;
         } else {
-            request['clOrdID'] = clOrdID;
+            request['clOrdID'] = clientOrderId;
+            params = this.omit (params, [ 'clOrdID', 'clientOrderId' ]);
         }
         const response = await this.privateDeleteOrder (this.extend (request, params));
-        let order = response[0];
+        let order = this.safeValue (response, 0, {});
         const error = this.safeString (order, 'error');
         if (error !== undefined) {
             if (error.indexOf ('Unable to cancel order due to existing state') >= 0) {
@@ -50786,7 +50809,7 @@ module.exports = class eterbase extends Exchange {
         return this.deepExtend (super.describe (), {
             'id': 'eterbase',
             'name': 'Eterbase',
-            'countries': [ 'SK' ],
+            'countries': [ 'SK' ], // Slovakia
             'rateLimit': 500,
             'version': 'v1',
             'certified': true,
@@ -50826,7 +50849,6 @@ module.exports = class eterbase extends Exchange {
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/82067900-faeb0f80-96d9-11ea-9f22-0071cfcb9871.jpg',
-                'base': 'https://api.eterbase.exchange',
                 'api': 'https://api.eterbase.exchange',
                 'www': 'https://www.eterbase.com',
                 'doc': 'https://developers.eterbase.exchange',
@@ -50940,12 +50962,6 @@ module.exports = class eterbase extends Exchange {
             result.push (market);
         }
         return result;
-    }
-
-    findMarket (id) {
-        // need to pass identifier as string
-        const idString = id.toString ();
-        return super.findMarket (idString);
     }
 
     parseMarket (market) {
@@ -51125,7 +51141,7 @@ module.exports = class eterbase extends Exchange {
         //         "high":0.0,
         //     }
         //
-        const marketId = this.safeInteger (ticker, 'marketId');
+        const marketId = this.safeString (ticker, 'marketId');
         if (marketId in this.markets_by_id) {
             market = this.markets_by_id[marketId];
         }
@@ -51895,15 +51911,13 @@ module.exports = class eterbase extends Exchange {
             const hasBody = (method === 'POST') || (method === 'PUT') || (method === 'PATCH');
             // const date = 'Mon, 30 Sep 2019 13:57:23 GMT';
             const date = this.rfc2616 (this.milliseconds ());
-            const urlBaselength = this.urls['base'].length - 0;
-            const urlPath = url.slice (urlBaselength);
             let headersCSV = 'date' + ' ' + 'request-line';
-            let message = 'date' + ':' + ' ' + date + "\n" + method + ' ' + urlPath + ' HTTP/1.1'; // eslint-disable-line quotes
+            let message = 'date' + ':' + ' ' + date + "\n" + method + ' ' + request + ' HTTP/1.1'; // eslint-disable-line quotes
             let digest = '';
             if (hasBody) {
                 digest = 'SHA-256=' + this.hash (payload, 'sha256', 'base64');
-                message = message + "\ndigest" + ':' + ' ' + digest;  // eslint-disable-line quotes
-                headersCSV = headersCSV + ' ' + 'digest';
+                message += "\ndigest" + ':' + ' ' + digest;  // eslint-disable-line quotes
+                headersCSV += ' ' + 'digest';
             }
             const signature64 = this.hmac (this.encode (message), this.encode (this.secret), 'sha256', 'base64');
             const signature = this.decode (signature64);
@@ -51914,7 +51928,7 @@ module.exports = class eterbase extends Exchange {
                 'Content-Type': 'application/json',
             };
             if (hasBody) {
-                httpHeaders = this.extend (httpHeaders, { 'Digest': digest });
+                httpHeaders['Digest'] = digest;
             }
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': httpHeaders };
@@ -52258,6 +52272,7 @@ module.exports = class exmo extends Exchange {
                                     { 'prov': 'XMR', 'dep': '0%', 'wd': '0.001 XMR' },
                                     { 'prov': 'XRP', 'dep': '0%', 'wd': '0.02 XRP' },
                                     { 'prov': 'ETC', 'dep': '0%', 'wd': '0.01 ETC' },
+                                    { 'prov': 'BCH', 'dep': '0%', 'wd': '0.001 BCH' },
                                     { 'prov': 'BTG', 'dep': '0%', 'wd': '0.001 BTG' },
                                     { 'prov': 'EOS', 'dep': '0%', 'wd': '0.05 EOS' },
                                     { 'prov': 'XLM', 'dep': '0%', 'wd': '0.01 XLM' },
@@ -56242,6 +56257,11 @@ module.exports = class ftx extends Exchange {
             // 'postOnly': false, // optional, default is false, limit or market orders only
             // 'clientId': 'abcdef0123456789', // string, optional, client order id, limit or market orders only
         };
+        const clientOrderId = this.safeString (params, [ 'clientId', 'clientOrderId' ]);
+        if (clientOrderId !== undefined) {
+            params['clientId'] = clientOrderId;
+            params = this.omit (params, [ 'clientId', 'clientOrderId' ]);
+        }
         let priceToPrecision = undefined;
         if (price !== undefined) {
             priceToPrecision = parseFloat (this.priceToPrecision (symbol, price));
@@ -56328,10 +56348,17 @@ module.exports = class ftx extends Exchange {
         const defaultMethod = this.safeString (options, 'method', 'privateDeleteOrdersOrderId');
         let method = this.safeString (params, 'method', defaultMethod);
         const type = this.safeValue (params, 'type');
-        if ((type === 'stop') || (type === 'trailingStop') || (type === 'takeProfit')) {
-            method = 'privateDeleteConditionalOrdersOrderId';
+        const clientOrderId = this.safeValue2 (params, 'client_order_id', 'clientOrderId');
+        if (clientOrderId === undefined) {
+            request['order_id'] = parseInt (id);
+            if ((type === 'stop') || (type === 'trailingStop') || (type === 'takeProfit')) {
+                method = 'privateDeleteConditionalOrdersOrderId';
+            }
+        } else {
+            request['client_order_id'] = clientOrderId;
+            method = 'privateDeleteOrdersByClientIdClientOrderId';
         }
-        const query = this.omit (params, [ 'method', 'type' ]);
+        const query = this.omit (params, [ 'method', 'type', 'client_order_id', 'clientOrderId' ]);
         const response = await this[method] (this.extend (request, query));
         //
         //     {
@@ -56368,10 +56395,17 @@ module.exports = class ftx extends Exchange {
 
     async fetchOrder (id, symbol = undefined, params = {}) {
         await this.loadMarkets ();
-        const request = {
-            'order_id': id,
-        };
-        const response = await this.privateGetOrdersOrderId (this.extend (request, params));
+        const request = {};
+        const clientOrderId = this.safeValue2 (params, 'client_order_id', 'clientOrderId');
+        let method = 'privateGetOrdersOrderId';
+        if (clientOrderId === undefined) {
+            request['order_id'] = id;
+        } else {
+            request['client_order_id'] = clientOrderId;
+            params = this.omit (params, [ 'client_order_id', 'clientOrderId']);
+            method = 'privateGetOrdersByClientIdClientOrderId';
+        }
+        const response = await this[method] (this.extend (request, params));
         //
         //     {
         //         "success": true,
@@ -69298,6 +69332,11 @@ module.exports = class kraken extends Exchange {
             'ordertype': type,
             'volume': this.amountToPrecision (symbol, amount),
         };
+        const clientOrderId = this.safeString2 (params, 'userref', 'clientOrderId');
+        const query = this.omit (params, [ 'userref', 'clientOrderId' ]);
+        if (clientOrderId !== undefined) {
+            request['userref'] = clientOrderId;
+        }
         const priceIsDefined = (price !== undefined);
         const marketOrder = (type === 'market');
         const limitOrder = (type === 'limit');
@@ -69305,7 +69344,7 @@ module.exports = class kraken extends Exchange {
         if (shouldIncludePrice) {
             request['price'] = this.priceToPrecision (symbol, price);
         }
-        const response = await this.privatePostAddOrder (this.extend (request, params));
+        const response = await this.privatePostAddOrder (this.extend (request, query));
         let id = this.safeValue (response['result'], 'txid');
         if (id !== undefined) {
             if (Array.isArray (id)) {
@@ -69313,7 +69352,6 @@ module.exports = class kraken extends Exchange {
                 id = (length > 1) ? id : id[0];
             }
         }
-        const clientOrderId = this.safeString (params, 'userref');
         return {
             'id': id,
             'clientOrderId': clientOrderId,
@@ -70767,9 +70805,10 @@ module.exports = class kucoin extends Exchange {
         await this.loadMarkets ();
         const marketId = this.marketId (symbol);
         // required param, cannot be used twice
-        const clientOid = this.uuid ();
+        const clientOrderId = this.safeString2 (params, 'clientOid', 'clientOrderId', this.uuid ());
+        params = this.omit (params, [ 'clientOid', 'clientOrderId' ]);
         const request = {
-            'clientOid': clientOid,
+            'clientOid': clientOrderId,
             'side': side,
             'symbol': marketId,
             'type': type,
@@ -70809,7 +70848,7 @@ module.exports = class kucoin extends Exchange {
             'datetime': this.iso8601 (timestamp),
             'fee': undefined,
             'status': 'open',
-            'clientOrderId': clientOid,
+            'clientOrderId': clientOrderId,
             'info': data,
         };
         if (!this.safeValue (params, 'quoteAmount')) {
@@ -80155,6 +80194,11 @@ module.exports = class okex extends Exchange {
             // 'client_oid': 'abcdef1234567890', // [a-z0-9]{1,32}
             // 'order_type': '0', // 0: Normal limit order (Unfilled and 0 represent normal limit order) 1: Post only 2: Fill Or Kill 3: Immediatel Or Cancel
         };
+        const clientOrderId = this.safeString2 (params, 'client_oid', 'clientOrderId');
+        if (clientOrderId !== undefined) {
+            request['client_oid'] = clientOrderId;
+            params = this.omit (params, [ 'client_oid', 'clientOrderId' ]);
+        }
         let method = undefined;
         if (market['futures'] || market['swap']) {
             const size = market['futures'] ? this.numberToString (amount) : this.amountToPrecision (symbol, amount);
@@ -80235,15 +80279,15 @@ module.exports = class okex extends Exchange {
         } else {
             method += 's';
         }
-        const clientOid = this.safeString (params, 'client_oid');
-        if (clientOid !== undefined) {
+        const clientOrderId = this.safeString2 (params, 'client_oid', 'clientOrderId');
+        if (clientOrderId !== undefined) {
             method += 'ClientOid';
-            request['client_oid'] = clientOid;
+            request['client_oid'] = clientOrderId;
         } else {
             method += 'OrderId';
             request['order_id'] = id;
         }
-        const query = this.omit (params, 'type');
+        const query = this.omit (params, [ 'type', 'client_oid', 'clientOrderId' ]);
         const response = await this[method] (this.extend (request, query));
         const result = ('result' in response) ? response : this.safeValue (response, market['id'], {});
         //
@@ -82820,6 +82864,11 @@ module.exports = class poloniex extends Exchange {
             'rate': this.priceToPrecision (symbol, price),
             'amount': amount,
         };
+        const clientOrderId = this.safeString (params, 'clientOrderId');
+        if (clientOrderId !== undefined) {
+            request['clientOrderId'] = clientOrderId;
+            params = this.omit (params, 'clientOrderId');
+        }
         // remember the timestamp before issuing the request
         const timestamp = this.milliseconds ();
         const response = await this[method] (this.extend (request, params));
@@ -82894,9 +82943,15 @@ module.exports = class poloniex extends Exchange {
         await this.loadMarkets ();
         let response = undefined;
         try {
-            response = await this.privatePostCancelOrder (this.extend ({
-                'orderNumber': id,
-            }, params));
+            const request = {};
+            const clientOrderId = this.safeValue (params, 'clientOrderId');
+            if (clientOrderId === undefined) {
+                request['orderNumber'] = id;
+            } else {
+                request['clientOrderId'] = clientOrderId;
+            }
+            params = this.omit (params, 'clientOrderId');
+            response = await this.privatePostCancelOrder (this.extend (request, params));
         } catch (e) {
             if (e instanceof CancelPending) {
                 // A request to cancel the order has been sent already.
