@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.77'
+const version = '1.20.78'
 
 Exchange.ccxtVersion = version
 
@@ -73688,6 +73688,7 @@ module.exports = class okex3 extends Exchange {
                 },
             },
             'options': {
+                'createMarketBuyOrderRequiresPrice': true,
                 'fetchMarkets': [ 'spot', 'futures', 'swap' ],
                 'defaultType': 'spot', // 'account', 'spot', 'margin', 'futures', 'swap'
                 'auth': {
