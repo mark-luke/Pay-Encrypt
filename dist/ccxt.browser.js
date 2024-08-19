@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.18'
+const version = '1.29.19'
 
 Exchange.ccxtVersion = version
 
@@ -45465,6 +45465,11 @@ module.exports = class coinone extends Exchange {
         const baseIds = Object.keys (response);
         for (let i = 0; i < baseIds.length; i++) {
             const baseId = baseIds[i];
+            const ticker = this.safeValue (response, baseId, {});
+            const currency = this.safeValue (ticker, 'currency');
+            if (currency === undefined) {
+                continue;
+            }
             const base = this.safeCurrencyCode (baseId);
             result.push ({
                 'id': baseId,
