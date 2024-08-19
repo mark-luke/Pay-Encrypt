@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.49'
+const version = '1.30.50'
 
 Exchange.ccxtVersion = version
 
@@ -121148,10 +121148,12 @@ module.exports = class wavesexchange extends Exchange {
             'timestamp': timestamp,
             'expiration': expiration,
             'matcherFee': matcherFee,
-            'matcherFeeAssetId': market['baseId'],
             'signature': signature,
             'version': 3,
         };
+        if (matcherFeeAssetId !== 'WAVES') {
+            body['matcherFeeAssetId'] = matcherFeeAssetId;
+        }
         const response = await this.matcherPostMatcherOrderbook (body);
         // { success: true,
         //   message:
