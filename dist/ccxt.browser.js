@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.55'
+const version = '1.25.56'
 
 Exchange.ccxtVersion = version
 
@@ -49499,7 +49499,7 @@ module.exports = class deribit extends Exchange {
         //
         const currencyId = this.safeString (transaction, 'currency');
         const code = this.safeCurrencyCode (currencyId, currency);
-        const timestamp = this.safeInteger (transaction, 'created_timestamp', 'received_timestamp');
+        const timestamp = this.safeInteger2 (transaction, 'created_timestamp', 'received_timestamp');
         const updated = this.safeInteger (transaction, 'updated_timestamp');
         const status = this.parseTransactionStatus (this.safeString (transaction, 'state'));
         const address = this.safeString (transaction, 'address');
