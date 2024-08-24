@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.29'
+const version = '1.34.30'
 
 Exchange.ccxtVersion = version
 
@@ -20761,7 +20761,6 @@ module.exports = class bitmart extends Exchange {
         if (percentage !== undefined) {
             percentage *= 100;
         }
-        // bitmart base/quote reversed
         const baseVolume = this.safeFloat2 (ticker, 'base_volume_24h', 'base_coin_volume');
         const quoteVolume = this.safeFloat2 (ticker, 'quote_volume_24h', 'quote_coin_volume');
         let vwap = undefined;
@@ -75133,6 +75132,7 @@ module.exports = class idex extends Exchange {
             'rateLimit': 1500,
             'certified': true,
             'requiresWeb3': true,
+            'version': 'v1',
             'has': {
                 'cancelOrder': true,
                 'createOrder': true,
