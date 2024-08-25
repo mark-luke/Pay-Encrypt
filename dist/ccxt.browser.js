@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.68'
+const version = '1.28.69'
 
 Exchange.ccxtVersion = version
 
@@ -51604,7 +51604,6 @@ module.exports = class eterbase extends Exchange {
             filled = Math.max (0, amount - remaining);
         }
         const cost = this.safeFloat (order, 'cost');
-        // Math.round (price * filled, market.precision.cost);
         if (type === 'market') {
             if (price === 0.0) {
                 if ((cost !== undefined) && (filled !== undefined)) {
