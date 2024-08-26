@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.2'
+const version = '1.21.3'
 
 Exchange.ccxtVersion = version
 
@@ -41858,7 +41858,7 @@ module.exports = class coss extends Exchange {
             'countries': [ 'SG', 'NL' ],
             'rateLimit': 1000,
             'version': 'v1',
-            'certified': true,
+            'certified': false,
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/50328158-22e53c00-0503-11e9-825c-c5cfd79bfa74.jpg',
                 'api': {
