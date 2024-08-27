@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.54'
+const version = '1.29.55'
 
 Exchange.ccxtVersion = version
 
@@ -10701,7 +10701,7 @@ module.exports = class binance extends Exchange {
         if (origClientOrderId === undefined) {
             request['orderId'] = parseInt (id);
         } else {
-            request['origClientOrderId'] = parseInt (origClientOrderId);
+            request['origClientOrderId'] = origClientOrderId;
         }
         let method = 'privateDeleteOrder';
         if (type === 'future') {
