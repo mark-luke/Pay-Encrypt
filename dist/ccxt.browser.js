@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.70'
+const version = '1.35.71'
 
 Exchange.ccxtVersion = version
 
@@ -35088,7 +35088,7 @@ module.exports = class braziliex extends Exchange {
         const ids = Object.keys (response);
         for (let i = 0; i < ids.length; i++) {
             const marketId = ids[i];
-            const market = this.markets_by_id[marketId];
+            const market = this.safeMarket (marketId);
             const symbol = market['symbol'];
             result[symbol] = this.parseTicker (response[marketId], market);
         }
