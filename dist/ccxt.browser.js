@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.62'
+const version = '1.34.63'
 
 Exchange.ccxtVersion = version
 
@@ -156,6 +156,7 @@ const exchanges = {
     'probit':                  require ('./js/probit.js'),
     'qtrade':                  require ('./js/qtrade.js'),
     'rightbtc':                require ('./js/rightbtc.js'),
+    'ripio':                   require ('./js/ripio.js'),
     'southxchange':            require ('./js/southxchange.js'),
     'stex':                    require ('./js/stex.js'),
     'stronghold':              require ('./js/stronghold.js'),
@@ -182,7 +183,7 @@ module.exports = Object.assign ({ version, Exchange, 'exchanges': Object.keys (e
 
 //-----------------------------------------------------------------------------
 
-},{"./js/acx.js":3,"./js/aofex.js":4,"./js/base/Exchange":5,"./js/base/errors":7,"./js/base/functions":8,"./js/bcex.js":19,"./js/bequant.js":20,"./js/bibox.js":21,"./js/bigone.js":22,"./js/binance.js":23,"./js/binanceje.js":24,"./js/binanceus.js":25,"./js/bit2c.js":26,"./js/bitbank.js":27,"./js/bitbay.js":28,"./js/bitfinex.js":29,"./js/bitfinex2.js":30,"./js/bitflyer.js":31,"./js/bitforex.js":32,"./js/bitget.js":33,"./js/bithumb.js":34,"./js/bitkk.js":35,"./js/bitmart.js":36,"./js/bitmax.js":37,"./js/bitmex.js":38,"./js/bitpanda.js":39,"./js/bitso.js":40,"./js/bitstamp.js":41,"./js/bitstamp1.js":42,"./js/bittrex.js":43,"./js/bitvavo.js":44,"./js/bitz.js":45,"./js/bl3p.js":46,"./js/bleutrade.js":47,"./js/braziliex.js":48,"./js/btcalpha.js":49,"./js/btcbox.js":50,"./js/btcmarkets.js":51,"./js/btctradeua.js":52,"./js/btcturk.js":53,"./js/buda.js":54,"./js/bw.js":55,"./js/bybit.js":56,"./js/bytetrade.js":57,"./js/cex.js":58,"./js/chilebit.js":59,"./js/coinbase.js":60,"./js/coinbaseprime.js":61,"./js/coinbasepro.js":62,"./js/coincheck.js":63,"./js/coinegg.js":64,"./js/coinex.js":65,"./js/coinfalcon.js":66,"./js/coinfloor.js":67,"./js/coingi.js":68,"./js/coinmarketcap.js":69,"./js/coinmate.js":70,"./js/coinone.js":71,"./js/coinspot.js":72,"./js/coss.js":73,"./js/crex24.js":74,"./js/currencycom.js":75,"./js/deribit.js":76,"./js/digifinex.js":77,"./js/dsx.js":78,"./js/eterbase.js":79,"./js/exmo.js":80,"./js/exx.js":81,"./js/fcoin.js":82,"./js/fcoinjp.js":83,"./js/flowbtc.js":84,"./js/foxbit.js":85,"./js/ftx.js":86,"./js/gateio.js":87,"./js/gemini.js":88,"./js/hbtc.js":89,"./js/hitbtc.js":90,"./js/hollaex.js":91,"./js/huobijp.js":92,"./js/huobipro.js":93,"./js/huobiru.js":94,"./js/ice3x.js":95,"./js/idex.js":96,"./js/idex2.js":97,"./js/independentreserve.js":98,"./js/indodax.js":99,"./js/itbit.js":100,"./js/kraken.js":101,"./js/kucoin.js":102,"./js/kuna.js":103,"./js/lakebtc.js":104,"./js/latoken.js":105,"./js/lbank.js":106,"./js/liquid.js":107,"./js/livecoin.js":108,"./js/luno.js":109,"./js/lykke.js":110,"./js/mercado.js":111,"./js/mixcoins.js":112,"./js/novadax.js":113,"./js/oceanex.js":114,"./js/okcoin.js":115,"./js/okex.js":116,"./js/paymium.js":117,"./js/phemex.js":118,"./js/poloniex.js":119,"./js/probit.js":120,"./js/qtrade.js":121,"./js/rightbtc.js":122,"./js/southxchange.js":123,"./js/stex.js":164,"./js/stronghold.js":165,"./js/surbitcoin.js":166,"./js/therock.js":167,"./js/tidebit.js":168,"./js/tidex.js":169,"./js/timex.js":170,"./js/upbit.js":171,"./js/vaultoro.js":172,"./js/vbtc.js":173,"./js/wavesexchange.js":174,"./js/whitebit.js":175,"./js/xbtce.js":176,"./js/xena.js":177,"./js/yobit.js":178,"./js/zaif.js":179,"./js/zb.js":180}],3:[function(require,module,exports){
+},{"./js/acx.js":3,"./js/aofex.js":4,"./js/base/Exchange":5,"./js/base/errors":7,"./js/base/functions":8,"./js/bcex.js":19,"./js/bequant.js":20,"./js/bibox.js":21,"./js/bigone.js":22,"./js/binance.js":23,"./js/binanceje.js":24,"./js/binanceus.js":25,"./js/bit2c.js":26,"./js/bitbank.js":27,"./js/bitbay.js":28,"./js/bitfinex.js":29,"./js/bitfinex2.js":30,"./js/bitflyer.js":31,"./js/bitforex.js":32,"./js/bitget.js":33,"./js/bithumb.js":34,"./js/bitkk.js":35,"./js/bitmart.js":36,"./js/bitmax.js":37,"./js/bitmex.js":38,"./js/bitpanda.js":39,"./js/bitso.js":40,"./js/bitstamp.js":41,"./js/bitstamp1.js":42,"./js/bittrex.js":43,"./js/bitvavo.js":44,"./js/bitz.js":45,"./js/bl3p.js":46,"./js/bleutrade.js":47,"./js/braziliex.js":48,"./js/btcalpha.js":49,"./js/btcbox.js":50,"./js/btcmarkets.js":51,"./js/btctradeua.js":52,"./js/btcturk.js":53,"./js/buda.js":54,"./js/bw.js":55,"./js/bybit.js":56,"./js/bytetrade.js":57,"./js/cex.js":58,"./js/chilebit.js":59,"./js/coinbase.js":60,"./js/coinbaseprime.js":61,"./js/coinbasepro.js":62,"./js/coincheck.js":63,"./js/coinegg.js":64,"./js/coinex.js":65,"./js/coinfalcon.js":66,"./js/coinfloor.js":67,"./js/coingi.js":68,"./js/coinmarketcap.js":69,"./js/coinmate.js":70,"./js/coinone.js":71,"./js/coinspot.js":72,"./js/coss.js":73,"./js/crex24.js":74,"./js/currencycom.js":75,"./js/deribit.js":76,"./js/digifinex.js":77,"./js/dsx.js":78,"./js/eterbase.js":79,"./js/exmo.js":80,"./js/exx.js":81,"./js/fcoin.js":82,"./js/fcoinjp.js":83,"./js/flowbtc.js":84,"./js/foxbit.js":85,"./js/ftx.js":86,"./js/gateio.js":87,"./js/gemini.js":88,"./js/hbtc.js":89,"./js/hitbtc.js":90,"./js/hollaex.js":91,"./js/huobijp.js":92,"./js/huobipro.js":93,"./js/huobiru.js":94,"./js/ice3x.js":95,"./js/idex.js":96,"./js/idex2.js":97,"./js/independentreserve.js":98,"./js/indodax.js":99,"./js/itbit.js":100,"./js/kraken.js":101,"./js/kucoin.js":102,"./js/kuna.js":103,"./js/lakebtc.js":104,"./js/latoken.js":105,"./js/lbank.js":106,"./js/liquid.js":107,"./js/livecoin.js":108,"./js/luno.js":109,"./js/lykke.js":110,"./js/mercado.js":111,"./js/mixcoins.js":112,"./js/novadax.js":113,"./js/oceanex.js":114,"./js/okcoin.js":115,"./js/okex.js":116,"./js/paymium.js":117,"./js/phemex.js":118,"./js/poloniex.js":119,"./js/probit.js":120,"./js/qtrade.js":121,"./js/rightbtc.js":122,"./js/ripio.js":123,"./js/southxchange.js":124,"./js/stex.js":165,"./js/stronghold.js":166,"./js/surbitcoin.js":167,"./js/therock.js":168,"./js/tidebit.js":169,"./js/tidex.js":170,"./js/timex.js":171,"./js/upbit.js":172,"./js/vaultoro.js":173,"./js/vbtc.js":174,"./js/wavesexchange.js":175,"./js/whitebit.js":176,"./js/xbtce.js":177,"./js/xena.js":178,"./js/yobit.js":179,"./js/zaif.js":180,"./js/zb.js":181}],3:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -3150,7 +3151,7 @@ module.exports = class Exchange {
 }
 
 
-},{"../static_dependencies/BN/bn":124,"./errors":7,"./functions":8}],6:[function(require,module,exports){
+},{"../static_dependencies/BN/bn":125,"./errors":7,"./functions":8}],6:[function(require,module,exports){
 'use strict';
 
 const errorHierarchy = {
@@ -3439,7 +3440,7 @@ module.exports = {
 
 /*  ------------------------------------------------------------------------ */
 
-},{"../../static_dependencies/BN/bn.js":124,"../../static_dependencies/crypto-js/crypto-js":125,"./../../static_dependencies/elliptic/lib/elliptic":126,"./../../static_dependencies/node-rsa/NodeRSA":144,"./../errors":7,"./encode":10,"./string":15}],10:[function(require,module,exports){
+},{"../../static_dependencies/BN/bn.js":125,"../../static_dependencies/crypto-js/crypto-js":126,"./../../static_dependencies/elliptic/lib/elliptic":127,"./../../static_dependencies/node-rsa/NodeRSA":145,"./../errors":7,"./encode":10,"./string":15}],10:[function(require,module,exports){
 "use strict";
 
 /*  ------------------------------------------------------------------------ */
@@ -3560,7 +3561,7 @@ module.exports['byteArrayToWordArray'] = byteArrayToWordArray
 
 /*  ------------------------------------------------------------------------ */
 
-},{"../../static_dependencies/BN/bn":124,"../../static_dependencies/crypto-js/crypto-js":125,"../../static_dependencies/qs/index":160}],11:[function(require,module,exports){
+},{"../../static_dependencies/BN/bn":125,"../../static_dependencies/crypto-js/crypto-js":126,"../../static_dependencies/qs/index":161}],11:[function(require,module,exports){
 "use strict";
 
 // ----------------------------------------------------------------------------
@@ -4320,7 +4321,7 @@ module.exports = {
     defaultFetch,
 }
 }).call(this,require('_process'))
-},{"../../static_dependencies/fetch-ponyfill/fetch-node":142,"_process":208}],15:[function(require,module,exports){
+},{"../../static_dependencies/fetch-ponyfill/fetch-node":143,"_process":209}],15:[function(require,module,exports){
 "use strict";
 
 /*  ------------------------------------------------------------------------ */
@@ -20063,7 +20064,7 @@ module.exports = class bitkk extends zb {
     }
 };
 
-},{"./zb.js":180}],36:[function(require,module,exports){
+},{"./zb.js":181}],36:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -101813,6 +101814,883 @@ module.exports = class rightbtc extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
+const { AuthenticationError, ExchangeError, BadSymbol, InvalidOrder, ArgumentsRequired, OrderNotFound } = require ('./base/errors');
+const { TICK_SIZE } = require ('./base/functions/number');
+
+//  ---------------------------------------------------------------------------
+
+module.exports = class ripio extends Exchange {
+    describe () {
+        return this.deepExtend (super.describe (), {
+            'id': 'ripio',
+            'name': 'Ripio',
+            'countries': [ 'AR' ], // Argentina
+            'rateLimit': 50,
+            'version': 'v1',
+            // new metainfo interface
+            'has': {
+                'CORS': false,
+                'cancelOrder': true,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchClosedOrders': true,
+                'fetchCurrencies': true,
+                'fetchMyTrades': true,
+                'fetchOpenOrders': true,
+                'fetchOrder': true,
+                'fetchOrderBook': true,
+                'fetchOrders': true,
+                'fetchTicker': true,
+                'fetchTickers': true,
+                'fetchTrades': true,
+            },
+            'urls': {
+                'logo': 'https://user-images.githubusercontent.com/1294454/94507548-a83d6a80-0218-11eb-9998-28b9cec54165.jpg',
+                'api': {
+                    'public': 'https://api.exchange.ripio.com/api',
+                    'private': 'https://api.exchange.ripio.com/api',
+                },
+                'www': 'https://exchange.ripio.com',
+                'doc': [
+                    'https://exchange.ripio.com/en/api/',
+                ],
+                'fees': 'https://exchange.ripio.com/en/fee',
+            },
+            'api': {
+                'public': {
+                    'get': [
+                        'rate/all/',
+                        'rate/{pair}/',
+                        'orderbook/{pair}/',
+                        'tradehistory/{pair}/',
+                        'pair/',
+                        'currency/',
+                        'orderbook/{pair}/depth/',
+                    ],
+                },
+                'private': {
+                    'get': [
+                        'balances/exchange_balances/',
+                        'order/{pair}/{order_id}/',
+                        'order/{pair}/',
+                        'trade/{pair}/',
+                    ],
+                    'post': [
+                        'order/{pair}/',
+                        'order/{pair}/{order_id}/cancel/',
+                    ],
+                },
+            },
+            'fees': {
+                'trading': {
+                    'tierBased': true,
+                    'percentage': true,
+                    'taker': 0.0 / 100,
+                    'maker': 0.0 / 100,
+                },
+            },
+            'precisionMode': TICK_SIZE,
+            'requiredCredentials': {
+                'apiKey': true,
+                'secret': false,
+            },
+            'exceptions': {
+                'exact': {
+                },
+                'broad': {
+                    'Invalid pair': BadSymbol, // {"status_code":400,"errors":{"pair":["Invalid pair FOOBAR"]},"message":"An error has occurred, please check the form."}
+                    'Disabled pair': BadSymbol, // {"status_code":400,"errors":{"pair":["Invalid/Disabled pair BTC_ARS"]},"message":"An error has occurred, please check the form."}
+                    'Authentication credentials were not provided': AuthenticationError, // {"detail":"Authentication credentials were not provided."}
+                    'Invalid order type': InvalidOrder, // {"status_code":400,"errors":{"order_type":["Invalid order type. Valid options: ['MARKET', 'LIMIT']"]},"message":"An error has occurred, please check the form."}
+                    'not found': OrderNotFound, // {"status_code":404,"errors":{"order":["Order 286e560e-b8a2-464b-8b84-15a7e2a67eab not found."]},"message":"An error has occurred, please check the form."}
+                },
+            },
+        });
+    }
+
+    async fetchMarkets (params = {}) {
+        const response = await this.publicGetPair (params);
+        //
+        //     {
+        //         "next":null,
+        //         "previous":null,
+        //         "results":[
+        //             {
+        //                 "base":"BTC",
+        //                 "base_name":"Bitcoin",
+        //                 "quote":"USDC",
+        //                 "quote_name":"USD Coin",
+        //                 "symbol":"BTC_USDC",
+        //                 "fees":[
+        //                     {"traded_volume":0.0,"maker_fee":0.0,"taker_fee":0.0,"cancellation_fee":0.0}
+        //                 ],
+        //                 "country":"ZZ",
+        //                 "enabled":true,
+        //                 "priority":10,
+        //                 "min_amount":"0.00001",
+        //                 "price_tick":"0.000001",
+        //                 "min_value":"10",
+        //                 "limit_price_threshold":"25.00"
+        //             },
+        //         ]
+        //     }
+        //
+        const result = [];
+        const results = this.safeValue (response, 'results', []);
+        for (let i = 0; i < results.length; i++) {
+            const market = results[i];
+            const baseId = this.safeString (market, 'base');
+            const quoteId = this.safeString (market, 'quote');
+            const id = this.safeString (market, 'symbol');
+            const base = this.safeCurrencyCode (baseId);
+            const quote = this.safeCurrencyCode (quoteId);
+            const symbol = base + '/' + quote;
+            const precision = {
+                'amount': this.safeFloat (market, 'min_amount'),
+                'price': this.safeFloat (market, 'price_tick'),
+            };
+            const limits = {
+                'amount': {
+                    'min': this.safeFloat (market, 'min_amount'),
+                    'max': undefined,
+                },
+                'price': {
+                    'min': undefined,
+                    'max': undefined,
+                },
+                'cost': {
+                    'min': this.safeFloat (market, 'min_value'),
+                    'max': undefined,
+                },
+            };
+            const active = this.safeValue (market, 'enabled', true);
+            const fees = this.safeValue (market, 'fees', []);
+            const firstFee = this.safeValue (fees, 0, {});
+            const maker = this.safeFloat (firstFee, 'maker_fee', 0.0);
+            const taker = this.safeFloat (firstFee, 'taker_fee', 0.0);
+            result.push ({
+                'id': id,
+                'symbol': symbol,
+                'base': base,
+                'quote': quote,
+                'baseId': baseId,
+                'quoteId': quoteId,
+                'precision': precision,
+                'maker': maker,
+                'taker': taker,
+                'limits': limits,
+                'info': market,
+                'active': active,
+            });
+        }
+        return result;
+    }
+
+    async fetchCurrencies (params = {}) {
+        const response = await this.publicGetCurrency (params);
+        //
+        //     {
+        //         "next":null,
+        //         "previous":null,
+        //         "results":[
+        //             {
+        //                 "name":"Argentine Peso",
+        //                 "symbol":"$",
+        //                 "currency":"ARS",
+        //                 "country":"AR",
+        //                 "decimal_places":"2",
+        //                 "enabled":true
+        //             },
+        //             {
+        //                 "name":"Bitcoin Cash",
+        //                 "symbol":"BCH",
+        //                 "currency":"BCH",
+        //                 "country":"AR",
+        //                 "decimal_places":"8",
+        //                 "enabled":true
+        //             },
+        //             {
+        //                 "name":"Bitcoin",
+        //                 "symbol":"BTC",
+        //                 "currency":"BTC",
+        //                 "country":"AR",
+        //                 "decimal_places":"8",
+        //                 "enabled":true
+        //             }
+        //         ]
+        //     }
+        //
+        const results = this.safeValue (response, 'results', []);
+        const result = {};
+        for (let i = 0; i < results.length; i++) {
+            const currency = results[i];
+            const id = this.safeString (currency, 'currency');
+            const code = this.safeCurrencyCode (id);
+            const name = this.safeString (currency, 'name');
+            const active = this.safeValue (currency, 'enabled', true);
+            const precision = this.safeInteger (currency, 'decimal_places');
+            result[code] = {
+                'id': id,
+                'code': code,
+                'name': name,
+                'info': currency, // the original payload
+                'active': active,
+                'fee': undefined,
+                'precision': precision,
+                'limits': {
+                    'amount': { 'min': undefined, 'max': undefined },
+                    'price': { 'min': undefined, 'max': undefined },
+                    'cost': { 'min': undefined, 'max': undefined },
+                    'withdraw': { 'min': undefined, 'max': undefined },
+                },
+            };
+        }
+        return result;
+    }
+
+    parseTicker (ticker, market = undefined) {
+        //
+        // fetchTicker, fetchTickers
+        //
+        //     {
+        //         "pair":"BTC_USDC",
+        //         "last_price":"10850.02",
+        //         "low":"10720.03",
+        //         "high":"10909.99",
+        //         "variation":"1.21",
+        //         "volume":"0.83868",
+        //         "base":"BTC",
+        //         "base_name":"Bitcoin",
+        //         "quote":"USDC",
+        //         "quote_name":"USD Coin",
+        //         "bid":"10811.00",
+        //         "ask":"10720.03",
+        //         "avg":"10851.47",
+        //         "ask_volume":"0.00140",
+        //         "bid_volume":"0.00185",
+        //         "created_at":"2020-09-28 21:44:51.228920+00:00"
+        //     }
+        //
+        const timestamp = this.parse8601 (this.safeString (ticker, 'created_at'));
+        const marketId = this.safeString (ticker, 'pair');
+        let symbol = undefined;
+        if (marketId !== undefined) {
+            if (marketId in this.markets_by_id) {
+                market = this.markets_by_id[marketId];
+            } else if (marketId !== undefined) {
+                const [ baseId, quoteId ] = marketId.split ('_');
+                const base = this.safeCurrencyCode (baseId);
+                const quote = this.safeCurrencyCode (quoteId);
+                symbol = base + '/' + quote;
+            }
+        }
+        if ((symbol === undefined) && (market !== undefined)) {
+            symbol = market['symbol'];
+        }
+        const last = this.safeFloat (ticker, 'last_price');
+        const average = this.safeFloat (ticker, 'avg');
+        return {
+            'symbol': symbol,
+            'timestamp': timestamp,
+            'datetime': this.iso8601 (timestamp),
+            'high': this.safeFloat (ticker, 'high'),
+            'low': this.safeFloat (ticker, 'low'),
+            'bid': this.safeFloat (ticker, 'bid'),
+            'bidVolume': this.safeFloat (ticker, 'bid_volume'),
+            'ask': this.safeFloat (ticker, 'ask'),
+            'askVolume': this.safeFloat (ticker, 'ask_volume'),
+            'vwap': undefined,
+            'open': undefined,
+            'close': last,
+            'last': last,
+            'previousClose': undefined,
+            'change': undefined,
+            'percentage': undefined,
+            'average': average,
+            'baseVolume': undefined,
+            'quoteVolume': undefined,
+            'info': ticker,
+        };
+    }
+
+    async fetchTicker (symbol, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'pair': market['id'],
+        };
+        const response = await this.publicGetRatePair (this.extend (request, params));
+        //
+        //     {
+        //         "pair":"BTC_USDC",
+        //         "last_price":"10850.02",
+        //         "low":"10720.03",
+        //         "high":"10909.99",
+        //         "variation":"1.21",
+        //         "volume":"0.83868",
+        //         "base":"BTC",
+        //         "base_name":"Bitcoin",
+        //         "quote":"USDC",
+        //         "quote_name":"USD Coin",
+        //         "bid":"10811.00",
+        //         "ask":"10720.03",
+        //         "avg":"10851.47",
+        //         "ask_volume":"0.00140",
+        //         "bid_volume":"0.00185",
+        //         "created_at":"2020-09-28 21:44:51.228920+00:00"
+        //     }
+        //
+        return this.parseTicker (response, market);
+    }
+
+    async fetchTickers (symbols = undefined, params = {}) {
+        await this.loadMarkets ();
+        const response = await this.publicGetRateAll (params);
+        //
+        //     [
+        //         {
+        //             "pair":"BTC_USDC",
+        //             "last_price":"10850.02",
+        //             "low":"10720.03",
+        //             "high":"10909.99",
+        //             "variation":"1.21",
+        //             "volume":"0.83868",
+        //             "base":"BTC",
+        //             "base_name":"Bitcoin",
+        //             "quote":"USDC",
+        //             "quote_name":"USD Coin",
+        //             "bid":"10811.00",
+        //             "ask":"10720.03",
+        //             "avg":"10851.47",
+        //             "ask_volume":"0.00140",
+        //             "bid_volume":"0.00185",
+        //             "created_at":"2020-09-28 21:44:51.228920+00:00"
+        //         }
+        //     ]
+        //
+        const result = {};
+        for (let i = 0; i < response.length; i++) {
+            const ticker = this.parseTicker (response[i]);
+            const symbol = ticker['symbol'];
+            result[symbol] = ticker;
+        }
+        return this.filterByArray (result, 'symbol', symbols);
+    }
+
+    async fetchOrderBook (symbol, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const request = {
+            'pair': this.marketId (symbol),
+        };
+        const response = await this.publicGetOrderbookPair (this.extend (request, params));
+        //
+        //     {
+        //         "buy":[
+        //             {"amount":"0.00230","total":"24.95","price":"10850.02"},
+        //             {"amount":"0.07920","total":"858.52","price":"10840.00"},
+        //             {"amount":"0.00277","total":"30.00","price":"10833.03"},
+        //         ],
+        //         "sell":[
+        //             {"amount":"0.03193","total":"348.16","price":"10904.00"},
+        //             {"amount":"0.00210","total":"22.90","price":"10905.70"},
+        //             {"amount":"0.00300","total":"32.72","price":"10907.98"},
+        //         ],
+        //         "updated_id":47225
+        //     }
+        //
+        const orderbook = this.parseOrderBook (response, undefined, 'buy', 'sell', 'price', 'amount');
+        orderbook['nonce'] = this.safeInteger (response, 'updated_id');
+        return orderbook;
+    }
+
+    parseTrade (trade, market = undefined) {
+        //
+        // public fetchTrades, private fetchMyTrades
+        //
+        //     {
+        //         "created_at":1601322501,
+        //         "amount":"0.00276",
+        //         "price":"10850.020000",
+        //         "side":"SELL",
+        //         "pair":"BTC_USDC",
+        //         "taker_fee":"0",
+        //         "taker_side":"SELL",
+        //         "maker_fee":"0",
+        //         "taker":2577953,
+        //         "maker":2577937
+        //     }
+        //
+        const id = this.safeString (trade, 'id');
+        const timestamp = this.safeTimestamp (trade, 'created_at');
+        let side = this.safeString (trade, 'side');
+        const takerSide = this.safeString (trade, 'taker_side');
+        const takerOrMaker = (takerSide === side) ? 'taker' : 'maker';
+        side = side.toLowerCase ();
+        const price = this.safeFloat (trade, 'price');
+        const amount = this.safeFloat (trade, 'amount');
+        let cost = undefined;
+        if ((amount !== undefined) && (price !== undefined)) {
+            cost = amount * price;
+        }
+        const marketId = this.safeString (trade, 'pair');
+        let symbol = undefined;
+        let base = undefined;
+        let quote = undefined;
+        if (marketId !== undefined) {
+            if (marketId in this.markets_by_id) {
+                market = this.markets_by_id[marketId];
+                symbol = market['symbol'];
+                base = market['base'];
+                quote = market['quote'];
+            } else {
+                const [ baseId, quoteId ] = marketId.split ('_');
+                base = this.safeCurrencyCode (baseId);
+                quote = this.safeCurrencyCode (quoteId);
+                symbol = base + '/' + quote;
+            }
+        }
+        if ((market !== undefined) && (symbol === undefined)) {
+            symbol = market['symbol'];
+            base = market['base'];
+            quote = market['quote'];
+        }
+        const feeCost = this.safeFloat (trade, takerOrMaker + '_fee');
+        const orderId = this.safeString (trade, takerOrMaker);
+        let fee = undefined;
+        if (feeCost !== undefined) {
+            fee = {
+                'cost': feeCost,
+                'currency': (side === 'buy') ? base : quote,
+            };
+        }
+        return {
+            'id': id,
+            'order': orderId,
+            'timestamp': timestamp,
+            'datetime': this.iso8601 (timestamp),
+            'symbol': symbol,
+            'type': undefined,
+            'side': side,
+            'price': price,
+            'amount': amount,
+            'cost': cost,
+            'takerOrMaker': takerOrMaker,
+            'fee': fee,
+            'info': trade,
+        };
+    }
+
+    async fetchTrades (symbol, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'pair': market['id'],
+        };
+        const response = await this.publicGetTradehistoryPair (this.extend (request, params));
+        //
+        //     [
+        //         {
+        //             "created_at":1601322501,
+        //             "amount":"0.00276",
+        //             "price":"10850.020000",
+        //             "side":"SELL",
+        //             "pair":"BTC_USDC",
+        //             "taker_fee":"0",
+        //             "taker_side":"SELL",
+        //             "maker_fee":"0",
+        //             "taker":2577953,
+        //             "maker":2577937
+        //         }
+        //     ]
+        //
+        return this.parseTrades (response, market, since, limit);
+    }
+
+    async fetchBalance (params = {}) {
+        await this.loadMarkets ();
+        const response = await this.privateGetBalancesExchangeBalances (params);
+        //
+        //     [
+        //         {
+        //             "id":603794,
+        //             "currency":"USD Coin",
+        //             "symbol":"USDC",
+        //             "available":"0",
+        //             "locked":"0",
+        //             "code":"exchange",
+        //             "balance_type":"crypto"
+        //         },
+        //     ]
+        //
+        const result = { 'info': response };
+        for (let i = 0; i < response.length; i++) {
+            const balance = response[i];
+            const currencyId = this.safeString (balance, 'symbol');
+            const code = this.safeCurrencyCode (currencyId);
+            const account = this.account ();
+            account['free'] = this.safeFloat (balance, 'available');
+            account['used'] = this.safeFloat (balance, 'locked');
+            result[code] = account;
+        }
+        return this.parseBalance (result);
+    }
+
+    async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const uppercaseType = type.toUpperCase ();
+        const uppercaseSide = side.toUpperCase ();
+        const request = {
+            'pair': market['id'],
+            'order_type': uppercaseType, // LIMIT, MARKET
+            'side': uppercaseSide, // BUY or SELL
+            'amount': this.amountToPrecision (symbol, amount),
+        };
+        if (uppercaseType === 'LIMIT') {
+            request['limit_price'] = this.priceToPrecision (symbol, price);
+        }
+        const response = await this.privatePostOrderPair (this.extend (request, params));
+        //
+        //     {
+        //         "order_id": "160f523c-f6ef-4cd1-a7c9-1a8ede1468d8",
+        //         "pair": "BTC_ARS",
+        //         "side": "BUY",
+        //         "amount": "0.00400",
+        //         "notional": null,
+        //         "fill_or_kill": false,
+        //         "all_or_none": false,
+        //         "order_type": "LIMIT",
+        //         "status": "OPEN",
+        //         "created_at": 1578413945,
+        //         "filled": "0.00000",
+        //         "limit_price": "10.00",
+        //         "stop_price": null,
+        //         "distance": null
+        //     }
+        //
+        return this.parseOrder (response, market);
+    }
+
+    async cancelOrder (id, symbol = undefined, params = {}) {
+        if (symbol === undefined) {
+            throw new ArgumentsRequired (this.id + ' cancelOrder() requires a symbol argument');
+        }
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'pair': market['id'],
+            'order_id': id,
+        };
+        const response = await this.privatePostOrderPairOrderIdCancel (this.extend (request, params));
+        //
+        //     {
+        //         "order_id": "286e560e-b8a2-464b-8b84-15a7e2a67eab",
+        //         "pair": "BTC_ARS",
+        //         "side": "SELL",
+        //         "amount": "0.00100",
+        //         "notional": null,
+        //         "fill_or_kill": false,
+        //         "all_or_none": false,
+        //         "order_type": "LIMIT",
+        //         "status": "CANC",
+        //         "created_at": 1575472707,
+        //         "filled": "0.00000",
+        //         "limit_price": "681000.00",
+        //         "stop_price": null,
+        //         "distance": null
+        //     }
+        //
+        return this.parseOrder (response, market);
+    }
+
+    async fetchOrder (id, symbol = undefined, params = {}) {
+        if (symbol === undefined) {
+            throw new ArgumentsRequired (this.id + ' fetchOrder() requires a symbol argument');
+        }
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'pair': market['id'],
+            'order_id': id,
+        };
+        const response = await this.privateGetOrderPairOrderId (this.extend (request, params));
+        //
+        //     {
+        //         "order_id": "0b4ff48e-cfd6-42db-8d8c-3b536da447af",
+        //         "pair": "BTC_ARS",
+        //         "side": "BUY",
+        //         "amount": "0.00100",
+        //         "notional": null,
+        //         "fill_or_kill": false,
+        //         "all_or_none": false,
+        //         "order_type": "LIMIT",
+        //         "status": "OPEN",
+        //         "created_at": 1575472944,
+        //         "filled": "0.00000",
+        //         "limit_price": "661000.00",
+        //         "stop_price": null,
+        //         "distance": null
+        //     }
+        //
+        return this.parseOrder (response, market);
+    }
+
+    async fetchOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        if (symbol === undefined) {
+            throw new ArgumentsRequired (this.id + ' fetchOrders() requires a symbol argument');
+        }
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'pair': market['id'],
+            // 'status': 'OPEN,PART,CLOS,CANC,COMP',
+            // 'offset': 0,
+            // 'limit': limit,
+        };
+        if (limit !== undefined) {
+            request['offset'] = limit;
+        }
+        const response = await this.privateGetOrderPair (this.extend (request, params));
+        //
+        //     {
+        //         "next": "https://api.exchange.ripio.com/api/v1/order/BTC_ARS/?limit=20&offset=20&page=1&page_size=25&status=OPEN%2CPART",
+        //         "previous": null,
+        //         "results": {
+        //             "data": [
+        //                 {
+        //                     "order_id": "ca74280b-6966-4b73-a720-68709078922b",
+        //                     "pair": "BTC_ARS",
+        //                     "side": "SELL",
+        //                     "amount": "0.00100",
+        //                     "notional": null,
+        //                     "fill_or_kill": false,
+        //                     "all_or_none": false,
+        //                     "order_type": "LIMIT",
+        //                     "status": "OPEN",
+        //                     "created_at": 1578340134,
+        //                     "filled": "0.00000",
+        //                     "limit_price": "665000.00",
+        //                     "stop_price": null,
+        //                     "distance": null
+        //                 },
+        //             ]
+        //         }
+        //     }
+        //
+        const results = this.safeValue (response, 'results', {});
+        const data = this.safeValue (results, 'data', []);
+        return this.parseOrders (data, market, since, limit);
+    }
+
+    async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        const request = {
+            'status': 'OPEN,PART',
+        };
+        return await this.fetchOrders (symbol, since, limit, this.extend (request, params));
+    }
+
+    async fetchClosedOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        const request = {
+            'status': 'CLOS,CANC,COMP',
+        };
+        return await this.fetchOrders (symbol, since, limit, this.extend (request, params));
+    }
+
+    parseOrderStatus (status) {
+        const statuses = {
+            'OPEN': 'open',
+            'PART': 'open',
+            'CLOS': 'canceled',
+            'CANC': 'canceled',
+            'COMP': 'closed',
+        };
+        return this.safeString (statuses, status, status);
+    }
+
+    parseOrder (order, market = undefined) {
+        //
+        // createOrder, cancelOrder, fetchOpenOrders, fetchClosedOrders, fetchOrders, fetchOrder
+        //
+        //
+        //     {
+        //         "order_id": "286e560e-b8a2-464b-8b84-15a7e2a67eab",
+        //         "pair": "BTC_ARS",
+        //         "side": "SELL",
+        //         "amount": "0.00100",
+        //         "notional": null,
+        //         "fill_or_kill": false,
+        //         "all_or_none": false,
+        //         "order_type": "LIMIT",
+        //         "status": "CANC",
+        //         "created_at": 1575472707,
+        //         "filled": "0.00000",
+        //         "limit_price": "681000.00",
+        //         "stop_price": null,
+        //         "distance": null
+        //     }
+        //
+        const id = this.safeString (order, 'order_id');
+        const amount = this.safeFloat (order, 'amount');
+        const price = this.safeFloat (order, 'limit_price');
+        let cost = this.safeFloat (order, 'notional');
+        const type = this.safeStringLower (order, 'order_type');
+        const side = this.safeStringLower (order, 'side');
+        const status = this.parseOrderStatus (this.safeString (order, 'status'));
+        const timestamp = this.safeTimestamp (order, 'timestamp');
+        const average = this.safeFloat (order, 'created_at');
+        const filled = this.safeFloat (order, 'filled');
+        let remaining = undefined;
+        if (filled !== undefined) {
+            if ((cost === undefined) && (price !== undefined)) {
+                cost = price * filled;
+            }
+            if (amount !== undefined) {
+                remaining = Math.max (0, amount - filled);
+            }
+        }
+        let symbol = undefined;
+        const marketId = this.safeString (order, 'pair');
+        if (marketId !== undefined) {
+            if (marketId in this.markets_by_id) {
+                market = this.markets_by_id[marketId];
+            } else {
+                const [ baseId, quoteId ] = marketId.split ('_');
+                const base = this.safeCurrencyCode (baseId);
+                const quote = this.safeCurrencyCode (quoteId);
+                symbol = base + '/' + quote;
+            }
+        }
+        if ((symbol === undefined) && (market !== undefined)) {
+            symbol = market['symbol'];
+        }
+        return {
+            'id': id,
+            'clientOrderId': undefined,
+            'info': order,
+            'timestamp': timestamp,
+            'datetime': this.iso8601 (timestamp),
+            'lastTradeTimestamp': undefined,
+            'symbol': symbol,
+            'type': type,
+            'side': side,
+            'price': price,
+            'amount': amount,
+            'cost': cost,
+            'average': average,
+            'filled': filled,
+            'remaining': remaining,
+            'status': status,
+            'fee': undefined,
+            'trades': undefined,
+        };
+    }
+
+    async fetchMyTrades (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        if (symbol === undefined) {
+            throw new ArgumentsRequired (this.id + ' fetchMyTrades() requires a symbol argument');
+        }
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'pair': market['id'],
+            // 'offset': 0,
+            // 'limit': limit,
+        };
+        if (limit !== undefined) {
+            request['limit'] = limit;
+        }
+        const response = await this.privateGetTradePair (this.extend (request, params));
+        //
+        //     {
+        //         "next": "https://api.exchange.ripio.com/api/v1/trade/<pair>/?limit=20&offset=20",
+        //         "previous": null,
+        //         "results": {
+        //             "data": [
+        //                 {
+        //                     "created_at": 1578414028,
+        //                     "amount": "0.00100",
+        //                     "price": "665000.00",
+        //                     "side": "BUY",
+        //                     "taker_fee": "0",
+        //                     "taker_side": "BUY",
+        //                     "match_price": "66500000",
+        //                     "maker_fee": "0",
+        //                     "taker": 4892,
+        //                     "maker": 4889
+        //                 },
+        //             ]
+        //         }
+        //     }
+        //
+        const results = this.safeValue (response, 'results', {});
+        const data = this.safeValue (results, 'data', []);
+        return this.parseTrades (data, market, since, limit);
+    }
+
+    sign (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
+        const request = '/' + this.version + '/' + this.implodeParams (path, params);
+        let url = this.urls['api'][api] + request;
+        const query = this.omit (params, this.extractParams (path));
+        if (api === 'public') {
+            if (Object.keys (query).length) {
+                url += '?' + this.urlencode (query);
+            }
+        } else if (api === 'private') {
+            this.checkRequiredCredentials ();
+            if (method === 'POST') {
+                body = this.json (query);
+            } else {
+                if (Object.keys (query).length) {
+                    url += '?' + this.urlencode (query);
+                }
+            }
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + this.apiKey,
+            };
+        }
+        return { 'url': url, 'method': method, 'body': body, 'headers': headers };
+    }
+
+    handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
+        if (response === undefined) {
+            return;
+        }
+        //
+        //      {"detail":"Authentication credentials were not provided."}
+        //      {"status_code":400,"errors":{"pair":["Invalid pair FOOBAR"]},"message":"An error has occurred, please check the form."}
+        //      {"status_code":400,"errors":{"order_type":["Invalid order type. Valid options: ['MARKET', 'LIMIT']"]},"message":"An error has occurred, please check the form."}
+        //      {"status_code":400,"errors":{"non_field_errors":"Something unexpected ocurred!"},"message":"Seems like an unexpected error occurred. Please try again later or write us to support@ripio.com if the problem persists."}
+        //      {"status_code":400,"errors":{"pair":["Invalid/Disabled pair BTC_ARS"]},"message":"An error has occurred, please check the form."}
+        //
+        const detail = this.safeString (response, 'detail');
+        if (detail !== undefined) {
+            const feedback = this.id + ' ' + body;
+            // this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
+            this.throwBroadlyMatchedException (this.exceptions['broad'], detail, feedback);
+        }
+        const errors = this.safeValue (response, 'errors');
+        if (errors !== undefined) {
+            const feedback = this.id + ' ' + body;
+            const keys = Object.keys (errors);
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                const error = this.safeValue (errors, key, []);
+                const message = this.safeString (error, 0);
+                // this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
+                this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
+            }
+            throw new ExchangeError (feedback); // unknown message
+        }
+    }
+};
+
+},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],124:[function(require,module,exports){
+'use strict';
+
+//  ---------------------------------------------------------------------------
+
+const Exchange = require ('./base/Exchange');
 const { ArgumentsRequired } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
@@ -102506,7 +103384,7 @@ module.exports = class southxchange extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],124:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],125:[function(require,module,exports){
 (function (module, exports) {
     'use strict';
 
@@ -106034,7 +106912,7 @@ module.exports = class southxchange extends Exchange {
     };
 })(typeof module === 'undefined' || module, this);
 
-},{"buffer":186}],125:[function(require,module,exports){
+},{"buffer":187}],126:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -112023,7 +112901,7 @@ module.exports = class southxchange extends Exchange {
 	return CryptoJS;
 
 }));
-},{}],126:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 'use strict';
 
 var elliptic = exports;
@@ -112047,7 +112925,7 @@ elliptic.curves = require('./elliptic/curves');
 elliptic.ec = require('./elliptic/ec');
 elliptic.eddsa = require('./elliptic/eddsa');
 
-},{"./elliptic/curve":129,"./elliptic/curves":132,"./elliptic/ec":133,"./elliptic/eddsa":136,"./elliptic/utils":140}],127:[function(require,module,exports){
+},{"./elliptic/curve":130,"./elliptic/curves":133,"./elliptic/ec":134,"./elliptic/eddsa":137,"./elliptic/utils":141}],128:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -112424,7 +113302,7 @@ BasePoint.prototype.dblp = function dblp(k) {
   return r;
 };
 
-},{"../../../../BN/bn":124,"../../elliptic":126}],128:[function(require,module,exports){
+},{"../../../../BN/bn":125,"../../elliptic":127}],129:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -112859,7 +113737,7 @@ Point.prototype.eqXToP = function eqXToP(x) {
 Point.prototype.toP = Point.prototype.normalize;
 Point.prototype.mixedAdd = Point.prototype.add;
 
-},{"../../../../BN/bn":124,"../../elliptic":126,"../curve":129}],129:[function(require,module,exports){
+},{"../../../../BN/bn":125,"../../elliptic":127,"../curve":130}],130:[function(require,module,exports){
 'use strict';
 
 var curve = exports;
@@ -112869,7 +113747,7 @@ curve.short = require('./short');
 curve.mont = require('./mont');
 curve.edwards = require('./edwards');
 
-},{"./base":127,"./edwards":128,"./mont":130,"./short":131}],130:[function(require,module,exports){
+},{"./base":128,"./edwards":129,"./mont":131,"./short":132}],131:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -113051,7 +113929,7 @@ Point.prototype.getX = function getX() {
   return this.x.fromRed();
 };
 
-},{"../../../../BN/bn":124,"../../elliptic":126,"../curve":129}],131:[function(require,module,exports){
+},{"../../../../BN/bn":125,"../../elliptic":127,"../curve":130}],132:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -113991,7 +114869,7 @@ JPoint.prototype.isInfinity = function isInfinity() {
   return this.z.cmpn(0) === 0;
 };
 
-},{"../../../../BN/bn":124,"../../elliptic":126,"../curve":129}],132:[function(require,module,exports){
+},{"../../../../BN/bn":125,"../../elliptic":127,"../curve":130}],133:[function(require,module,exports){
 'use strict';
 
 var curves = exports;
@@ -114197,7 +115075,7 @@ defineCurve('secp256k1', {
   ]
 });
 
-},{"../elliptic":126,"./precomputed/secp256k1":139}],133:[function(require,module,exports){
+},{"../elliptic":127,"./precomputed/secp256k1":140}],134:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -114439,7 +115317,7 @@ EC.prototype.getKeyRecoveryParam = function(e, signature, Q, enc) {
   throw new Error('Unable to find valid recovery factor');
 };
 
-},{"../../../../BN/bn":124,"../../elliptic":126,"../../hmac-drbg/hmac-drbg":141,"./key":134,"./signature":135}],134:[function(require,module,exports){
+},{"../../../../BN/bn":125,"../../elliptic":127,"../../hmac-drbg/hmac-drbg":142,"./key":135,"./signature":136}],135:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -114560,7 +115438,7 @@ KeyPair.prototype.inspect = function inspect() {
          ' pub: ' + (this.pub && this.pub.inspect()) + ' >';
 };
 
-},{"../../../../BN/bn":124,"../../elliptic":126}],135:[function(require,module,exports){
+},{"../../../../BN/bn":125,"../../elliptic":127}],136:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -114586,7 +115464,7 @@ function Signature(options, enc) {
 }
 module.exports = Signature;
 
-},{"../../../../BN/bn":124,"../../elliptic":126}],136:[function(require,module,exports){
+},{"../../../../BN/bn":125,"../../elliptic":127}],137:[function(require,module,exports){
 'use strict';
 
 var curves = require('../curves');
@@ -114733,7 +115611,7 @@ EDDSA.prototype.isPoint = function isPoint(val) {
   return val instanceof this.pointClass;
 };
 
-},{"../../../../../base/functions/encode":10,"../../../../BN/bn.js":124,"../../../../crypto-js/crypto-js":125,"../curves":132,"../utils":140,"./key":137,"./signature":138}],137:[function(require,module,exports){
+},{"../../../../../base/functions/encode":10,"../../../../BN/bn.js":125,"../../../../crypto-js/crypto-js":126,"../curves":133,"../utils":141,"./key":138,"./signature":139}],138:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -114835,7 +115713,7 @@ KeyPair.prototype.getPublic = function getPublic(enc) {
 
 module.exports = KeyPair;
 
-},{"../utils":140}],138:[function(require,module,exports){
+},{"../utils":141}],139:[function(require,module,exports){
 'use strict';
 
 var BN = require('../../../../BN/bn');
@@ -114902,7 +115780,7 @@ Signature.prototype.toHex = function toHex() {
 
 module.exports = Signature;
 
-},{"../../../../BN/bn":124,"../utils":140}],139:[function(require,module,exports){
+},{"../../../../BN/bn":125,"../utils":141}],140:[function(require,module,exports){
 module.exports = {
   doubles: {
     step: 4,
@@ -115684,7 +116562,7 @@ module.exports = {
   }
 };
 
-},{}],140:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 'use strict';
 
 var utils = exports;
@@ -115900,7 +116778,7 @@ utils.encode = function encode(arr, enc) {
     return arr;
 };
 
-},{"../../../BN/bn":124}],141:[function(require,module,exports){
+},{"../../../BN/bn":125}],142:[function(require,module,exports){
 'use strict';
 
 var CryptoJS = require('../../../crypto-js/crypto-js');
@@ -116016,7 +116894,7 @@ HmacDRBG.prototype.generate = function generate(len, enc, add, addEnc) {
   return utils.wordArrayToBuffer(res);
 };
 
-},{"../../../../base/functions/encode":10,"../../../crypto-js/crypto-js":125,"../elliptic/utils":140}],142:[function(require,module,exports){
+},{"../../../../base/functions/encode":10,"../../../crypto-js/crypto-js":126,"../elliptic/utils":141}],143:[function(require,module,exports){
 'use strict';
 
 var fetch = require('../node-fetch/index');
@@ -116057,7 +116935,7 @@ module.exports = function (context) {
   };
 };
 
-},{"../node-fetch/index":143}],143:[function(require,module,exports){
+},{"../node-fetch/index":144}],144:[function(require,module,exports){
 (function (global,Buffer){
 'use strict';
 
@@ -117625,7 +118503,7 @@ exports.Response = Response;
 exports.FetchError = FetchError;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"buffer":186,"http":228,"https":191,"stream":227,"url":234,"zlib":185}],144:[function(require,module,exports){
+},{"buffer":187,"http":229,"https":192,"stream":228,"url":235,"zlib":186}],145:[function(require,module,exports){
 (function (Buffer){
 /*!
  * RSA library for Node.js
@@ -117852,7 +118730,7 @@ module.exports = (function () {
 })();
 
 }).call(this,require("buffer").Buffer)
-},{"./formats/formats.js":151,"./libs/rsa.js":155,"./schemes/schemes.js":157,"./utils":158,"buffer":186}],145:[function(require,module,exports){
+},{"./formats/formats.js":152,"./libs/rsa.js":156,"./schemes/schemes.js":158,"./utils":159,"buffer":187}],146:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 
@@ -117867,7 +118745,7 @@ module.exports = {
 
 };
 
-},{}],146:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 var errors = require('./errors');
@@ -117890,7 +118768,7 @@ for (var e in errors) {
     module.exports[e] = errors[e];
 }
 
-},{"./errors":145,"./reader":147,"./types":148}],147:[function(require,module,exports){
+},{"./errors":146,"./reader":148,"./types":149}],148:[function(require,module,exports){
 (function (Buffer){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
@@ -118156,7 +119034,7 @@ Reader.prototype._readTag = function (tag) {
 module.exports = Reader;
 
 }).call(this,require("buffer").Buffer)
-},{"./errors":145,"./types":148,"assert":181,"buffer":186}],148:[function(require,module,exports){
+},{"./errors":146,"./types":149,"assert":182,"buffer":187}],149:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 
@@ -118194,7 +119072,7 @@ module.exports = {
   Context: 128
 };
 
-},{}],149:[function(require,module,exports){
+},{}],150:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 // If you have no idea what ASN.1 or BER is, see this:
@@ -118213,7 +119091,7 @@ module.exports = {
   BerReader: Ber.Reader,
 };
 
-},{"./ber/index":146}],150:[function(require,module,exports){
+},{"./ber/index":147}],151:[function(require,module,exports){
 var _ = require('../utils')._;
 var utils = require('../utils');
 
@@ -118286,7 +119164,7 @@ module.exports = {
     }
 };
 
-},{"../utils":158}],151:[function(require,module,exports){
+},{"../utils":159}],152:[function(require,module,exports){
 var _ = require('../utils')._;
 
 module.exports = {
@@ -118319,7 +119197,7 @@ module.exports = {
     },
 };
 
-},{"../utils":158,"./components":150,"./pkcs1":152,"./pkcs8":153}],152:[function(require,module,exports){
+},{"../utils":159,"./components":151,"./pkcs1":153,"./pkcs8":154}],153:[function(require,module,exports){
 (function (Buffer){
 var ber = require('../asn1/index').Ber;
 var _ = require('../utils')._;
@@ -118471,7 +119349,7 @@ module.exports = {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"../asn1/index":149,"../utils":158,"buffer":186}],153:[function(require,module,exports){
+},{"../asn1/index":150,"../utils":159,"buffer":187}],154:[function(require,module,exports){
 (function (Buffer){
 var ber = require('../asn1/index').Ber;
 var _ = require('../utils')._;
@@ -118662,7 +119540,7 @@ module.exports = {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"../asn1/index":149,"../utils":158,"buffer":186}],154:[function(require,module,exports){
+},{"../asn1/index":150,"../utils":159,"buffer":187}],155:[function(require,module,exports){
 (function (Buffer){
 /*
  * Basic JavaScript BN library - subset useful for RSA encryption.
@@ -119918,7 +120796,7 @@ BigInteger.prototype.square = bnSquare;
 module.exports = BigInteger;
 
 }).call(this,require("buffer").Buffer)
-},{"../utils":158,"buffer":186}],155:[function(require,module,exports){
+},{"../utils":159,"buffer":187}],156:[function(require,module,exports){
 /*
  * RSA Encryption / Decryption with PKCS1 v2 Padding.
  *
@@ -120067,7 +120945,7 @@ module.exports.Key = (function () {
 })();
 
 
-},{"../schemes/schemes.js":157,"../utils":158,"../utils.js":158,"./jsbn.js":154}],156:[function(require,module,exports){
+},{"../schemes/schemes.js":158,"../utils":159,"../utils.js":159,"./jsbn.js":155}],157:[function(require,module,exports){
 (function (Buffer){
 /**
  * PKCS1 padding and signature scheme
@@ -120247,7 +121125,7 @@ function wordArrayToBuffer(wordArray) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"../../crypto-js/crypto-js":125,"../libs/jsbn":154,"buffer":186,"constants":188}],157:[function(require,module,exports){
+},{"../../crypto-js/crypto-js":126,"../libs/jsbn":155,"buffer":187,"constants":189}],158:[function(require,module,exports){
 module.exports = {
     pkcs1: require('./pkcs1'),
 
@@ -120270,7 +121148,7 @@ module.exports = {
     }
 };
 
-},{"./pkcs1":156}],158:[function(require,module,exports){
+},{"./pkcs1":157}],159:[function(require,module,exports){
 /*
  * Utils functions
  *
@@ -120370,7 +121248,7 @@ module.exports.trimSurroundingText = function (data, opening, closing) {
     return data.substring(trimStartIndex, trimEndIndex);
 }
 
-},{}],159:[function(require,module,exports){
+},{}],160:[function(require,module,exports){
 'use strict';
 
 var replace = String.prototype.replace;
@@ -120390,7 +121268,7 @@ module.exports = {
     RFC3986: 'RFC3986'
 };
 
-},{}],160:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 'use strict';
 
 var stringify = require('./stringify');
@@ -120403,7 +121281,7 @@ module.exports = {
     stringify: stringify
 };
 
-},{"./formats":159,"./parse":161,"./stringify":162}],161:[function(require,module,exports){
+},{"./formats":160,"./parse":162,"./stringify":163}],162:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -120647,7 +121525,7 @@ module.exports = function (str, opts) {
     return utils.compact(obj);
 };
 
-},{"./utils":163}],162:[function(require,module,exports){
+},{"./utils":164}],163:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -120918,7 +121796,7 @@ module.exports = function (object, opts) {
     return joined.length > 0 ? prefix + joined : '';
 };
 
-},{"./formats":159,"./utils":163}],163:[function(require,module,exports){
+},{"./formats":160,"./utils":164}],164:[function(require,module,exports){
 'use strict';
 
 var has = Object.prototype.hasOwnProperty;
@@ -121150,7 +122028,7 @@ module.exports = {
     merge: merge
 };
 
-},{}],164:[function(require,module,exports){
+},{}],165:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -122976,7 +123854,7 @@ module.exports = class stex extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],165:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],166:[function(require,module,exports){
 'use strict';
 
 // ----------------------------------------------------------------------------
@@ -123772,7 +124650,7 @@ module.exports = class stronghold extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],166:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],167:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -123806,7 +124684,7 @@ module.exports = class surbitcoin extends foxbit {
     }
 };
 
-},{"./foxbit.js":85}],167:[function(require,module,exports){
+},{"./foxbit.js":85}],168:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -125045,7 +125923,7 @@ module.exports = class therock extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],168:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],169:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -125595,7 +126473,7 @@ module.exports = class tidebit extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],169:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],170:[function(require,module,exports){
 'use strict';
 
 const Exchange = require ('./base/Exchange');
@@ -126466,7 +127344,7 @@ module.exports = class tidex extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],170:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],171:[function(require,module,exports){
 'use strict';
 
 const Exchange = require ('./base/Exchange');
@@ -127729,7 +128607,7 @@ module.exports = class timex extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],171:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],172:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -129283,7 +130161,7 @@ module.exports = class upbit extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],172:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],173:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -129488,7 +130366,7 @@ module.exports = class vaultoro extends Exchange {
     }
 };
 
-},{"./base/Exchange":5}],173:[function(require,module,exports){
+},{"./base/Exchange":5}],174:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -129522,7 +130400,7 @@ module.exports = class vbtc extends foxbit {
     }
 };
 
-},{"./foxbit.js":85}],174:[function(require,module,exports){
+},{"./foxbit.js":85}],175:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -131161,7 +132039,7 @@ module.exports = class wavesexchange extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],175:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],176:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -131816,7 +132694,7 @@ module.exports = class whitebit extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],176:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],177:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -132188,7 +133066,7 @@ module.exports = class xbtce extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],177:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],178:[function(require,module,exports){
 'use strict';
 
 const Exchange = require ('./base/Exchange');
@@ -133937,7 +134815,7 @@ module.exports = class xena extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],178:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],179:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
@@ -134887,7 +135765,7 @@ module.exports = class yobit extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],179:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],180:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -135406,7 +136284,7 @@ module.exports = class zaif extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],180:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],181:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -136064,7 +136942,7 @@ module.exports = class zb extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],181:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7}],182:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -136558,7 +137436,7 @@ var objectKeys = Object.keys || function (obj) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"util/":239}],182:[function(require,module,exports){
+},{"util/":240}],183:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -136674,9 +137552,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],183:[function(require,module,exports){
-
 },{}],184:[function(require,module,exports){
+
+},{}],185:[function(require,module,exports){
 (function (process,Buffer){
 'use strict';
 /* eslint camelcase: "off" */
@@ -137088,7 +137966,7 @@ Zlib.prototype._reset = function () {
 
 exports.Zlib = Zlib;
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":208,"assert":181,"buffer":186,"pako/lib/zlib/constants":198,"pako/lib/zlib/deflate.js":200,"pako/lib/zlib/inflate.js":202,"pako/lib/zlib/zstream":206}],185:[function(require,module,exports){
+},{"_process":209,"assert":182,"buffer":187,"pako/lib/zlib/constants":199,"pako/lib/zlib/deflate.js":201,"pako/lib/zlib/inflate.js":203,"pako/lib/zlib/zstream":207}],186:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -137700,7 +138578,7 @@ util.inherits(DeflateRaw, Zlib);
 util.inherits(InflateRaw, Zlib);
 util.inherits(Unzip, Zlib);
 }).call(this,require('_process'))
-},{"./binding":184,"_process":208,"assert":181,"buffer":186,"stream":227,"util":239}],186:[function(require,module,exports){
+},{"./binding":185,"_process":209,"assert":182,"buffer":187,"stream":228,"util":240}],187:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -139416,7 +140294,7 @@ function numberIsNaN (obj) {
   return obj !== obj // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":182,"ieee754":192}],187:[function(require,module,exports){
+},{"base64-js":183,"ieee754":193}],188:[function(require,module,exports){
 module.exports = {
   "100": "Continue",
   "101": "Switching Protocols",
@@ -139482,7 +140360,7 @@ module.exports = {
   "511": "Network Authentication Required"
 }
 
-},{}],188:[function(require,module,exports){
+},{}],189:[function(require,module,exports){
 module.exports={
   "O_RDONLY": 0,
   "O_WRONLY": 1,
@@ -139693,7 +140571,7 @@ module.exports={
   "UV_UDP_REUSEADDR": 4
 }
 
-},{}],189:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -139804,7 +140682,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":194}],190:[function(require,module,exports){
+},{"../../is-buffer/index.js":195}],191:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -140108,7 +140986,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],191:[function(require,module,exports){
+},{}],192:[function(require,module,exports){
 var http = require('http')
 var url = require('url')
 
@@ -140141,7 +141019,7 @@ function validateParams (params) {
   return params
 }
 
-},{"http":228,"url":234}],192:[function(require,module,exports){
+},{"http":229,"url":235}],193:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -140227,7 +141105,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],193:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -140252,7 +141130,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],194:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -140275,14 +141153,14 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],195:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],196:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 'use strict';
 
 
@@ -140389,7 +141267,7 @@ exports.setTyped = function (on) {
 
 exports.setTyped(TYPED_OK);
 
-},{}],197:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 'use strict';
 
 // Note: adler32 takes 12% for level 0 and 2% for level 6.
@@ -140442,7 +141320,7 @@ function adler32(adler, buf, len, pos) {
 
 module.exports = adler32;
 
-},{}],198:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -140512,7 +141390,7 @@ module.exports = {
   //Z_NULL:                 null // Use -1 or null inline, depending on var type
 };
 
-},{}],199:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 'use strict';
 
 // Note: we can't get significant speed boost here.
@@ -140573,7 +141451,7 @@ function crc32(crc, buf, len, pos) {
 
 module.exports = crc32;
 
-},{}],200:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -142449,7 +143327,7 @@ exports.deflatePrime = deflatePrime;
 exports.deflateTune = deflateTune;
 */
 
-},{"../utils/common":196,"./adler32":197,"./crc32":199,"./messages":204,"./trees":205}],201:[function(require,module,exports){
+},{"../utils/common":197,"./adler32":198,"./crc32":200,"./messages":205,"./trees":206}],202:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -142796,7 +143674,7 @@ module.exports = function inflate_fast(strm, start) {
   return;
 };
 
-},{}],202:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -144354,7 +145232,7 @@ exports.inflateSyncPoint = inflateSyncPoint;
 exports.inflateUndermine = inflateUndermine;
 */
 
-},{"../utils/common":196,"./adler32":197,"./crc32":199,"./inffast":201,"./inftrees":203}],203:[function(require,module,exports){
+},{"../utils/common":197,"./adler32":198,"./crc32":200,"./inffast":202,"./inftrees":204}],204:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -144699,7 +145577,7 @@ module.exports = function inflate_table(type, lens, lens_index, codes, table, ta
   return 0;
 };
 
-},{"../utils/common":196}],204:[function(require,module,exports){
+},{"../utils/common":197}],205:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -144733,7 +145611,7 @@ module.exports = {
   '-6':   'incompatible version' /* Z_VERSION_ERROR (-6) */
 };
 
-},{}],205:[function(require,module,exports){
+},{}],206:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -145955,7 +146833,7 @@ exports._tr_flush_block  = _tr_flush_block;
 exports._tr_tally = _tr_tally;
 exports._tr_align = _tr_align;
 
-},{"../utils/common":196}],206:[function(require,module,exports){
+},{"../utils/common":197}],207:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -146004,7 +146882,7 @@ function ZStream() {
 
 module.exports = ZStream;
 
-},{}],207:[function(require,module,exports){
+},{}],208:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -146051,7 +146929,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 }
 
 }).call(this,require('_process'))
-},{"_process":208}],208:[function(require,module,exports){
+},{"_process":209}],209:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -146237,7 +147115,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],209:[function(require,module,exports){
+},{}],210:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
@@ -146774,7 +147652,7 @@ process.umask = function() { return 0; };
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],210:[function(require,module,exports){
+},{}],211:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -146860,7 +147738,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],211:[function(require,module,exports){
+},{}],212:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -146947,16 +147825,16 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],212:[function(require,module,exports){
+},{}],213:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":210,"./encode":211}],213:[function(require,module,exports){
+},{"./decode":211,"./encode":212}],214:[function(require,module,exports){
 module.exports = require('./lib/_stream_duplex.js');
 
-},{"./lib/_stream_duplex.js":214}],214:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":215}],215:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -147081,7 +147959,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":216,"./_stream_writable":218,"core-util-is":189,"inherits":193,"process-nextick-args":207}],215:[function(require,module,exports){
+},{"./_stream_readable":217,"./_stream_writable":219,"core-util-is":190,"inherits":194,"process-nextick-args":208}],216:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -147129,7 +148007,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":217,"core-util-is":189,"inherits":193}],216:[function(require,module,exports){
+},{"./_stream_transform":218,"core-util-is":190,"inherits":194}],217:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -148139,7 +149017,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./_stream_duplex":214,"./internal/streams/BufferList":219,"./internal/streams/destroy":220,"./internal/streams/stream":221,"_process":208,"core-util-is":189,"events":190,"inherits":193,"isarray":195,"process-nextick-args":207,"safe-buffer":226,"string_decoder/":232,"util":183}],217:[function(require,module,exports){
+},{"./_stream_duplex":215,"./internal/streams/BufferList":220,"./internal/streams/destroy":221,"./internal/streams/stream":222,"_process":209,"core-util-is":190,"events":191,"inherits":194,"isarray":196,"process-nextick-args":208,"safe-buffer":227,"string_decoder/":233,"util":184}],218:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -148354,7 +149232,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":214,"core-util-is":189,"inherits":193}],218:[function(require,module,exports){
+},{"./_stream_duplex":215,"core-util-is":190,"inherits":194}],219:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -149021,7 +149899,7 @@ Writable.prototype._destroy = function (err, cb) {
   cb(err);
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./_stream_duplex":214,"./internal/streams/destroy":220,"./internal/streams/stream":221,"_process":208,"core-util-is":189,"inherits":193,"process-nextick-args":207,"safe-buffer":226,"util-deprecate":236}],219:[function(require,module,exports){
+},{"./_stream_duplex":215,"./internal/streams/destroy":221,"./internal/streams/stream":222,"_process":209,"core-util-is":190,"inherits":194,"process-nextick-args":208,"safe-buffer":227,"util-deprecate":237}],220:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -149096,7 +149974,7 @@ module.exports = function () {
 
   return BufferList;
 }();
-},{"safe-buffer":226}],220:[function(require,module,exports){
+},{"safe-buffer":227}],221:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -149169,13 +150047,13 @@ module.exports = {
   destroy: destroy,
   undestroy: undestroy
 };
-},{"process-nextick-args":207}],221:[function(require,module,exports){
+},{"process-nextick-args":208}],222:[function(require,module,exports){
 module.exports = require('events').EventEmitter;
 
-},{"events":190}],222:[function(require,module,exports){
+},{"events":191}],223:[function(require,module,exports){
 module.exports = require('./readable').PassThrough
 
-},{"./readable":223}],223:[function(require,module,exports){
+},{"./readable":224}],224:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = exports;
 exports.Readable = exports;
@@ -149184,13 +150062,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":214,"./lib/_stream_passthrough.js":215,"./lib/_stream_readable.js":216,"./lib/_stream_transform.js":217,"./lib/_stream_writable.js":218}],224:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":215,"./lib/_stream_passthrough.js":216,"./lib/_stream_readable.js":217,"./lib/_stream_transform.js":218,"./lib/_stream_writable.js":219}],225:[function(require,module,exports){
 module.exports = require('./readable').Transform
 
-},{"./readable":223}],225:[function(require,module,exports){
+},{"./readable":224}],226:[function(require,module,exports){
 module.exports = require('./lib/_stream_writable.js');
 
-},{"./lib/_stream_writable.js":218}],226:[function(require,module,exports){
+},{"./lib/_stream_writable.js":219}],227:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -149254,7 +150132,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":186}],227:[function(require,module,exports){
+},{"buffer":187}],228:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -149383,7 +150261,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":190,"inherits":193,"readable-stream/duplex.js":213,"readable-stream/passthrough.js":222,"readable-stream/readable.js":223,"readable-stream/transform.js":224,"readable-stream/writable.js":225}],228:[function(require,module,exports){
+},{"events":191,"inherits":194,"readable-stream/duplex.js":214,"readable-stream/passthrough.js":223,"readable-stream/readable.js":224,"readable-stream/transform.js":225,"readable-stream/writable.js":226}],229:[function(require,module,exports){
 (function (global){
 var ClientRequest = require('./lib/request')
 var extend = require('xtend')
@@ -149465,7 +150343,7 @@ http.METHODS = [
 	'UNSUBSCRIBE'
 ]
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./lib/request":230,"builtin-status-codes":187,"url":234,"xtend":240}],229:[function(require,module,exports){
+},{"./lib/request":231,"builtin-status-codes":188,"url":235,"xtend":241}],230:[function(require,module,exports){
 (function (global){
 exports.fetch = isFunction(global.fetch) && isFunction(global.ReadableStream)
 
@@ -149538,7 +150416,7 @@ function isFunction (value) {
 xhr = null // Help gc
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],230:[function(require,module,exports){
+},{}],231:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -149848,7 +150726,7 @@ var unsafeHeaders = [
 ]
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":229,"./response":231,"_process":208,"buffer":186,"inherits":193,"readable-stream":223,"to-arraybuffer":233}],231:[function(require,module,exports){
+},{"./capability":230,"./response":232,"_process":209,"buffer":187,"inherits":194,"readable-stream":224,"to-arraybuffer":234}],232:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -150034,7 +150912,7 @@ IncomingMessage.prototype._onXHRProgress = function () {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":229,"_process":208,"buffer":186,"inherits":193,"readable-stream":223}],232:[function(require,module,exports){
+},{"./capability":230,"_process":209,"buffer":187,"inherits":194,"readable-stream":224}],233:[function(require,module,exports){
 'use strict';
 
 var Buffer = require('safe-buffer').Buffer;
@@ -150307,7 +151185,7 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":226}],233:[function(require,module,exports){
+},{"safe-buffer":227}],234:[function(require,module,exports){
 var Buffer = require('buffer').Buffer
 
 module.exports = function (buf) {
@@ -150336,7 +151214,7 @@ module.exports = function (buf) {
 	}
 }
 
-},{"buffer":186}],234:[function(require,module,exports){
+},{"buffer":187}],235:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -151070,7 +151948,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":235,"punycode":209,"querystring":212}],235:[function(require,module,exports){
+},{"./util":236,"punycode":210,"querystring":213}],236:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -151088,7 +151966,7 @@ module.exports = {
   }
 };
 
-},{}],236:[function(require,module,exports){
+},{}],237:[function(require,module,exports){
 (function (global){
 
 /**
@@ -151159,16 +152037,16 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],237:[function(require,module,exports){
-arguments[4][193][0].apply(exports,arguments)
-},{"dup":193}],238:[function(require,module,exports){
+},{}],238:[function(require,module,exports){
+arguments[4][194][0].apply(exports,arguments)
+},{"dup":194}],239:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],239:[function(require,module,exports){
+},{}],240:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -151758,7 +152636,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":238,"_process":208,"inherits":237}],240:[function(require,module,exports){
+},{"./support/isBuffer":239,"_process":209,"inherits":238}],241:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
