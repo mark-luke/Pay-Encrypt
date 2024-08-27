@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1311'
+const version = '1.18.1312'
 
 Exchange.ccxtVersion = version
 
@@ -29408,7 +29408,7 @@ module.exports = class buda extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, NullResponse, InvalidOrder, NotSupported } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, NullResponse, InvalidOrder, NotSupported, InsufficientFunds, InvalidNonce } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -29521,6 +29521,13 @@ module.exports = class cex extends Exchange {
                         'XRP': 0.0,
                         'XLM': 0.0,
                     },
+                },
+            },
+            'exceptions': {
+                'exact': {},
+                'broad': {
+                    'Insufficient funds': InsufficientFunds,
+                    'Nonce must be incremented': InvalidNonce,
                 },
             },
             'options': {
@@ -30543,28 +30550,37 @@ module.exports = class cex extends Exchange {
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
     }
 
-    async request (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
-        const response = await this.fetch2 (path, api, method, params, headers, body);
+    handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
         if (Array.isArray (response)) {
             return response; // public endpoints may return []-arrays
         }
         if (!response) {
             throw new NullResponse (this.id + ' returned ' + this.json (response));
-        } else if (response === true || response === 'true') {
-            return response;
-        } else if ('e' in response) {
+        }
+        if (response === true || response === 'true') {
+            return;
+        }
+        if ('e' in response) {
             if ('ok' in response) {
                 if (response['ok'] === 'ok') {
-                    return response;
+                    return;
                 }
             }
-            throw new ExchangeError (this.id + ' ' + this.json (response));
-        } else if ('error' in response) {
-            if (response['error']) {
-                throw new ExchangeError (this.id + ' ' + this.json (response));
-            }
         }
-        return response;
+        if ('error' in response) {
+            const message = this.safeString (response, 'error');
+            const feedback = this.id + ' ' + body;
+            const exact = this.exceptions['exact'];
+            if (message in exact) {
+                throw new exact[message] (feedback);
+            }
+            const broad = this.exceptions['broad'];
+            const broadKey = this.findBroadlyMatchedKey (broad, message);
+            if (broadKey !== undefined) {
+                throw new broad[broadKey] (feedback);
+            }
+            throw new ExchangeError (feedback);
+        }
     }
 };
 
