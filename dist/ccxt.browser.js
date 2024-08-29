@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.2'
+const version = '1.28.3'
 
 Exchange.ccxtVersion = version
 
@@ -77088,25 +77088,25 @@ module.exports = class lykke extends Exchange {
     async fetchOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const response = await this.privateGetOrders (params);
-        return this.parseOrders (response, undefined, since, limit);
+        let market = undefined;
+        if (symbol !== undefined) {
+            market = this.market (symbol);
+        }
+        return this.parseOrders (response, market, since, limit);
     }
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
-        await this.loadMarkets ();
         const request = {
             'status': 'InOrderBook',
         };
-        const response = await this.privateGetOrders (this.extend (request, params));
-        return this.parseOrders (response, undefined, since, limit);
+        return await this.fetchOrders (symbol, since, limit, this.extend (request, params));
     }
 
     async fetchClosedOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
-        await this.loadMarkets ();
         const request = {
             'status': 'Matched',
         };
-        const response = await this.privateGetOrders (this.extend (request, params));
-        return this.parseOrders (response, undefined, since, limit);
+        return await this.fetchOrders (symbol, since, limit, this.extend (request, params));
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
