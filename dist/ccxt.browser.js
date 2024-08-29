@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.55'
+const version = '1.27.56'
 
 Exchange.ccxtVersion = version
 
@@ -37190,8 +37190,16 @@ module.exports = class coinbase extends Exchange {
 
     async fetchTime (params = {}) {
         const response = await this.publicGetTime (params);
+        //
+        //     {
+        //         "data": {
+        //             "epoch": 1589295679,
+        //             "iso": "2020-05-12T15:01:19Z"
+        //         }
+        //     }
+        //
         const data = this.safeValue (response, 'data', {});
-        return this.parse8601 (this.safeString (data, 'iso'));
+        return this.safeTimestamp (data, 'epoch');
     }
 
     async fetchAccounts (params = {}) {
