@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.60'
+const version = '1.20.61'
 
 Exchange.ccxtVersion = version
 
@@ -39400,7 +39400,7 @@ module.exports = class coinfalcon extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { InsufficientFunds, ExchangeError, NotSupported, InvalidNonce, InvalidOrder } = require ('./base/errors');
+const { InsufficientFunds, ExchangeError, InvalidNonce, InvalidOrder, ArgumentsRequired } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -39470,33 +39470,40 @@ module.exports = class coinfloor extends Exchange {
     async fetchBalance (params = {}) {
         await this.loadMarkets ();
         let market = undefined;
-        if ('symbol' in params) {
-            market = this.findMarket (params['symbol']);
+        let query = params;
+        const symbol = this.safeString (params, 'symbol');
+        if (symbol !== undefined) {
+            market = this.market (params['symbol']);
+            query = this.omit (params, 'symbol');
         }
-        if ('id' in params) {
-            market = this.findMarket (params['id']);
+        const marketId = this.safeString (params, 'id');
+        if (marketId in this.markets_by_id) {
+            market = this.markets_by_id[marketId];
         }
-        if (!market) {
-            throw new NotSupported (this.id + ' fetchBalance requires a symbol param');
+        if (market === undefined) {
+            throw new ArgumentsRequired (this.id + ' fetchBalance requires a symbol param');
         }
         const request = {
             'id': market['id'],
         };
-        const response = await this.privatePostIdBalance (this.extend (request, params));
+        const response = await this.privatePostIdBalance (this.extend (request, query));
         const result = {
             'info': response,
         };
         // base/quote used for keys e.g. "xbt_reserved"
-        const keys = market['id'].toLowerCase ().split ('/');
-        result[market['base']] = {
-            'free': this.safeFloat (response, keys[0] + '_available'),
-            'used': this.safeFloat (response, keys[0] + '_reserved'),
-            'total': this.safeFloat (response, keys[0] + '_balance'),
+        const base = market['base'];
+        const quote = market['quote'];
+        const baseIdLower = this.safeStringLower (market, 'baseId');
+        const quoteIdLower = this.safeStringLower (market, 'quoteId');
+        result[base] = {
+            'free': this.safeFloat (response, baseIdLower + '_available'),
+            'used': this.safeFloat (response, baseIdLower + '_reserved'),
+            'total': this.safeFloat (response, baseIdLower + '_balance'),
         };
-        result[market['quote']] = {
-            'free': this.safeFloat (response, keys[1] + '_available'),
-            'used': this.safeFloat (response, keys[1] + '_reserved'),
-            'total': this.safeFloat (response, keys[1] + '_balance'),
+        result[quote] = {
+            'free': this.safeFloat (response, quoteIdLower + '_available'),
+            'used': this.safeFloat (response, quoteIdLower + '_reserved'),
+            'total': this.safeFloat (response, quoteIdLower + '_balance'),
         };
         return this.parseBalance (result);
     }
@@ -39604,10 +39611,10 @@ module.exports = class coinfloor extends Exchange {
         // code is actually a market symbol in this situation, not a currency code
         await this.loadMarkets ();
         let market = undefined;
-        if (code) {
-            market = this.findMarket (code);
-            if (!market) {
-                throw new NotSupported (this.id + ' fetchTransactions requires a code argument (a market symbol)');
+        if (code !== undefined) {
+            market = this.market (code);
+            if (market === undefined) {
+                throw new ArgumentsRequired (this.id + ' fetchTransactions requires a code argument (a market symbol)');
             }
         }
         const request = {
@@ -39795,7 +39802,7 @@ module.exports = class coinfloor extends Exchange {
 
     async cancelOrder (id, symbol = undefined, params = {}) {
         if (symbol === undefined) {
-            throw new NotSupported (this.id + ' cancelOrder requires a symbol argument');
+            throw new ArgumentsRequired (this.id + ' cancelOrder requires a symbol argument');
         }
         await this.loadMarkets ();
         const market = this.market (symbol);
@@ -39854,7 +39861,7 @@ module.exports = class coinfloor extends Exchange {
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         if (symbol === undefined) {
-            throw new NotSupported (this.id + ' fetchOpenOrders requires a symbol param');
+            throw new ArgumentsRequired (this.id + ' fetchOpenOrders requires a symbol param');
         }
         await this.loadMarkets ();
         const market = this.market (symbol);
