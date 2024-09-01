@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1069'
+const version = '1.18.1070'
 
 Exchange.ccxtVersion = version
 
@@ -14064,9 +14064,10 @@ module.exports = class bithumb extends Exchange {
             const account = this.account ();
             const currency = this.currency (code);
             const currencyId = currency['id'];
-            account['total'] = this.safeFloat (balances, 'total_' + currencyId);
-            account['used'] = this.safeFloat (balances, 'in_use_' + currencyId);
-            account['free'] = this.safeFloat (balances, 'available_' + currencyId);
+            const lowercase = currencyId.toLowerCase ();
+            account['total'] = this.safeFloat (balances, 'total_' + lowercase);
+            account['used'] = this.safeFloat (balances, 'in_use_' + lowercase);
+            account['free'] = this.safeFloat (balances, 'available_' + lowercase);
             result[code] = account;
         }
         return this.parseBalance (result);
