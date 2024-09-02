@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.92'
+const version = '1.28.93'
 
 Exchange.ccxtVersion = version
 
@@ -26316,7 +26316,7 @@ module.exports = class bitvavo extends Exchange {
         //
         const id = this.safeString (order, 'orderId');
         const timestamp = this.safeInteger (order, 'created');
-        const marketId = this.safeInteger (order, 'market');
+        const marketId = this.safeString (order, 'market');
         let symbol = undefined;
         if (marketId !== undefined) {
             if (marketId in this.markets_by_id) {
