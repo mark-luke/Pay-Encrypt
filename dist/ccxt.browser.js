@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.58'
+const version = '1.27.59'
 
 Exchange.ccxtVersion = version
 
@@ -57621,8 +57621,8 @@ module.exports = class hbtc extends Exchange {
                 'trading': {
                     'tierBased': false,
                     'percentage': true,
-                    'maker': 0.002, // MAKER费率
-                    'taker': 0.002, // TAKER费率
+                    'maker': 0.001,
+                    'taker': 0.001,
                 },
             },
             'exceptions': {
