@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.54'
+const version = '1.33.55'
 
 Exchange.ccxtVersion = version
 
@@ -20182,7 +20182,7 @@ module.exports = class bitmart extends Exchange {
                     'max': undefined,
                 },
                 'cost': {
-                    'min': undefined,
+                    'min': this.safeFloat (market, 'min_buy_amount'),
                     'max': undefined,
                 },
             };
