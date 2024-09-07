@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1068'
+const version = '1.18.1070'
 
 Exchange.ccxtVersion = version
 
@@ -4487,12 +4487,14 @@ module.exports =
 },{"./type":20}],14:[function(require,module,exports){
 'use strict';
 
+const { ROUND_UP, ROUND_DOWN } = require ('./number')
+
 //-------------------------------------------------------------------------
 // converts timeframe to seconds
 const parseTimeframe = (timeframe) => {
 
-    let amount = timeframe.slice (0, -1)
-    let unit = timeframe.slice (-1)
+    const amount = timeframe.slice (0, -1)
+    const unit = timeframe.slice (-1)
     let scale = 60 // 1m by default
 
     if (unit === 'y') {
@@ -4510,19 +4512,26 @@ const parseTimeframe = (timeframe) => {
     return amount * scale
 }
 
+const roundTimeframe = (timeframe, timestamp, direction = ROUND_DOWN) => {
+    const ms = parseTimeframe (timeframe) * 1000
+    // Get offset based on timeframe in milliseconds
+    const offset = timestamp % ms
+    return timestamp - offset + ((direction === ROUND_UP) ? ms : 0);
+}
+
 // given a sorted arrays of trades (recent last) and a timeframe builds an array of OHLCV candles
 const buildOHLCVC = (trades, timeframe = '1m', since = -Infinity, limit = Infinity) => {
-    let ms = parseTimeframe (timeframe) * 1000;
-    let ohlcvs = [];
+    const ms = parseTimeframe (timeframe) * 1000;
+    const ohlcvs = [];
     const [ timestamp, /* open */, high, low, close, volume, count ] = [ 0, 1, 2, 3, 4, 5, 6 ];
-    let oldest = Math.min (trades.length - 1, limit);
+    const oldest = Math.min (trades.length - 1, limit);
 
     for (let i = 0; i <= oldest; i++) {
-        let trade = trades[i];
+        const trade = trades[i];
         if (trade.timestamp < since)
             continue;
-        let openingTime = Math.floor (trade.timestamp / ms) * ms; // shift to the edge of m/h/d (but not M)
-        let candle = ohlcvs.length - 1;
+        const openingTime = Math.floor (trade.timestamp / ms) * ms; // shift to the edge of m/h/d (but not M)
+        const candle = ohlcvs.length - 1;
 
         if (candle === -1 || openingTime >= ohlcvs[candle][timestamp] + ms) {
             // moved to a new timeframe -> create a new candle from opening trade
@@ -4553,27 +4562,32 @@ module.exports = {
 
     aggregate (bidasks) {
 
-        let result = {}
+        const result = {}
 
-        for (const [price, volume] of bidasks) {
-            if (volume > 0)
+        for (let i = 0; i < bidasks.length; i++) {
+            const [ price, volume ] = bidasks[i];
+            if (volume > 0) {
                 result[price] = (result[price] || 0) + volume
+            }
         }
 
         return Object.keys (result).map (price => [parseFloat (price), parseFloat (result[price])])
     },
 
     parseTimeframe,
+    roundTimeframe,
     buildOHLCVC,
+    ROUND_UP,
+    ROUND_DOWN
 }
 
 /*  ------------------------------------------------------------------------ */
 
-},{}],15:[function(require,module,exports){
+},{"./number":15}],15:[function(require,module,exports){
 'use strict'
 
 const { isString, isNumber } = require ('./type')
-const { max } = Math
+    , { max } = Math
 
 /*  ------------------------------------------------------------------------
 
@@ -4588,8 +4602,10 @@ const { max } = Math
 
             decimalToPrecision ('123.456', ROUND, 2, DECIMAL_PLACES)                     */
 
-const ROUND    = 0                  // rounding mode
-    , TRUNCATE = 1
+const ROUND      = 0                // rounding mode
+    , TRUNCATE   = 1
+    , ROUND_UP   = 2
+    , ROUND_DOWN = 3
 
 const DECIMAL_PLACES     = 0        // digits counting mode
     , SIGNIFICANT_DIGITS = 1
@@ -4621,7 +4637,7 @@ function numberToString (x) { // avoids scientific notation for too large and to
         const e = parseInt (s.split ('e-')[1])
         const neg = (s[0] === '-')
         if (e) {
-            x *= Math.pow (10, e-1)
+            x *= Math.pow (10, e - 1)
             x = (neg ? '-' : '') + '0.' + (new Array (e)).join ('0') + x.toString ().substring (neg ? 3 : 2)
         }
     } else {
@@ -4629,7 +4645,7 @@ function numberToString (x) { // avoids scientific notation for too large and to
         if (e > 20) {
             e -= 20
             x /= Math.pow (10, e)
-            x += (new Array (e+1)).join ('0')
+            x += (new Array (e + 1)).join ('0')
         }
     }
     return x.toString ()
@@ -4642,8 +4658,8 @@ const truncate_regExpCache = []
     , truncate_to_string = (num, precision = 0) => {
         num = numberToString (num)
         if (precision > 0) {
-            const re = truncate_regExpCache[precision] || (truncate_regExpCache[precision] = new RegExp("([-]*\\d+\\.\\d{" + precision + "})(\\d)"))
-            const [,result] = num.toString ().match (re) || [null, num]
+            const re = truncate_regExpCache[precision] || (truncate_regExpCache[precision] = new RegExp ("([-]*\\d+\\.\\d{" + precision + "})(\\d)"))
+            const [ , result] = num.toString ().match (re) || [null, num]
             return result.toString ()
         }
         return parseInt (num).toString ()
@@ -4666,7 +4682,7 @@ const decimalToPrecision = (x, roundingMode
         if (countingMode === TICK_SIZE) {
             throw new Error (`TICK_SIZE cant be used with negative numPrecisionDigits`)
         }
-        let toNearest = Math.pow (10, -numPrecisionDigits)
+        const toNearest = Math.pow (10, -numPrecisionDigits)
         if (roundingMode === ROUND) {
             return (toNearest * decimalToPrecision (x / toNearest, roundingMode, 0, countingMode, paddingMode)).toString ()
         }
@@ -4679,7 +4695,7 @@ const decimalToPrecision = (x, roundingMode
     if (countingMode === TICK_SIZE) {
         const missing = x % numPrecisionDigits
         const reminder = x / numPrecisionDigits
-        if (reminder !== Math.floor(reminder)) {
+        if (reminder !== Math.floor (reminder)) {
             if (roundingMode === ROUND) {
                 if (x > 0) {
                     if (missing >= numPrecisionDigits / 2) {
@@ -4689,9 +4705,9 @@ const decimalToPrecision = (x, roundingMode
                     }
                 } else {
                     if (missing >= numPrecisionDigits / 2) {
-                        x = Number(x) - missing
+                        x = Number (x) - missing
                     } else {
-                        x = Number(x) - missing - numPrecisionDigits
+                        x = Number (x) - missing - numPrecisionDigits
                     }
                 }
             } else if (roundingMode === TRUNCATE) {
@@ -4865,6 +4881,8 @@ module.exports = {
     precisionConstants,
     ROUND,
     TRUNCATE,
+    ROUND_UP,
+    ROUND_DOWN,
     DECIMAL_PLACES,
     SIGNIFICANT_DIGITS,
     TICK_SIZE,
@@ -14046,9 +14064,10 @@ module.exports = class bithumb extends Exchange {
             const account = this.account ();
             const currency = this.currency (code);
             const currencyId = currency['id'];
-            account['total'] = this.safeFloat (balances, 'total_' + currencyId);
-            account['used'] = this.safeFloat (balances, 'in_use_' + currencyId);
-            account['free'] = this.safeFloat (balances, 'available_' + currencyId);
+            const lowercase = currencyId.toLowerCase ();
+            account['total'] = this.safeFloat (balances, 'total_' + lowercase);
+            account['used'] = this.safeFloat (balances, 'in_use_' + lowercase);
+            account['free'] = this.safeFloat (balances, 'available_' + lowercase);
             result[code] = account;
         }
         return this.parseBalance (result);
