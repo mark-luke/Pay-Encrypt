@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.13'
+const version = '1.27.14'
 
 Exchange.ccxtVersion = version
 
@@ -107811,7 +107811,7 @@ module.exports = class timex extends Exchange {
         const feeString = this.safeString (currency, 'withdrawalFee');
         const tradeDecimals = this.safeInteger (currency, 'tradeDecimals');
         let fee = undefined;
-        if ((feeString !== undefined) (tradeDecimals !== undefined)) {
+        if ((feeString !== undefined) && (tradeDecimals !== undefined)) {
             const feeStringLen = feeString.length;
             const dotIndex = feeStringLen - tradeDecimals;
             if (dotIndex > 0) {
