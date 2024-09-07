@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1159'
+const version = '1.18.1160'
 
 Exchange.ccxtVersion = version
 
@@ -24756,6 +24756,18 @@ module.exports = class btcalpha extends Exchange {
         let trades = this.safeValue (order, 'trades', []);
         trades = this.parseTrades (trades, market);
         const side = this.safeString2 (order, 'my_side', 'type');
+        let filled = undefined;
+        const numTrades = trades.length;
+        if (numTrades > 0) {
+            filled = 0.0;
+            for (let i = 0; i < numTrades; i++) {
+                filled = this.sum (filled, trades[i]['amount']);
+            }
+        }
+        let remaining = undefined;
+        if ((amount !== undefined) && (amount > 0) && (filled !== undefined)) {
+            remaining = Math.max (0, amount - filled);
+        }
         return {
             'id': id,
             'datetime': this.iso8601 (timestamp),
@@ -24767,8 +24779,8 @@ module.exports = class btcalpha extends Exchange {
             'price': price,
             'cost': undefined,
             'amount': amount,
-            'filled': undefined,
-            'remaining': undefined,
+            'filled': filled,
+            'remaining': remaining,
             'trades': trades,
             'fee': undefined,
             'info': order,
@@ -24788,7 +24800,11 @@ module.exports = class btcalpha extends Exchange {
         if (!response['success']) {
             throw new InvalidOrder (this.id + ' ' + this.json (response));
         }
-        return this.parseOrder (response, market);
+        const order = this.parseOrder (response, market);
+        amount = (order['amount'] > 0) ? order['amount'] : amount;
+        return this.extend (order, {
+            'amount': amount,
+        });
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
