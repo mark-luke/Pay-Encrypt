@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.17'
+const version = '1.20.18'
 
 Exchange.ccxtVersion = version
 
@@ -3586,12 +3586,6 @@ const {
     , throttle
     , capitalize
     , now
-    , microseconds
-    , seconds
-    , iso8601
-    , parse8601
-    , parseDate
-    , sleep
     , timeout
     , TimedOut
     , buildOHLCVC
@@ -3809,12 +3803,6 @@ module.exports = class Exchange {
         this.proxy = ''
         this.origin = '*' // CORS origin
 
-        this.iso8601      = iso8601
-        this.parse8601    = parse8601
-        this.parseDate    = parseDate
-        this.microseconds = microseconds
-        this.seconds      = seconds
-
         this.minFundingAddressLength = 1 // used in checkAddress
         this.substituteCommonCurrencyCodes = true  // reserved
 
@@ -3897,10 +3885,6 @@ module.exports = class Exchange {
 
     nonce () {
         return this.seconds ()
-    }
-
-    milliseconds () {
-        return now ()
     }
 
     encodeURIComponent (...args) {
@@ -6289,6 +6273,7 @@ module.exports = {
 
 const now = Date.now // TODO: figure out how to utilize performance.now () properly – it's not as easy as it does not return a unix timestamp...
 const microseconds = () => now () * 1000 // TODO: utilize performance.now for that purpose
+const milliseconds = now
 const seconds      = () => Math.floor (now () / 1000)
 
 /*  ------------------------------------------------------------------------ */
@@ -6442,6 +6427,7 @@ module.exports =
     {
         now
         , microseconds
+        , milliseconds
         , seconds
         , iso8601
         , parse8601
