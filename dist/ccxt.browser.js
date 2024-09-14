@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.18'
+const version = '1.27.19'
 
 Exchange.ccxtVersion = version
 
@@ -108034,7 +108034,7 @@ module.exports = class timex extends Exchange {
             this.safeFloat (ohlcv, 'high'),
             this.safeFloat (ohlcv, 'low'),
             this.safeFloat (ohlcv, 'close'),
-            this.safeFloat (ohlcv, 'volumeQuote'),
+            this.safeFloat (ohlcv, 'volume'),
         ];
     }
 
