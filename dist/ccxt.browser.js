@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.63'
+const version = '1.21.64'
 
 Exchange.ccxtVersion = version
 
@@ -8184,6 +8184,7 @@ module.exports = class bigone extends Exchange {
                 'fetchDeposits': true,
                 'fetchMyTrades': true,
                 'fetchOHLCV': true,
+                'fetchOrder': true,
                 'fetchOrders': true,
                 'fetchOpenOrders': true,
                 'fetchClosedOrders': true,
