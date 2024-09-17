@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.42'
+const version = '1.34.43'
 
 Exchange.ccxtVersion = version
 
@@ -89050,9 +89050,9 @@ module.exports = class novadax extends Exchange {
                 },
                 'www': 'https://www.novadax.com.br',
                 'doc': [
-                    'https://doc.novadax.com/en-US/',
+                    'https://doc.novadax.com/pt-BR/',
                 ],
-                'fees': 'https://www.novadax.com/en/fees-and-limits',
+                'fees': 'https://www.novadax.com.br/fees-and-limits',
                 'referral': 'https://www.novadax.com.br/?s=ccxt',
             },
             'api': {
@@ -89679,14 +89679,14 @@ module.exports = class novadax extends Exchange {
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         const request = {
-            'status': 'SUBMITTED,PROCESSING,PARTIAL_FILLED',
+            'status': 'SUBMITTED,PROCESSING,PARTIAL_FILLED,CANCELING',
         };
         return await this.fetchOrders (symbol, since, limit, this.extend (request, params));
     }
 
     async fetchClosedOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         const request = {
-            'status': 'CANCELING,FILLED,CANCELED,REJECTED',
+            'status': 'FILLED,CANCELED,REJECTED',
         };
         return await this.fetchOrders (symbol, since, limit, this.extend (request, params));
     }
@@ -89729,7 +89729,7 @@ module.exports = class novadax extends Exchange {
             'SUBMITTED': 'open',
             'PROCESSING': 'open',
             'PARTIAL_FILLED': 'open',
-            'CANCELING': 'canceled',
+            'CANCELING': 'open',
             'FILLED': 'closed',
             'CANCELED': 'canceled',
             'REJECTED': 'rejected',
@@ -89923,10 +89923,15 @@ module.exports = class novadax extends Exchange {
         } else if (api === 'private') {
             this.checkRequiredCredentials ();
             const timestamp = this.milliseconds ().toString ();
+            headers = {
+                'X-Nova-Access-Key': this.apiKey,
+                'X-Nova-Timestamp': timestamp,
+            };
             let queryString = undefined;
             if (method === 'POST') {
                 body = this.json (query);
                 queryString = this.hash (body, 'md5');
+                headers['Content-Type'] = 'application/json';
             } else {
                 if (Object.keys (query).length) {
                     url += '?' + this.urlencode (query);
@@ -89934,12 +89939,7 @@ module.exports = class novadax extends Exchange {
                 queryString = this.urlencode (this.keysort (query));
             }
             const auth = method + "\n" + request + "\n" + queryString + "\n" + timestamp; // eslint-disable-line quotes
-            const signature = this.hmac (this.encode (auth), this.encode (this.secret));
-            headers = {
-                'X-Nova-Access-Key': this.apiKey,
-                'X-Nova-Signature': signature,
-                'X-Nova-Timestamp': timestamp,
-            };
+            headers['X-Nova-Signature'] = this.hmac (this.encode (auth), this.encode (this.secret));
         }
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
     }
