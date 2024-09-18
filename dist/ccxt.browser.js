@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.90'
+const version = '1.29.91'
 
 Exchange.ccxtVersion = version
 
@@ -122520,7 +122520,7 @@ module.exports = class zaif extends Exchange {
             'remaining': undefined,
             'trades': undefined,
             'fee': undefined,
-            'info': undefined,
+            'info': order,
             'average': undefined,
         };
     }
