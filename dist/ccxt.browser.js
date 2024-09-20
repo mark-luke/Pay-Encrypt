@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1129'
+const version = '1.18.1132'
 
 Exchange.ccxtVersion = version
 
@@ -6161,6 +6161,7 @@ module.exports =
     , capitalize: s => s.length
                             ? (s.charAt (0).toUpperCase () + s.slice (1))
                             : s
+    , strip: s => s.replace(/^\s+|\s+$/g, '')
     }
 
 /*  ------------------------------------------------------------------------ */
@@ -25131,11 +25132,9 @@ module.exports = class btcbox extends Exchange {
 
     async request (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
         let response = await this.fetch2 (path, api, method, params, headers, body);
-        // sometimes the exchange returns whitespace prepended to json
-        // the code below removes excessive spaces
         if (typeof response === 'string') {
-            response = response.split (' ');
-            response = response.join ('');
+            // sometimes the exchange returns whitespace prepended to json
+            response = this.strip (response);
             if (!this.isJsonEncodedObject (response)) {
                 throw new ExchangeError (this.id + ' ' + response);
             }
@@ -43141,6 +43140,9 @@ module.exports = class dsx extends Exchange {
             // 'endId': 321, // Decimal, ID of the last order of the selection
             // 'order': 'ASC', // String, Order in which orders shown. Possible values are "ASC" — from first to last, "DESC" — from last to first.
         };
+        if (limit !== undefined) {
+            request['count'] = limit;
+        }
         const response = await this.privatePostHistoryOrders (this.extend (request, params));
         //
         //     {
