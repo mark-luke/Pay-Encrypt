@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.60'
+const version = '1.32.61'
 
 Exchange.ccxtVersion = version
 
@@ -65282,7 +65282,7 @@ module.exports = class gateio extends Exchange {
             const quote = this.safeCurrencyCode (quoteId);
             const symbol = base + '/' + quote;
             const precision = {
-                'amount': 8,
+                'amount': this.safeInteger (details, 'amount_decimal_places'),
                 'price': this.safeInteger (details, 'decimal_places'),
             };
             const amountLimits = {
