@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.23'
+const version = '1.21.24'
 
 Exchange.ccxtVersion = version
 
@@ -3569,8 +3569,6 @@ module.exports = class anxpro extends Exchange {
 
 /*  ------------------------------------------------------------------------ */
 
-const http = require ('http')
-const https = require ('https')
 const functions = require ('./functions')
 
 const {
@@ -3787,7 +3785,11 @@ module.exports = class Exchange {
         // }
 
         this.options = {} // exchange-specific options, if any
-        this.fetchOptions = {} // fetch implementation options (JS only)
+
+        // fetch implementation options (JS only)
+        this.fetchOptions = {
+            keepalive: true,
+        }
 
         this.userAgents = {
             'chrome': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
@@ -3856,13 +3858,13 @@ module.exports = class Exchange {
         // merge to this
         for (const [property, value] of Object.entries (config))
             this[property] = deepExtend (this[property], value)
-        
+
         if (!this.httpAgent) {
-            this.httpAgent = new http.Agent ({ 'keepAlive': true })
+            this.httpAgent = defaultFetch.http ? new defaultFetch.http.Agent ({ 'keepAlive': true }) : undefined
         }
-        
+
         if (!this.httpsAgent) {
-            this.httpsAgent = new https.Agent ({ 'keepAlive': true })
+            this.httpsAgent = defaultFetch.https ? new defaultFetch.https.Agent ({ 'keepAlive': true }) : undefined
         }
 
         // generate old metainfo interface
@@ -5065,7 +5067,7 @@ module.exports = class Exchange {
 
 
 }).call(this,require("buffer").Buffer)
-},{"../static_dependencies/BN/bn":123,"./errors":10,"./functions":11,"buffer":182,"http":224,"https":187}],9:[function(require,module,exports){
+},{"../static_dependencies/BN/bn":123,"./errors":10,"./functions":11,"buffer":182}],9:[function(require,module,exports){
 'use strict';
 
 const errorHierarchy = {
@@ -13997,17 +13999,17 @@ module.exports = class bitfinex extends Exchange {
             symbol = market['symbol'];
         } else if ('pair' in ticker) {
             const marketId = this.safeString (ticker, 'pair');
-            if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[marketId];
-            }
-            if (market !== undefined) {
-                symbol = market['symbol'];
-            } else {
-                const baseId = marketId.slice (0, 3);
-                const quoteId = marketId.slice (3, 6);
-                const base = this.safeCurrencyCode (baseId);
-                const quote = this.safeCurrencyCode (quoteId);
-                symbol = base + '/' + quote;
+            if (marketId !== undefined) {
+                if (marketId in this.markets_by_id) {
+                    market = this.markets_by_id[marketId];
+                    symbol = market['symbol'];
+                } else {
+                    const baseId = marketId.slice (0, 3);
+                    const quoteId = marketId.slice (3, 6);
+                    const base = this.safeCurrencyCode (baseId);
+                    const quote = this.safeCurrencyCode (quoteId);
+                    symbol = base + '/' + quote;
+                }
             }
         }
         const last = this.safeFloat (ticker, 'last_price');
@@ -14182,9 +14184,8 @@ module.exports = class bitfinex extends Exchange {
         }
         let symbol = undefined;
         if (market === undefined) {
-            let marketId = this.safeString (order, 'symbol');
+            const marketId = this.safeStringUpper (order, 'symbol');
             if (marketId !== undefined) {
-                marketId = marketId.toUpperCase ();
                 if (marketId in this.markets_by_id) {
                     market = this.markets_by_id[marketId];
                 }
@@ -90098,13 +90099,19 @@ var fetch = require('../node-fetch/index');
 function wrapFetchForNode(fetch) {
   // Support schemaless URIs on the server for parity with the browser.
   // https://github.com/matthew-andrews/isomorphic-fetch/pull/10
-  return function (u, options) {
+  const f = function (u, options) {
     if (typeof u === 'string' && u.slice(0, 2) === '//') {
       return fetch('https:' + u, options);
     }
 
     return fetch(u, options);
   };
+  // Igor Kroitor 2019 Dec 30
+  // expose http and https
+  // https://github.com/ccxt/ccxt/issues/6327
+  f.http = fetch.http;
+  f.https = fetch.https;
+  return f;
 }
 
 module.exports = function (context) {
@@ -91679,6 +91686,12 @@ fetch.default = fetch;
 
 // expose Promise
 fetch.Promise = global.Promise;
+
+// Igor Kroitor 2019 Dec 30
+// expose http and https
+// https://github.com/ccxt/ccxt/issues/6327
+fetch.http = http
+fetch.https = https
 
 module.exports = exports = fetch;
 exports.Headers = Headers;
