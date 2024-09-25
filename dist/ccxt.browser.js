@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.46'
+const version = '1.19.47'
 
 Exchange.ccxtVersion = version
 
@@ -41711,6 +41711,7 @@ module.exports = class coss extends Exchange {
             },
             'commonCurrencies': {
                 'COS': 'COSS',
+                'COSS': 'COSS.io',
             },
         });
     }
