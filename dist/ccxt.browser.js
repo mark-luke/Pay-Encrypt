@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.14'
+const version = '1.32.16'
 
 Exchange.ccxtVersion = version
 
@@ -26348,8 +26348,10 @@ module.exports = class bittrex extends Exchange {
                         'markets/{marketSymbol}/orderbook',
                         'markets/{marketSymbol}/trades',
                         'markets/{marketSymbol}/ticker',
-                        'markets/{marketSymbol}/candles',
+                        'markets/{marketSymbol}/candles/{candleInterval}/recent',
                         'markets/{marketSymbol}/candles/{candleInterval}/historical/{year}/{month}/{day}',
+                        'markets/{marketSymbol}/candles/{candleInterval}/historical/{year}/{month}',
+                        'markets/{marketSymbol}/candles/{candleInterval}/historical/{year}',
                     ],
                 },
                 'public': {
@@ -26894,20 +26896,37 @@ module.exports = class bittrex extends Exchange {
             'candleInterval': this.timeframes[timeframe],
             'marketSymbol': reverseId,
         };
-        let method = 'v3publicGetMarketsMarketSymbolCandles';
+        let method = 'v3publicGetMarketsMarketSymbolCandlesCandleIntervalRecent';
         if (since !== undefined) {
             const now = this.milliseconds ();
             const difference = Math.abs (now - since);
-            if (difference > 86400000) {
-                method = 'v3publicGetMarketsMarketSymbolCandlesCandleIntervalHistoricalYearMonthDay';
-                const date = this.ymd (since);
-                const parts = date.split ('-');
-                const year = this.safeInteger (parts, 0);
-                const month = this.safeInteger (parts, 1);
-                const day = this.safeInteger (parts, 2);
-                request['year'] = year;
-                request['month'] = month;
-                request['day'] = day;
+            const sinceDate = this.ymd (since);
+            const parts = sinceDate.split ('-');
+            const sinceYear = this.safeInteger (parts, 0);
+            const sinceMonth = this.safeInteger (parts, 1);
+            const sinceDay = this.safeInteger (parts, 2);
+            if (timeframe === '1d') {
+                // if the since argument is beyond one year into the past
+                if (difference > 31622400000) {
+                    method = 'v3publicGetMarketsMarketSymbolCandlesCandleIntervalHistoricalYear';
+                    request['year'] = sinceYear;
+                }
+                // request['year'] = year;
+            } else if (timeframe === '1h') {
+                // if the since argument is beyond 31 days into the past
+                if (difference > 2678400000) {
+                    method = 'v3publicGetMarketsMarketSymbolCandlesCandleIntervalHistoricalYearMonth';
+                    request['year'] = sinceYear;
+                    request['month'] = sinceMonth;
+                }
+            } else {
+                // if the since argument is beyond 1 day into the past
+                if (difference > 86400000) {
+                    method = 'v3publicGetMarketsMarketSymbolCandlesCandleIntervalHistoricalYearMonthDay';
+                    request['year'] = sinceYear;
+                    request['month'] = sinceMonth;
+                    request['day'] = sinceDay;
+                }
             }
         }
         const response = await this[method] (this.extend (request, params));
@@ -42866,19 +42885,26 @@ module.exports = class coinbasepro extends Exchange {
             'pro': true,
             'has': {
                 'cancelAllOrders': true,
+                'cancelOrder': true,
                 'CORS': true,
+                'createDepositAddress': true,
+                'createOrder': true,
                 'deposit': true,
                 'fetchAccounts': true,
+                'fetchBalance': true,
                 'fetchClosedOrders': true,
                 'fetchDepositAddress': true,
-                'createDepositAddress': true,
+                'fetchMarkets': true,
                 'fetchMyTrades': true,
                 'fetchOHLCV': true,
                 'fetchOpenOrders': true,
                 'fetchOrder': true,
-                'fetchOrderTrades': true,
+                'fetchOrderBook': true,
                 'fetchOrders': true,
+                'fetchOrderTrades': true,
                 'fetchTime': true,
+                'fetchTicker': true,
+                'fetchTrades': true,
                 'fetchTransactions': true,
                 'withdraw': true,
             },
@@ -43871,9 +43897,15 @@ module.exports = class coincheck extends Exchange {
             'countries': [ 'JP', 'ID' ],
             'rateLimit': 1500,
             'has': {
+                'cancelOrder': true,
                 'CORS': false,
-                'fetchOpenOrders': true,
+                'createOrder': true,
+                'fetchBalance': true,
                 'fetchMyTrades': true,
+                'fetchOrderBook': true,
+                'fetchOpenOrders': true,
+                'fetchTicker': true,
+                'fetchTrades': true,
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/51840849/87182088-1d6d6380-c2ec-11ea-9c64-8ab9f9b289f5.jpg',
