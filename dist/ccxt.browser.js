@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.62'
+const version = '1.27.63'
 
 Exchange.ccxtVersion = version
 
@@ -3392,6 +3392,7 @@ module.exports = class Exchange {
             'certified': false,
             'pro': false,
             'has': {
+                'loadMarkets': true,
                 'cancelAllOrders': false,
                 'cancelOrder': true,
                 'cancelOrders': false,
