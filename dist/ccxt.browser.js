@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1346'
+const version = '1.18.1350'
 
 Exchange.ccxtVersion = version
 
@@ -64381,7 +64381,7 @@ module.exports = class latoken extends Exchange {
             'has': {
                 'CORS': false,
                 'publicAPI': true,
-                'pivateAPI': true,
+                'privateAPI': true,
                 'cancelOrder': true,
                 'cancelAllOrders': true,
                 'createMarketOrder': false,
@@ -74515,7 +74515,10 @@ module.exports = class okex3 extends Exchange {
         const feeCost = this.safeFloat (trade, 'fee');
         let fee = undefined;
         if (feeCost !== undefined) {
-            const feeCurrency = undefined;
+            let feeCurrency = undefined;
+            if (market !== undefined) {
+                feeCurrency = side === 'buy' ? market['base'] : market['quote'];
+            }
             fee = {
                 // fee is either a positive number (invitation rebate)
                 // or a negative number (transaction fee deduction)
@@ -100802,6 +100805,7 @@ module.exports = class tidex extends Exchange {
                 },
                 'www': 'https://tidex.com',
                 'doc': 'https://tidex.com/exchange/public-api',
+                'referral': 'https://tidex.com/exchange/?ref=57f5638d9cd7',
                 'fees': [
                     'https://tidex.com/exchange/assets-spec',
                     'https://tidex.com/exchange/pairs-spec',
