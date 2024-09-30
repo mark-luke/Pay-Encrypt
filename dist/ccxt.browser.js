@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.4'
+const version = '1.32.5'
 
 Exchange.ccxtVersion = version
 
@@ -39327,7 +39327,7 @@ module.exports = class bytetrade extends Exchange {
         const type = this.safeString (trade, 'type');
         const takerOrMaker = this.safeString (trade, 'takerOrMaker');
         const side = this.safeString (trade, 'side');
-        const datetime = this.safeString (trade, 'datetime');
+        const datetime = this.iso8601 (timestamp); // this.safeString (trade, 'datetime');
         const order = this.safeString (trade, 'order');
         const fee = this.safeValue (trade, 'fee');
         let symbol = undefined;
