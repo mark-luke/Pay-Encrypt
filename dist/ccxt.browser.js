@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.75'
+const version = '1.28.76'
 
 Exchange.ccxtVersion = version
 
@@ -50804,6 +50804,7 @@ const { ArgumentsRequired, InvalidOrder, ExchangeError, BadRequest } = require (
 const { TRUNCATE } = require ('./base/functions/number');
 
 // ----------------------------------------------------------------------------
+
 module.exports = class eterbase extends Exchange {
     describe () {
         return this.deepExtend (super.describe (), {
@@ -51154,7 +51155,7 @@ module.exports = class eterbase extends Exchange {
         const baseVolume = this.safeFloat (ticker, 'volumeBase');
         const quoteVolume = this.safeFloat (ticker, 'volume');
         let vwap = undefined;
-        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume > 0)) {
+        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && baseVolume) {
             vwap = quoteVolume / baseVolume;
         }
         const percentage = this.safeFloat (ticker, 'change');
