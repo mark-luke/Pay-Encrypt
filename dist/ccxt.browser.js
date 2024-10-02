@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.65'
+const version = '1.19.70'
 
 Exchange.ccxtVersion = version
 
@@ -17270,20 +17270,24 @@ module.exports = class bitmart extends Exchange {
         // fetchMyTrades (private)
         //
         //     {
-        //         "symbol": "BMX_ETH",
-        //         "amount": "1.0",
-        //         "fees": "0.0005000000",
-        //         "trade_id": 2734956,
-        //         "price": "0.00013737",
-        //         "active": true,
-        //         "entrust_id": 5576623,
-        //         "timestamp": 1545292334000
-        //     }
+        //         active: true,
+        //             amount: '0.2000',
+        //             entrustType: 1,
+        //             entrust_id: 979648824,
+        //             fees: '0.0000085532',
+        //             price: '0.021383',
+        //             symbol: 'ETH_BTC',
+        //             timestamp: 1574343514000,
+        //             trade_id: 329418828
+        //     },
         //
         const id = this.safeString (trade, 'trade_id');
         const timestamp = this.safeInteger2 (trade, 'timestamp', 'order_time');
         const type = undefined;
-        const side = this.safeStringLower (trade, 'type');
+        let side = this.safeStringLower (trade, 'type');
+        if ((side === undefined) && ('entrustType' in trade)) {
+            side = trade['entrustType'] ? 'sell' : 'buy';
+        }
         const price = this.safeFloat (trade, 'price');
         const amount = this.safeFloat (trade, 'amount');
         let cost = undefined;
@@ -17314,8 +17318,10 @@ module.exports = class bitmart extends Exchange {
         const feeCost = this.safeFloat (trade, 'fees');
         let fee = undefined;
         if (feeCost !== undefined) {
-            // is it always quote, always base, or base-quote depending on the side?
-            const feeCurrencyCode = undefined;
+            let feeCurrencyCode = undefined;
+            if (market !== undefined) {
+                feeCurrencyCode = (side === 'buy') ? market['base'] : market['quote'];
+            }
             fee = {
                 'cost': feeCost,
                 'currency': feeCurrencyCode,
@@ -17367,7 +17373,8 @@ module.exports = class bitmart extends Exchange {
         const market = this.market (symbol);
         const request = {
             'symbol': market['id'],
-            // 'offset': 0, // current page, starts from 0
+            'offset': 0, // current page, starts from 0
+            'limit': 500,
         };
         if (limit !== undefined) {
             request['limit'] = limit; // default 500, max 1000
@@ -40373,7 +40380,7 @@ module.exports = class coinmate extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, ExchangeNotAvailable, InvalidOrder, OrderNotFound } = require ('./base/errors');
+const { BadSymbol, ExchangeError, ArgumentsRequired, InvalidOrder, OrderNotFound, OnMaintenance } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -40484,8 +40491,9 @@ module.exports = class coinone extends Exchange {
                 },
             },
             'exceptions': {
-                '405': ExchangeNotAvailable,
+                '405': OnMaintenance, // {"errorCode":"405","status":"maintenance","result":"error"}
                 '104': OrderNotFound,
+                '108': BadSymbol, // {"errorCode":"108","errorMsg":"Unknown CryptoCurrency","result":"error"}
             },
         });
     }
@@ -48303,7 +48311,7 @@ module.exports = class exmo extends Exchange {
                             { 'pair': 'DCR/RUB', 'min_q': '0.01', 'max_q': '50000', 'min_p': '0.00001', 'max_p': '100000', 'min_a': '0.5', 'max_a': '3000000' },
                             { 'pair': 'DCR/UAH', 'min_q': '0.01', 'max_q': '50000', 'min_p': '0.00001', 'max_p': '100000', 'min_a': '0.25', 'max_a': '1000000' },
                             { 'pair': 'ZAG/BTC', 'min_q': '1', 'max_q': '10000000', 'min_p': '0.00000001', 'max_p': '0.1', 'min_a': '0.00001', 'max_a': '100' },
-                            { 'pair': 'EXM/BTC', 'min_q': '1', 'max_q': '148743645', 'min_p': '0.000001', 'max_p': '0.000001', 'min_a': '0.000001', 'max_a': '141' },
+                            { 'pair': 'EXM/BTC', 'min_q': '1', 'max_q': '100000000', 'min_p': '0.00000001', 'max_p': '1', 'min_a': '0.0000001', 'max_a': '100' },
                             { 'pair': 'VLX/BTC', 'min_q': '1', 'max_q': '10000000', 'min_p': '0.00000001', 'max_p': '0.1', 'min_a': '0.00001', 'max_a': '100' },
                             { 'pair': 'BTT/BTC', 'min_q': '1', 'max_q': '10000000', 'min_p': '0.00000001', 'max_p': '0.1', 'min_a': '0.00001', 'max_a': '100' },
                             { 'pair': 'BTT/RUB', 'min_q': '1', 'max_q': '10000000', 'min_p': '0.000001', 'max_p': '1000', 'min_a': '0.000001', 'max_a': '100' },
@@ -48314,7 +48322,7 @@ module.exports = class exmo extends Exchange {
                                 'group': 'crypto',
                                 'title': 'Криптовалюта',
                                 'items': [
-                                    { 'prov': 'EXM', 'dep': '0%', 'wd': '-' },
+                                    { 'prov': 'EXM', 'dep': '0%', 'wd': '1 EXM' },
                                     { 'prov': 'BTC', 'dep': '0%', 'wd': '0.0005 BTC' },
                                     { 'prov': 'LTC', 'dep': '0%', 'wd': '0.01 LTC' },
                                     { 'prov': 'DOGE', 'dep': '0%', 'wd': '1 DOGE' },
