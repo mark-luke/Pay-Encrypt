@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.47'
+const version = '1.34.48'
 
 Exchange.ccxtVersion = version
 
@@ -13171,6 +13171,7 @@ module.exports = class bitfinex extends Exchange {
                     // 'BCH': 'bcash', // undocumented
                     'BCI': 'bci',
                     'BFT': 'bft',
+                    'BSV': 'bsv',
                     'BTC': 'bitcoin',
                     'BTG': 'bgold',
                     'CFI': 'cfi',
