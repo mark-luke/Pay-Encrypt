@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1106'
+const version = '1.18.1107'
 
 Exchange.ccxtVersion = version
 
@@ -70696,7 +70696,9 @@ module.exports = class okex3 extends Exchange {
             if (currencyId !== undefined) {
                 const feeWithCurrencyId = this.safeString (transaction, 'fee');
                 if (feeWithCurrencyId !== undefined) {
-                    const feeWithoutCurrencyId = feeWithCurrencyId.replace (currencyId, '');
+                    // https://github.com/ccxt/ccxt/pull/5748
+                    const lowercaseCurrencyId = currencyId.toLowerCase ();
+                    const feeWithoutCurrencyId = feeWithCurrencyId.replace (lowercaseCurrencyId, '');
                     feeCost = parseFloat (feeWithoutCurrencyId);
                 }
             }
