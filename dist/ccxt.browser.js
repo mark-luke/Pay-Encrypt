@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.13'
+const version = '1.30.14'
 
 Exchange.ccxtVersion = version
 
@@ -119702,7 +119702,7 @@ module.exports = class wavesexchange extends Exchange {
     }
 
     priceToPrecision (symbol, price) {
-        return this.toWei (price, this.markets[symbol]['precision']['price']);
+        return parseInt (parseFloat (this.toWei (price, this.markets[symbol]['precision']['price'])));
     }
 
     amountToPrecision (symbol, amount) {
@@ -119710,7 +119710,7 @@ module.exports = class wavesexchange extends Exchange {
     }
 
     currencyFromPrecision (currency, amount) {
-        return parseInt (parseFloat (this.fromWei (amount, this.currencies[currency]['precision'])));
+        return this.fromWei (amount, this.currencies[currency]['precision']);
     }
 
     getDefaultExpiry () {
