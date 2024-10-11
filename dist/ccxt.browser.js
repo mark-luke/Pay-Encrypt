@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.90'
+const version = '1.34.91'
 
 Exchange.ccxtVersion = version
 
@@ -66552,18 +66552,10 @@ module.exports = class gateio extends Exchange {
         const ids = Object.keys (response);
         for (let i = 0; i < ids.length; i++) {
             const id = ids[i];
-            const [ baseId, quoteId ] = id.split ('_');
-            let base = baseId.toUpperCase ();
-            let quote = quoteId.toUpperCase ();
-            base = this.safeCurrencyCode (base);
-            quote = this.safeCurrencyCode (quote);
-            const symbol = base + '/' + quote;
+            const symbol = this.safeSymbol (id, undefined, '_');
             let market = undefined;
             if (symbol in this.markets) {
                 market = this.markets[symbol];
-            }
-            if (id in this.markets_by_id) {
-                market = this.markets_by_id[id];
             }
             result[symbol] = this.parseTicker (response[id], market);
         }
@@ -66749,14 +66741,8 @@ module.exports = class gateio extends Exchange {
         //     }
         //
         const id = this.safeString2 (order, 'orderNumber', 'id');
-        let symbol = undefined;
         const marketId = this.safeString (order, 'currencyPair');
-        if (marketId in this.markets_by_id) {
-            market = this.markets_by_id[marketId];
-        }
-        if (market !== undefined) {
-            symbol = market['symbol'];
-        }
+        const symbol = this.safeSymbol (marketId, market, '_');
         const timestamp = this.safeTimestamp2 (order, 'timestamp', 'ctime');
         const lastTradeTimestamp = this.safeTimestamp (order, 'mtime');
         const status = this.parseOrderStatus (this.safeString (order, 'status'));
