@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.38'
+const version = '1.29.39'
 
 Exchange.ccxtVersion = version
 
@@ -4065,23 +4065,23 @@ module.exports = class Exchange {
         throw new NotSupported (this.id + ' fetchBidsAsks not supported yet')
     }
 
-    async fetchOHLCVC (symbol, timeframe = '1m', since = undefined, limits = undefined, params = {}) {
+    async fetchOHLCVC (symbol, timeframe = '1m', since = undefined, limit = undefined, params = {}) {
         if (!this.has['fetchTrades']) {
             throw new NotSupported (this.id + ' fetchOHLCV() not supported yet')
         }
         await this.loadMarkets ()
-        const trades = await this.fetchTrades (symbol, since, limits, params)
-        const ohlcvc = buildOHLCVC (trades, timeframe, since, limits)
+        const trades = await this.fetchTrades (symbol, since, limit, params)
+        const ohlcvc = buildOHLCVC (trades, timeframe, since, limit)
         return ohlcvc
     }
 
-    async fetchOHLCV (symbol, timeframe = '1m', since = undefined, limits = undefined, params = {}) {
+    async fetchOHLCV (symbol, timeframe = '1m', since = undefined, limit = undefined, params = {}) {
         if (!this.has['fetchTrades']) {
             throw new NotSupported (this.id + ' fetchOHLCV() not supported yet')
         }
         await this.loadMarkets ()
-        const trades = await this.fetchTrades (symbol, since, limits, params)
-        const ohlcvc = buildOHLCVC (trades, timeframe, since, limits)
+        const trades = await this.fetchTrades (symbol, since, limit, params)
+        const ohlcvc = buildOHLCVC (trades, timeframe, since, limit)
         return ohlcvc.map ((c) => c.slice (0, -1))
     }
 
@@ -4218,8 +4218,9 @@ module.exports = class Exchange {
     }
 
     commonCurrencyCode (currency) {
-        if (!this.substituteCommonCurrencyCodes)
+        if (!this.substituteCommonCurrencyCodes) {
             return currency
+        }
         return this.safeString (this.commonCurrencies, currency, currency)
     }
 
@@ -5416,7 +5417,7 @@ module.exports =
 'use strict';
 
 const { ROUND_UP, ROUND_DOWN } = require ('./number')
-const { NotSupported } = require ('./../errors')
+const { NotSupported } = require ('../errors')
 
 //-------------------------------------------------------------------------
 // converts timeframe to seconds
@@ -5463,8 +5464,9 @@ const buildOHLCVC = (trades, timeframe = '1m', since = -Infinity, limit = Infini
 
     for (let i = 0; i <= oldest; i++) {
         const trade = trades[i];
-        if (trade.timestamp < since)
+        if (trade.timestamp < since) {
             continue;
+        }
         const openingTime = Math.floor (trade.timestamp / ms) * ms; // shift to the edge of m/h/d (but not M)
         const candle = ohlcvs.length - 1;
 
@@ -5530,7 +5532,7 @@ module.exports = {
             }
         }
 
-        return Object.keys (result).map (price => [parseFloat (price), parseFloat (result[price])])
+        return Object.keys (result).map ((price) => [parseFloat (price), parseFloat (result[price])])
     },
 
     parseTimeframe,
@@ -5545,7 +5547,7 @@ module.exports = {
 
 /*  ------------------------------------------------------------------------ */
 
-},{"./../errors":9,"./number":15}],15:[function(require,module,exports){
+},{"../errors":9,"./number":15}],15:[function(require,module,exports){
 'use strict'
 
 /*  ------------------------------------------------------------------------
