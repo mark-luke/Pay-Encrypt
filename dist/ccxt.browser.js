@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.22'
+const version = '1.26.23'
 
 Exchange.ccxtVersion = version
 
@@ -13530,6 +13530,7 @@ module.exports = class bitbay extends Exchange {
                     'https://github.com/BitBayNet/API',
                     'https://docs.bitbay.net/v1.0.1-en/reference',
                 ],
+                'support': 'https://support.bitbay.net',
                 'fees': 'https://bitbay.net/en/fees',
             },
             'api': {
