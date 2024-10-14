@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.31'
+const version = '1.28.32'
 
 Exchange.ccxtVersion = version
 
@@ -80187,7 +80187,11 @@ module.exports = class okex extends Exchange {
         }
         await this.loadMarkets ();
         const market = this.market (symbol);
-        const type = market['type'];
+        const defaultType = this.safeString2 (this.options, 'cancelOrder', 'defaultType', market['type']);
+        const type = this.safeString (params, 'type', defaultType);
+        if (type === undefined) {
+            throw new ArgumentsRequired (this.id + " cancelOrder requires a type parameter (one of 'spot', 'margin', 'futures', 'swap').");
+        }
         let method = type + 'PostCancelOrder';
         const request = {
             'instrument_id': market['id'],
