@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.19'
+const version = '1.32.20'
 
 Exchange.ccxtVersion = version
 
@@ -45850,9 +45850,17 @@ module.exports = class coinfalcon extends Exchange {
             'rateLimit': 1000,
             'version': 'v1',
             'has': {
-                'fetchTickers': true,
-                'fetchOpenOrders': true,
+                'cancelOrder': true,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchMarkets': true,
                 'fetchMyTrades': true,
+                'fetchOpenOrders': true,
+                'fetchOrder': true,
+                'fetchOrderBook': true,
+                'fetchTicker': true,
+                'fetchTickers': true,
+                'fetchTrades': true,
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/41822275-ed982188-77f5-11e8-92bb-496bcd14ca52.jpg',
@@ -46300,8 +46308,15 @@ module.exports = class coinfloor extends Exchange {
             'rateLimit': 1000,
             'countries': [ 'UK' ],
             'has': {
+                'cancelOrder': true,
                 'CORS': false,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchLedger': true,
                 'fetchOpenOrders': true,
+                'fetchOrderBook': true,
+                'fetchTicker': true,
+                'fetchTrades': true,
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/51840849/87153925-ef265e80-c2c0-11ea-91b5-020c804b90e0.jpg',
