@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.48'
+const version = '1.22.49'
 
 Exchange.ccxtVersion = version
 
@@ -3791,7 +3791,6 @@ module.exports = class Exchange {
             throw new Error (this.id + '.rateLimit property is not configured')
 
         this.tokenBucket = this.extend ({
-            refillRate:  1 / this.rateLimit,
             delay:       1,
             capacity:    1,
             defaultCost: 1,
