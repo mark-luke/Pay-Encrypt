@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.15'
+const version = '1.28.16'
 
 Exchange.ccxtVersion = version
 
@@ -56932,6 +56932,7 @@ module.exports = class gateio extends Exchange {
             'has': {
                 'CORS': false,
                 'createMarketOrder': false,
+                'fetchCurrencies': true,
                 'fetchTickers': true,
                 'withdraw': true,
                 'fetchDeposits': true,
@@ -56980,6 +56981,7 @@ module.exports = class gateio extends Exchange {
                     'get': [
                         'candlestick2/{id}',
                         'pairs',
+                        'coininfo',
                         'marketinfo',
                         'marketlist',
                         'coininfo',
@@ -57073,6 +57075,86 @@ module.exports = class gateio extends Exchange {
                 'BTCBULL': 'BULL',
             },
         });
+    }
+
+    async fetchCurrencies (params = {}) {
+        const response = await this.publicGetCoininfo (params);
+        //
+        //     {
+        //         "result":"true",
+        //         "coins":[
+        //             {
+        //                 "CNYX":{
+        //                     "delisted":0,
+        //                     "withdraw_disabled":1,
+        //                     "withdraw_delayed":0,
+        //                     "deposit_disabled":0,
+        //                     "trade_disabled":0
+        //                 }
+        //             },
+        //             {
+        //                 "USDT_ETH":{
+        //                     "delisted":0,
+        //                     "withdraw_disabled":1,
+        //                     "withdraw_delayed":0,
+        //                     "deposit_disabled":0,
+        //                     "trade_disabled":1
+        //                 }
+        //             }
+        //         ]
+        //     }
+        //
+        const coins = this.safeValue (response, 'coins');
+        if (!coins) {
+            throw new ExchangeError (this.id + ' fetchCurrencies got an unrecognized response');
+        }
+        const result = [];
+        for (let i = 0; i < coins.length; i++) {
+            const coin = coins[i];
+            const ids = Object.keys (coin);
+            for (let j = 0; j < ids.length; j++) {
+                const id = ids[j];
+                const currency = coin[id];
+                const code = this.safeCurrencyCode (id);
+                const delisted = this.safeValue (currency, 'delisted', 0);
+                const withdrawDisabled = this.safeValue (currency, 'withdraw_disabled', 0);
+                const depositDisabled = this.safeValue (currency, 'deposit_disabled', 0);
+                const tradeDisabled = this.safeValue (currency, 'trade_disabled', 0);
+                const listed = (delisted === 0);
+                const withdrawEnabled = (withdrawDisabled === 0);
+                const depositEnabled = (depositDisabled === 0);
+                const tradeEnabled = (tradeDisabled === 0);
+                const active = listed && withdrawEnabled && depositEnabled && tradeEnabled;
+                result[code] = {
+                    'id': id,
+                    'code': code,
+                    'active': active,
+                    'info': currency,
+                    'name': undefined,
+                    'fee': undefined,
+                    'precision': undefined,
+                    'limits': {
+                        'amount': {
+                            'min': undefined,
+                            'max': undefined,
+                        },
+                        'price': {
+                            'min': undefined,
+                            'max': undefined,
+                        },
+                        'cost': {
+                            'min': undefined,
+                            'max': undefined,
+                        },
+                        'withdraw': {
+                            'min': undefined,
+                            'max': undefined,
+                        },
+                    },
+                };
+            }
+        }
+        return result;
     }
 
     async fetchMarkets (params = {}) {
