@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.63'
+const version = '1.31.64'
 
 Exchange.ccxtVersion = version
 
@@ -85919,8 +85919,13 @@ module.exports = class okex extends Exchange {
         }
         await this.loadMarkets ();
         const market = this.market (symbol);
-        const defaultType = this.safeString2 (this.options, 'cancelOrder', 'defaultType', market['type']);
-        const type = this.safeString (params, 'type', defaultType);
+        let type = undefined;
+        if (market['futures'] || market['swap']) {
+            type = market['type'];
+        } else {
+            const defaultType = this.safeString2 (this.options, 'cancelOrder', 'defaultType', market['type']);
+            type = this.safeString (params, 'type', defaultType);
+        }
         if (type === undefined) {
             throw new ArgumentsRequired (this.id + " cancelOrder requires a type parameter (one of 'spot', 'margin', 'futures', 'swap').");
         }
@@ -86221,8 +86226,13 @@ module.exports = class okex extends Exchange {
         }
         await this.loadMarkets ();
         const market = this.market (symbol);
-        const defaultType = this.safeString2 (this.options, 'fetchOrder', 'defaultType', market['type']);
-        const type = this.safeString (params, 'type', defaultType);
+        let type = undefined;
+        if (market['futures'] || market['swap']) {
+            type = market['type'];
+        } else {
+            const defaultType = this.safeString2 (this.options, 'fetchOrder', 'defaultType', market['type']);
+            type = this.safeString (params, 'type', defaultType);
+        }
         if (type === undefined) {
             throw new ArgumentsRequired (this.id + " fetchOrder requires a type parameter (one of 'spot', 'margin', 'futures', 'swap').");
         }
@@ -86306,7 +86316,7 @@ module.exports = class okex extends Exchange {
         //     }
         //
         let orders = undefined;
-        if (market['type'] === 'swap' || market['type'] === 'futures') {
+        if (market['swap'] || market['futures']) {
             orders = this.safeValue (response, 'order_info', []);
         } else {
             orders = response;
@@ -87253,17 +87263,22 @@ module.exports = class okex extends Exchange {
         if (!response) {
             return; // fallback to default error handler
         }
+        //
+        //     {"error_message":"Order does not exist","result":"true","error_code":"35029","order_id":"-1"}
+        //
         const message = this.safeString (response, 'message');
         const errorCode = this.safeString2 (response, 'code', 'error_code');
+        const nonEmptyMessage = ((message !== undefined) && (message !== ''));
+        const nonZeroErrorCode = (errorCode !== undefined) && (errorCode !== '0');
         if (message !== undefined) {
             this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
+        }
+        if (errorCode !== undefined) {
             this.throwExactlyMatchedException (this.exceptions['exact'], errorCode, feedback);
-            const nonEmptyMessage = (message !== '');
-            const nonZeroErrorCode = (errorCode !== undefined) && (errorCode !== '0');
-            if (nonZeroErrorCode || nonEmptyMessage) {
-                throw new ExchangeError (feedback); // unknown message
-            }
+        }
+        if (nonZeroErrorCode || nonEmptyMessage) {
+            throw new ExchangeError (feedback); // unknown message
         }
     }
 };
