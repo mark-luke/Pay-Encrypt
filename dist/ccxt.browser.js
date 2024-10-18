@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1358'
+const version = '1.18.1359'
 
 Exchange.ccxtVersion = version
 
@@ -71858,7 +71858,7 @@ module.exports = class oceanex extends Exchange {
                 },
                 'limits': {
                     'amount': {
-                        'min': this.safeValue (market, 'minimum_trading_amount'),
+                        'min': undefined,
                         'max': undefined,
                     },
                     'price': {
@@ -71866,7 +71866,7 @@ module.exports = class oceanex extends Exchange {
                         'max': undefined,
                     },
                     'cost': {
-                        'min': undefined,
+                        'min': this.safeValue (market, 'minimum_trading_amount'),
                         'max': undefined,
                     },
                 },
