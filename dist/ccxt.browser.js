@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1352'
+const version = '1.18.1353'
 
 Exchange.ccxtVersion = version
 
@@ -3256,6 +3256,8 @@ module.exports = class anxpro extends Exchange {
             'ACTIVE': 'open',
             'FULL_FILL': 'closed',
             'CANCEL': 'canceled',
+            'USER_CANCEL_PARTIAL': 'canceled',
+            'PARTIAL_FILL': 'canceled',
         };
         return this.safeString (statuses, status, status);
     }
