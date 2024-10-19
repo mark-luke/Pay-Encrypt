@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.41'
+const version = '1.34.42'
 
 Exchange.ccxtVersion = version
 
@@ -74247,13 +74247,14 @@ module.exports = class huobipro extends Exchange {
                 } else {
                     // despite that cost = amount * price is in quote currency and should have quote precision
                     // the exchange API requires the cost supplied in 'amount' to be of base precision
-                    // more about it here: https://github.com/ccxt/ccxt/pull/4395
-                    // we use priceToPrecision instead of amountToPrecision here
-                    // because in this case the amount is in the quote currency
-                    request['amount'] = this.costToPrecision (symbol, parseFloat (amount) * parseFloat (price));
+                    // more about it here:
+                    // https://github.com/ccxt/ccxt/pull/4395
+                    // https://github.com/ccxt/ccxt/issues/7611
+                    // we use amountToPrecision here because the exchange requires cost in base precision
+                    request['amount'] = this.amountToPrecision (symbol, parseFloat (amount) * parseFloat (price));
                 }
             } else {
-                request['amount'] = this.costToPrecision (symbol, amount);
+                request['amount'] = this.amountToPrecision (symbol, amount);
             }
         } else {
             request['amount'] = this.amountToPrecision (symbol, amount);
