@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.97'
+const version = '1.35.98'
 
 Exchange.ccxtVersion = version
 
@@ -77806,6 +77806,15 @@ module.exports = class indodax extends Exchange {
         return this.parseTrades (response, market, since, limit);
     }
 
+    parseOrderStatus (status) {
+        const statuses = {
+            'open': 'open',
+            'filled': 'closed',
+            'cancelled': 'canceled',
+        };
+        return this.safeString (statuses, status, status);
+    }
+
     parseOrder (order, market = undefined) {
         //
         //     {
@@ -77821,12 +77830,7 @@ module.exports = class indodax extends Exchange {
         if ('type' in order) {
             side = order['type'];
         }
-        let status = this.safeString (order, 'status', 'open');
-        if (status === 'filled') {
-            status = 'closed';
-        } else if (status === 'cancelled') {
-            status = 'canceled';
-        }
+        const status = this.parseOrderStatus (this.safeString (order, 'status', 'open'));
         let symbol = undefined;
         let cost = undefined;
         const price = this.safeFloat (order, 'price');
@@ -85604,7 +85608,7 @@ module.exports = class liquid extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, AuthenticationError, NotSupported, InvalidOrder, OrderNotFound, ExchangeNotAvailable, RateLimitExceeded, InsufficientFunds } = require ('./base/errors');
+const { ExchangeError, OnMaintenance, BadResponse, ArgumentsRequired, AuthenticationError, NotSupported, InvalidOrder, OrderNotFound, ExchangeNotAvailable, RateLimitExceeded, InsufficientFunds } = require ('./base/errors');
 const { TRUNCATE, DECIMAL_PLACES } = require ('./base/functions/number');
 
 //  ---------------------------------------------------------------------------
@@ -85799,6 +85803,13 @@ module.exports = class livecoin extends Exchange {
 
     async fetchCurrencies (params = {}) {
         const response = await this.publicGetInfoCoinInfo (params);
+        if (typeof response === 'string') {
+            if (response.indexOf ('site is under maintenance') >= 0) {
+                throw new OnMaintenance (this.id + ' fetchCurrencies() failed to fetch the currencies, the exchange is on maintenance');
+            } else {
+                throw new BadResponse (this.id + ' fetchCurrencies() failed to fetch the currencies');
+            }
+        }
         const currencies = this.safeValue (response, 'info');
         let result = {};
         for (let i = 0; i < currencies.length; i++) {
@@ -134735,21 +134746,6 @@ module.exports = class yobit extends Exchange {
             'trades': undefined,
         };
         return result;
-    }
-
-    parseOrders (orders, market = undefined, since = undefined, limit = undefined, params = {}) {
-        const result = [];
-        const ids = Object.keys (orders);
-        let symbol = undefined;
-        if (market !== undefined) {
-            symbol = market['symbol'];
-        }
-        for (let i = 0; i < ids.length; i++) {
-            const id = ids[i];
-            const order = this.extend ({ 'id': id }, orders[id]);
-            result.push (this.extend (this.parseOrder (order, market), params));
-        }
-        return this.filterBySymbolSinceLimit (result, symbol, since, limit);
     }
 
     async fetchOrder (id, symbol = undefined, params = {}) {
