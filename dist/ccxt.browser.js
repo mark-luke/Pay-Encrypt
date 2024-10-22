@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.11'
+const version = '1.19.12'
 
 Exchange.ccxtVersion = version
 
@@ -38039,7 +38039,7 @@ module.exports = class coinfalcon extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { InsufficientFunds, ExchangeError, NotSupported, InvalidNonce } = require ('./base/errors');
+const { InsufficientFunds, ExchangeError, NotSupported, InvalidNonce, InvalidOrder } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -38442,7 +38442,12 @@ module.exports = class coinfloor extends Exchange {
             'symbol': market['id'],
             'id': id,
         };
-        return await this.privatePostSymbolCancelOrder (request);
+        const response = await this.privatePostSymbolCancelOrder (request);
+        if (response === 'false') {
+            // unfortunately the exchange does not give much info in the response
+            throw new InvalidOrder (this.id + ' cancel was rejected');
+        }
+        return response;
     }
 
     parseOrder (order, market = undefined) {
