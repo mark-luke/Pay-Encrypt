@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1071'
+const version = '1.18.1072'
 
 Exchange.ccxtVersion = version
 
@@ -23907,6 +23907,21 @@ module.exports = class btcbox extends Exchange {
             throw new exceptions[errorCode] (feedback);
         }
         throw new ExchangeError (feedback); // unknown message
+    }
+
+    async request (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
+        let response = await this.fetch2 (path, api, method, params, headers, body);
+        // sometimes the exchange returns whitespace prepended to json
+        // the code below removes excessive spaces
+        if (typeof response === 'string') {
+            response = response.split (' ');
+            response = response.join ('');
+            if (!this.isJsonEncodedObject (response)) {
+                throw new ExchangeError (this.id + ' ' + response);
+            }
+            response = JSON.parse (response);
+        }
+        return response;
     }
 };
 
