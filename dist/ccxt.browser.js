@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1242'
+const version = '1.18.1243'
 
 Exchange.ccxtVersion = version
 
@@ -33272,7 +33272,8 @@ module.exports = class coinex extends Exchange {
         const response = await this.fetch2 (path, api, method, params, headers, body);
         const code = this.safeString (response, 'code');
         const data = this.safeValue (response, 'data');
-        if (code !== '0' || !data) {
+        const message = this.safeString (response, 'message');
+        if ((code !== '0') || (data === undefined) || ((message !== 'Ok') && !data)) {
             const responseCodes = {
                 '24': AuthenticationError,
                 '25': AuthenticationError,
