@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.21.94'
+const version = '1.21.95'
 
 Exchange.ccxtVersion = version
 
@@ -11013,7 +11013,7 @@ module.exports = class binance extends Exchange {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 };
             } else {
-                throw new AuthenticationError (this.id + ' historicalTrades endpoint requires `apiKey` credential');
+                throw new AuthenticationError (this.id + ' userDataStream endpoint requires `apiKey` credential');
             }
         }
         if ((api === 'private') || (api === 'sapi') || (api === 'wapi' && path !== 'systemStatus') || (api === 'fapiPrivate')) {
