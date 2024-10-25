@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1057'
+const version = '1.18.1058'
 
 Exchange.ccxtVersion = version
 
@@ -3745,12 +3745,6 @@ module.exports = class Exchange {
         return '0x' +  ethAbi.soliditySHA3 (types, values).toString ('hex')
     }
 
-    soliditySha256 (array) {
-        const values = this.solidityValues (array);
-        const types = this.solidityTypes (values);
-        return '0x' +  ethAbi.soliditySHA256 (types, values).toString ('hex')
-    }
-
     solidityTypes (array) {
         return array.map (value => (this.web3.utils.isAddress (value) ? 'address' : 'uint256'))
     }
@@ -4081,7 +4075,12 @@ const { ArgumentsRequired } = require ('./../errors')
 /*  ------------------------------------------------------------------------ */
 
 const hash = (request, hash = 'md5', digest = 'hex') => {
-    const result = CryptoJS[hash.toUpperCase ()] (request)
+    const options = {}
+    if (hash === 'keccak') {
+        hash = 'SHA3'
+        options['outputLength'] = 256
+    }
+    const result = CryptoJS[hash.toUpperCase ()] (request, options)
     return (digest === 'binary') ? result : result.toString (CryptoJS.enc[capitalize (digest)])
 }
 
