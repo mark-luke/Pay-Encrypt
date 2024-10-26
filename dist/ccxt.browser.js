@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1322'
+const version = '1.18.1333'
 
 Exchange.ccxtVersion = version
 
@@ -6516,7 +6516,7 @@ module.exports = {
     , safeFloat:          (o, k,          $default, n =   asFloat (prop (o, k))) => (isNumber (n)          ? n                         : $default)
     , safeInteger:        (o, k,          $default, n = asInteger (prop (o, k))) => (isNumber (n)          ? n                         : $default)
     , safeIntegerProduct: (o, k, $factor, $default, n = asInteger (prop (o, k))) => (isNumber (n)          ? parseInt (n * $factor)    : $default)
-    , safeTimestamp:      (o, k,          $default, n = asInteger (prop (o, k))) => (isNumber (n)          ? parseInt (n * 1000)       : $default)
+    , safeTimestamp:      (o, k,          $default, n =   asFloat (prop (o, k))) => (isNumber (n)          ? parseInt (n * 1000)       : $default)
     , safeValue:          (o, k,          $default, x =            prop (o, k))  => (hasProps (x)          ? x                         : $default)
     , safeString:         (o, k,          $default, x =            prop (o, k))  => (isStringCoercible (x) ? String (x)                : $default)
     , safeStringLower:    (o, k,          $default, x =            prop (o, k))  => (isStringCoercible (x) ? String (x).toLowerCase () : $default)
@@ -6528,7 +6528,7 @@ module.exports = {
     , safeFloat2:          (o, k1, k2,          $default, n =   asFloat (prop2 (o, k1, k2))) => (isNumber (n)          ? n                         : $default)
     , safeInteger2:        (o, k1, k2,          $default, n = asInteger (prop2 (o, k1, k2))) => (isNumber (n)          ? n                         : $default)
     , safeIntegerProduct2: (o, k1, k2, $factor, $default, n = asInteger (prop2 (o, k1, k2))) => (isNumber (n)          ? parseInt (n * $factor)    : $default)
-    , safeTimestamp2:      (o, k1, k2,          $default, n = asInteger (prop2 (o, k1, k2))) => (isNumber (n)          ? parseInt (n * 1000)       : $default)
+    , safeTimestamp2:      (o, k1, k2,          $default, n =   asFloat (prop2 (o, k1, k2))) => (isNumber (n)          ? parseInt (n * 1000)       : $default)
     , safeValue2:          (o, k1, k2,          $default, x =            prop2 (o, k1, k2))  => (hasProps (x)          ? x                         : $default)
     , safeString2:         (o, k1, k2,          $default, x =            prop2 (o, k1, k2))  => (isStringCoercible (x) ? String (x)                : $default)
     , safeStringLower2:    (o, k1, k2,          $default, x =            prop2 (o, k1, k2))  => (isStringCoercible (x) ? String (x).toLowerCase () : $default)
@@ -8208,7 +8208,7 @@ module.exports = class bibox extends Exchange {
                     throw new ExchangeError (feedback);
                 }
             }
-            throw new ExchangeError (this.id + ': "error" in response: ' + body);
+            throw new ExchangeError (this.id + ' ' + body);
         }
         if (!('result' in response)) {
             throw new ExchangeError (this.id + ' ' + body);
@@ -10794,7 +10794,7 @@ module.exports = class bit2c extends Exchange {
             timestamp = this.safeTimestamp (trade, 'ticks');
             price = this.safeFloat (trade, 'price');
             amount = this.safeFloat (trade, 'firstAmount');
-            const reference_parts = reference.split ('|'); // reference contains: 'pair|orderId|tradeId'
+            const reference_parts = reference.split ('|'); // reference contains 'pair|orderId|tradeId'
             if (market === undefined) {
                 const marketId = this.safeString (trade, 'pair');
                 if (marketId in this.markets_by_id[marketId]) {
@@ -12779,6 +12779,7 @@ module.exports = class bitfinex extends Exchange {
             'commonCurrencies': {
                 'ABS': 'ABYSS',
                 'AIO': 'AION',
+                'ALG': 'ALGO', // https://github.com/ccxt/ccxt/issues/6034
                 'AMP': 'AMPL',
                 'ATM': 'ATMI',
                 'ATO': 'ATOM', // https://github.com/ccxt/ccxt/issues/5118
@@ -12898,7 +12899,11 @@ module.exports = class bitfinex extends Exchange {
                     'USD': 'wire',
                     'USDC': 'udc', // https://github.com/ccxt/ccxt/issues/5833
                     'UTK': 'utk',
-                    'USDT': 'tetheruso', // undocumented
+                    'USDT': 'tetheruso', // Tether on Omni
+                    // 'USDT': 'tetheruse', // Tether on ERC20
+                    // 'USDT': 'tetherusl', // Tether on Liquid
+                    // 'USDT': 'tetherusx', // Tether on Tron
+                    // 'USDT': 'tetheruss', // Tether on EOS
                     'VEE': 'vee',
                     'WAX': 'wax',
                     'XLM': 'xlm',
@@ -18095,7 +18100,7 @@ module.exports = class bitmax extends Exchange {
             request['startTime'] = since;
         }
         if (limit !== undefined) {
-            request['pageSize'] = limit;
+            request['n'] = limit; // default 15, max 50
         }
         const response = await this.privateGetOrderHistory (this.extend (request, params));
         //
@@ -18283,7 +18288,11 @@ module.exports = class bitmax extends Exchange {
             }
             const signature = this.hmac (this.encode (auth), this.encode (this.secret), 'sha256', 'base64');
             headers['x-auth-signature'] = signature;
-            if (method !== 'GET') {
+            if (method === 'GET') {
+                if (Object.keys (query).length) {
+                    url += '?' + this.urlencode (query);
+                }
+            } else {
                 body = this.json (query);
             }
         }
@@ -50506,7 +50515,7 @@ module.exports = class fybse extends Exchange {
 // ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, InvalidAddress, OrderNotFound, NotSupported, DDoSProtection, InsufficientFunds } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, InvalidAddress, OrderNotFound, NotSupported, DDoSProtection, InsufficientFunds, InvalidOrder } = require ('./base/errors');
 
 // ---------------------------------------------------------------------------
 
@@ -50612,6 +50621,7 @@ module.exports = class gateio extends Exchange {
                 '15': DDoSProtection,
                 '16': OrderNotFound,
                 '17': OrderNotFound,
+                '20': InvalidOrder,
                 '21': InsufficientFunds,
             },
             // https://gate.io/api2#errCode
@@ -50832,30 +50842,6 @@ module.exports = class gateio extends Exchange {
             'quoteVolume': this.safeFloat (ticker, 'baseVolume'),
             'info': ticker,
         };
-    }
-
-    handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
-        if (response === undefined) {
-            return;
-        }
-        const resultString = this.safeString (response, 'result', '');
-        if (resultString !== 'false') {
-            return;
-        }
-        const errorCode = this.safeString (response, 'code');
-        if (errorCode !== undefined) {
-            const exceptions = this.exceptions;
-            const errorCodeNames = this.errorCodeNames;
-            if (errorCode in exceptions) {
-                let message = '';
-                if (errorCode in errorCodeNames) {
-                    message = errorCodeNames[errorCode];
-                } else {
-                    message = this.safeString (response, 'message', '(unknown)');
-                }
-                throw new exceptions[errorCode] (message);
-            }
-        }
     }
 
     async fetchTickers (symbols = undefined, params = {}) {
@@ -51278,23 +51264,23 @@ module.exports = class gateio extends Exchange {
         return this.safeString (types, type, type);
     }
 
-    async request (path, api = 'public', method = 'GET', params = {}, headers = undefined, body = undefined) {
-        const response = await this.fetch2 (path, api, method, params, headers, body);
-        if ('result' in response) {
-            const result = response['result'];
-            const message = this.id + ' ' + this.json (response);
-            if (result === undefined) {
-                throw new ExchangeError (message);
-            }
-            if (typeof result === 'string') {
-                if (result !== 'true') {
-                    throw new ExchangeError (message);
-                }
-            } else if (!result) {
-                throw new ExchangeError (message);
+    handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
+        if (response === undefined) {
+            return;
+        }
+        const resultString = this.safeString (response, 'result', '');
+        if (resultString !== 'false') {
+            return;
+        }
+        const errorCode = this.safeString (response, 'code');
+        if (errorCode !== undefined) {
+            const exceptions = this.exceptions;
+            if (errorCode in exceptions) {
+                const message = this.safeString (response, 'message', body);
+                const feedback = this.safeString (this.errorCodeNames, errorCode, message);
+                throw new exceptions[errorCode] (feedback);
             }
         }
-        return response;
     }
 };
 
@@ -57764,7 +57750,7 @@ module.exports = class independentreserve extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, InsufficientFunds, InvalidOrder, OrderNotFound, AuthenticationError, BadRequest } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, InsufficientFunds, InvalidOrder, OrderNotFound, AuthenticationError, BadSymbol } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -57896,7 +57882,7 @@ module.exports = class indodax extends Exchange {
             },
             'exceptions': {
                 'exact': {
-                    'invalid_pair': BadRequest, // {"error":"invalid_pair","error_description":"Invalid Pair"}
+                    'invalid_pair': BadSymbol, // {"error":"invalid_pair","error_description":"Invalid Pair"}
                     'Insufficient balance.': InsufficientFunds,
                     'invalid order.': OrderNotFound,
                     'Invalid credentials. API not found or session has expired.': AuthenticationError,
@@ -61263,6 +61249,7 @@ module.exports = class kucoin extends Exchange {
             percentage = percentage * 100;
         }
         const last = this.safeFloat (ticker, 'last');
+        const average = this.safeFloat (ticker, 'averagePrice');
         let symbol = undefined;
         const marketId = this.safeString (ticker, 'symbol');
         if (marketId !== undefined) {
@@ -61298,7 +61285,7 @@ module.exports = class kucoin extends Exchange {
             'previousClose': undefined,
             'change': this.safeFloat (ticker, 'changePrice'),
             'percentage': percentage,
-            'average': undefined,
+            'average': average,
             'baseVolume': this.safeFloat (ticker, 'vol'),
             'quoteVolume': this.safeFloat (ticker, 'volValue'),
             'info': ticker,
@@ -61493,12 +61480,19 @@ module.exports = class kucoin extends Exchange {
         const request = {
             'clientOid': clientOid,
             'side': side,
-            'size': this.amountToPrecision (symbol, amount),
             'symbol': marketId,
             'type': type,
         };
         if (type !== 'market') {
             request['price'] = this.priceToPrecision (symbol, price);
+            request['size'] = this.amountToPrecision (symbol, amount);
+        } else {
+            if (this.safeValue (params, 'quoteAmount')) {
+                // used to create market order by quote amount - https://github.com/ccxt/ccxt/issues/4876
+                request['funds'] = this.amountToPrecision (symbol, amount);
+            } else {
+                request['size'] = this.amountToPrecision (symbol, amount);
+            }
         }
         const response = await this.privatePostOrders (this.extend (request, params));
         //
@@ -61511,12 +61505,11 @@ module.exports = class kucoin extends Exchange {
         //
         const data = this.safeValue (response, 'data', {});
         const timestamp = this.milliseconds ();
-        return {
+        const order = {
             'id': this.safeString (data, 'orderId'),
             'symbol': symbol,
             'type': type,
             'side': side,
-            'amount': amount,
             'price': price,
             'cost': undefined,
             'filled': undefined,
@@ -61528,6 +61521,10 @@ module.exports = class kucoin extends Exchange {
             'clientOid': clientOid,
             'info': data,
         };
+        if (!this.safeValue (params, 'quoteAmount')) {
+            order['amount'] = amount;
+        }
+        return order;
     }
 
     async cancelOrder (id, symbol = undefined, params = {}) {
@@ -61692,7 +61689,8 @@ module.exports = class kucoin extends Exchange {
         const cost = this.safeFloat (order, 'dealFunds');
         const remaining = amount - filled;
         // bool
-        const status = order['isActive'] ? 'open' : 'closed';
+        let status = order['isActive'] ? 'open' : 'closed';
+        status = order['cancelExist'] ? 'canceled' : status;
         const fee = {
             'currency': feeCurrency,
             'cost': feeCost,
