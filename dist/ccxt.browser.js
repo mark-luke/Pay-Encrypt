@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.99'
+const version = '1.19.100'
 
 Exchange.ccxtVersion = version
 
@@ -104835,6 +104835,7 @@ module.exports = class upbit extends Exchange {
             },
             'exceptions': {
                 'exact': {
+                    'This key has expired.': AuthenticationError,
                     'Missing request parameter error. Check the required parameters!': BadRequest,
                     'side is missing, side does not have a valid value': InvalidOrder,
                 },
