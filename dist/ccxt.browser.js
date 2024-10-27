@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.18'
+const version = '1.20.19'
 
 Exchange.ccxtVersion = version
 
@@ -52087,12 +52087,15 @@ module.exports = class ftx extends Exchange {
         return this.parseTickers (tickers, symbols);
     }
 
-    async fetchOrderBook (symbol, params = {}) {
+    async fetchOrderBook (symbol, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const market = this.market (symbol);
         const request = {
             'market_name': market['id'],
         };
+        if (limit !== undefined) {
+            request['depth'] = limit; // max 100, default 20
+        }
         const response = await this.publicGetMarketsMarketNameOrderbook (this.extend (request, params));
         //
         //     {
