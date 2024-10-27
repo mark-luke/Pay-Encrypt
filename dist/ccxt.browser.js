@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.17'
+const version = '1.34.18'
 
 Exchange.ccxtVersion = version
 
@@ -28073,6 +28073,8 @@ module.exports = class bitstamp extends Exchange {
                         'eth_address/',
                         'xrp_withdrawal/',
                         'xrp_address/',
+                        'xlm_withdrawal/',
+                        'xlm_address/',
                         'transfer-to-main/',
                         'transfer-from-main/',
                         'withdrawal-requests/',
@@ -29136,10 +29138,8 @@ module.exports = class bitstamp extends Exchange {
         const v1 = (code === 'BTC');
         let method = v1 ? 'v1' : 'private'; // v1 or v2
         method += 'Post' + this.capitalize (name) + 'Withdrawal';
-        if (code === 'XRP') {
-            if (tag !== undefined) {
-                request['destination_tag'] = tag;
-            }
+        if (tag !== undefined) {
+            request['destination_tag'] = tag;
         }
         const response = await this[method] (this.extend (request, params));
         return {
