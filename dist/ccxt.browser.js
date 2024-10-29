@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.29'
+const version = '1.23.30'
 
 Exchange.ccxtVersion = version
 
@@ -45715,7 +45715,7 @@ module.exports = class digifinex extends Exchange {
                 'doc': [
                     'https://docs.digifinex.vip',
                 ],
-                'fees': 'https://digifinex.zendesk.com/hc/en-us/articles/360000328482-Fee-Structure-on-DigiFinex',
+                'fees': 'https://digifinex.zendesk.com/hc/en-us/articles/360000328422-Fee-Structure-on-DigiFinex',
                 'referral': 'https://www.digifinex.vip/en-ww/from/DhOzBg/3798****5114',
             },
             'api': {
@@ -45770,6 +45770,14 @@ module.exports = class digifinex extends Exchange {
                         'spot/order/new',
                         'transfer',
                     ],
+                },
+            },
+            'fees': {
+                'trading': {
+                    'tierBased': false,
+                    'percentage': true,
+                    'maker': 0.002,
+                    'taker': 0.002,
                 },
             },
             'exceptions': {
