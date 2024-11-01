@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.12'
+const version = '1.35.13'
 
 Exchange.ccxtVersion = version
 
@@ -62799,7 +62799,7 @@ module.exports = class exmo extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, AuthenticationError, ExchangeNotAvailable } = require ('./base/errors');
+const { ExchangeError, AuthenticationError, ExchangeNotAvailable, ArgumentsRequired } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -63180,6 +63180,9 @@ module.exports = class exx extends Exchange {
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
+        if (symbol === undefined) {
+            throw new ArgumentsRequired (this.id + ' fetchOpenOrders requires a symbol argument');
+        }
         const market = this.market (symbol);
         const request = {
             'currency': market['id'],
@@ -82373,10 +82376,10 @@ module.exports = class kuna extends acx {
         return this.parseTrades (response, market, since, limit);
     }
 
-    async fetchOHLCV (symbol, timeframe = '1m', since = undefined, limits = undefined, params = {}) {
+    async fetchOHLCV (symbol, timeframe = '1m', since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
-        const trades = await this.fetchTrades (symbol, since, limits, params);
-        const ohlcvc = this.buildOHLCVC (trades, timeframe, since, limits);
+        const trades = await this.fetchTrades (symbol, since, limit, params);
+        const ohlcvc = this.buildOHLCVC (trades, timeframe, since, limit);
         const result = [];
         for (let i = 0; i < ohlcvc.length; i++) {
             const ohlcv = ohlcvc[i];
