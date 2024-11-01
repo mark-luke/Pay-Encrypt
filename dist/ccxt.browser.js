@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.99'
+const version = '1.30.1'
 
 Exchange.ccxtVersion = version
 
@@ -10533,8 +10533,8 @@ module.exports = class binance extends Exchange {
             const test = this.safeValue (params, 'test', false);
             if (test) {
                 method += 'Test';
-                params = this.omit (params, 'test');
             }
+            params = this.omit (params, 'test');
         }
         const uppercaseType = type.toUpperCase ();
         const validOrderTypes = this.safeValue (market['info'], 'orderTypes');
