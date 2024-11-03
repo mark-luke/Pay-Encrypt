@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.29'
+const version = '1.33.30'
 
 Exchange.ccxtVersion = version
 
@@ -79268,7 +79268,10 @@ module.exports = class kucoin extends Exchange {
                 'rate': this.safeFloat (trade, 'feeRate'),
             };
         }
-        const type = this.safeString (trade, 'type');
+        let type = this.safeString (trade, 'type');
+        if (type === 'match') {
+            type = undefined;
+        }
         let cost = this.safeFloat2 (trade, 'funds', 'dealValue');
         if (cost === undefined) {
             if (amount !== undefined) {
