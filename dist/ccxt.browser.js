@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.48'
+const version = '1.32.49'
 
 Exchange.ccxtVersion = version
 
@@ -41161,8 +41161,8 @@ module.exports = class coinbase extends Exchange {
         const id = this.safeString (trade, 'id');
         const timestamp = this.parse8601 (this.safeValue (trade, 'created_at'));
         if (market === undefined) {
-            const baseId = this.safeString (totalObject, 'currency');
-            const quoteId = this.safeString (amountObject, 'currency');
+            const baseId = this.safeString (amountObject, 'currency');
+            const quoteId = this.safeString (totalObject, 'currency');
             if ((baseId !== undefined) && (quoteId !== undefined)) {
                 const base = this.safeCurrencyCode (baseId);
                 const quote = this.safeCurrencyCode (quoteId);
@@ -41176,7 +41176,7 @@ module.exports = class coinbase extends Exchange {
         const amount = this.safeFloat (amountObject, 'amount');
         let price = undefined;
         if (cost !== undefined) {
-            if (amount !== undefined) {
+            if ((amount !== undefined) && (amount > 0)) {
                 price = cost / amount;
             }
         }
