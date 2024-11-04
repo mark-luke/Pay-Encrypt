@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.2'
+const version = '1.30.11'
 
 Exchange.ccxtVersion = version
 
@@ -334,7 +334,7 @@ module.exports = class _1btcxe extends Exchange {
         };
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1d', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         return [
             this.parse8601 (ohlcv['date'] + ' 00:00:00'),
             undefined,
@@ -767,7 +767,7 @@ module.exports = class acx extends Exchange {
         return this.parseTrades (response, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         return [
             this.safeTimestamp (ohlcv, 0),
             this.safeFloat (ohlcv, 1),
@@ -2418,7 +2418,7 @@ module.exports = class aofex extends Exchange {
         return result;
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         id:  1584950100,
@@ -4537,7 +4537,7 @@ module.exports = class Exchange {
         return ((symbol !== undefined) ? array.filter ((entry) => entry.symbol === symbol) : array)
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         return Array.isArray (ohlcv) ? ohlcv.slice (0, 6) : ohlcv
     }
 
@@ -4552,7 +4552,7 @@ module.exports = class Exchange {
             if (limit && (result.length >= limit)) {
                 break;
             }
-            const ohlcv = this.parseOHLCV (ohlcvs[i], market, timeframe, since, limit)
+            const ohlcv = this.parseOHLCV (ohlcvs[i], market)
             if (since && (ohlcv[0] < since)) {
                 continue
             }
@@ -4644,7 +4644,7 @@ module.exports = class Exchange {
     }
 
     checkRequiredDependencies () {
-        if (!Exchange.hasWeb3 ()) {
+        if (this.requiresWeb3 && !Exchange.hasWeb3 ()) {
             throw new ExchangeError ('Required dependencies missing: \nnpm i ethereumjs-util ethereumjs-abi --no-save');
         }
     }
@@ -7423,7 +7423,7 @@ module.exports = class bibox extends Exchange {
         return this.parseOrderBook (response['result'], this.safeFloat (response['result'], 'update_time'), 'bids', 'asks', 'price', 'volume');
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "time":1591448220000,
@@ -8634,7 +8634,7 @@ module.exports = class bigone extends Exchange {
         return this.parseTrades (trades, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         close: '0.021562',
@@ -10102,7 +10102,7 @@ module.exports = class binance extends Exchange {
         return this.parseTickers (response, symbols);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1591478520000,
@@ -12227,7 +12227,7 @@ module.exports = class bitbank extends Exchange {
         return this.parseTrades (response['data']['transactions'], market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         "0.02501786",
@@ -13427,7 +13427,7 @@ module.exports = class bitbay extends Exchange {
         return this.safeString (types, type, type);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         '1582399800000',
@@ -14227,6 +14227,7 @@ module.exports = class bitfinex extends Exchange {
                     'Cannot evaluate your available balance, please try again': ExchangeNotAvailable,
                 },
                 'broad': {
+                    'Invalid X-BFX-SIGNATURE': AuthenticationError,
                     'This API key does not have permission': PermissionDenied, // authenticated but not authorized
                     'not enough exchange balance for ': InsufficientFunds, // when buying cost is greater than the available quote currency
                     'minimum size for ': InvalidOrder, // when amount below limits.amount.min
@@ -14799,7 +14800,7 @@ module.exports = class bitfinex extends Exchange {
         return this.parseOrder (response);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1457539800000,
@@ -17190,7 +17191,7 @@ module.exports = class bitforex extends Exchange {
         };
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "close":0.02505143,
@@ -18891,7 +18892,7 @@ module.exports = class bitmart extends Exchange {
         return await this.fetchMyTrades (symbol, since, limit, this.extend (request, params));
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "timestamp":1525761000000,
@@ -20055,7 +20056,7 @@ module.exports = class bitmax extends Exchange {
         return this.parseTickers (data, symbols);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "m":"bar",
@@ -21883,7 +21884,7 @@ module.exports = class bitmex extends Exchange {
         };
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "timestamp":"2015-09-25T13:38:00.000Z",
@@ -25110,7 +25111,7 @@ module.exports = class bittrex extends Exchange {
         throw new ExchangeError (this.id + ' fetchTrades() returned undefined response');
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1d', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "startsAt":"2020-06-12T02:35:00Z",
@@ -26745,7 +26746,7 @@ module.exports = class bitvavo extends Exchange {
         return orderbook;
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1590383700000,
@@ -28205,7 +28206,7 @@ module.exports = class bitz extends Exchange {
         return this.parseTrades (response['data'], market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         time: "1535973420000",
@@ -29368,7 +29369,7 @@ module.exports = class bleutrade extends Exchange {
         };
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1d', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         return [
             this.parse8601 (ohlcv['TimeStamp'] + '+00:00'),
             this.safeFloat (ohlcv, 'Open'),
@@ -30726,7 +30727,7 @@ module.exports = class btcalpha extends Exchange {
         return this.parseTrades (trades, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "time":1591296000,
@@ -31704,7 +31705,7 @@ module.exports = class btcmarkets extends Exchange {
         return this.parseBalance (result);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "timestamp":1572307200000,
@@ -32863,7 +32864,7 @@ module.exports = class btcturk extends Exchange {
         return this.parseTrades (response, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1d', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         return [
             this.parse8601 (this.safeString (ohlcv, 'Time')),
             this.safeFloat (ohlcv, 'Open'),
@@ -34296,7 +34297,7 @@ module.exports = class bw extends Exchange {
         return this.parseTrades (trades, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         "K",
@@ -35598,7 +35599,7 @@ module.exports = class bybit extends Exchange {
         return this.filterByArray (tickers, 'symbol', symbols);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         // inverse perpetual BTC/USD
         //
@@ -37507,7 +37508,7 @@ module.exports = class bytetrade extends Exchange {
         return this.parseTickers (rawTickers, symbols);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1591505760000,
@@ -38489,7 +38490,7 @@ module.exports = class bytetrade extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, AuthenticationError, NullResponse, InvalidOrder, NotSupported, InsufficientFunds, InvalidNonce, OrderNotFound, RateLimitExceeded } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, AuthenticationError, NullResponse, InvalidOrder, NotSupported, InsufficientFunds, InvalidNonce, OrderNotFound, RateLimitExceeded, DDoSProtection } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -38614,6 +38615,7 @@ module.exports = class cex extends Exchange {
                     'Rate limit exceeded': RateLimitExceeded,
                     'Invalid API key': AuthenticationError,
                     'There was an error while placing your order': InvalidOrder,
+                    'Sorry, too many clients already': DDoSProtection,
                 },
             },
             'options': {
@@ -38879,7 +38881,7 @@ module.exports = class cex extends Exchange {
         return this.parseOrderBook (response, timestamp);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1591403940,
@@ -41475,7 +41477,7 @@ module.exports = class coinbasepro extends Exchange {
         return this.parseTrades (response, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1591514160,
@@ -43265,7 +43267,7 @@ module.exports = class coinex extends Exchange {
         return this.parseTrades (response['data'], market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1591484400,
@@ -47571,7 +47573,7 @@ module.exports = class coss extends Exchange {
         return this.parseBalance (result);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1545138960000,
@@ -48771,7 +48773,7 @@ module.exports = class crex24 extends Exchange {
         return this.parseTrades (response, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         timestamp: '2019-09-21T10:36:00Z',
@@ -50098,7 +50100,7 @@ module.exports = class currencycom extends Exchange {
         return this.parseTickers (response, symbols);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1590971040000,
@@ -52932,7 +52934,7 @@ module.exports = class digifinex extends Exchange {
         return this.parseTrades (data, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1556712900,
@@ -54070,7 +54072,7 @@ module.exports = class dsx extends Exchange {
         return this.parseTrades (response[market['id']], market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "high" : 0.01955,
@@ -55348,7 +55350,7 @@ module.exports = class eterbase extends Exchange {
         return this.parseOrderBook (response, timestamp);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "time":1588807500000,
@@ -56656,7 +56658,7 @@ module.exports = class exmo extends Exchange {
         return this.parseOHLCVs (candles, market, timeframe, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "t":1584057600000,
@@ -58667,7 +58669,7 @@ module.exports = class fcoin extends Exchange {
         return this.parseOrders (response['data'], market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         return [
             this.safeTimestamp (ohlcv, 'id'),
             this.safeFloat (ohlcv, 'open'),
@@ -59825,7 +59827,7 @@ module.exports = class ftx extends Exchange {
         return this.parseOrderBook (result);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "close":177.23,
@@ -61380,7 +61382,7 @@ module.exports = class gateio extends Exchange {
         return this.parseOrderBook (response);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         // they return [ Timestamp, Volume, Close, High, Low, Open ]
         return [
             this.safeInteger (ohlcv, 0), // t
@@ -63478,7 +63480,7 @@ module.exports = class hbtc extends Exchange {
         return this.parseTrades (response, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1587906000000, // open time
@@ -65104,7 +65106,7 @@ module.exports = class hitbtc extends Exchange {
         return this.parseBalance (result);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1d', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "timestamp":"2015-08-20T19:01:00.000Z",
@@ -67830,7 +67832,7 @@ module.exports = class huobipro extends Exchange {
         return this.filterBySymbolSinceLimit (result, symbol, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "amount":1.2082,
@@ -72462,7 +72464,7 @@ module.exports = class kraken extends Exchange {
         return this.parseTicker (ticker, market);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1591475640,
@@ -74174,7 +74176,7 @@ module.exports = class kucoin extends Exchange {
         return this.parseTicker (response['data'], market);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         "1545904980",             // Start time of the candle cycle
@@ -77152,7 +77154,7 @@ module.exports = class lbank extends Exchange {
         return this.parseTrades (response, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1590969600,
@@ -78046,13 +78048,18 @@ module.exports = class liquid extends Exchange {
 
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
         await this.loadMarkets ();
+        const clientOrderId = this.safeString2 (params, 'clientOrderId', 'client_order_id');
+        params = this.omit (params, [ 'clientOrderId', 'client_order_id' ]);
         const request = {
             'order_type': type,
             'product_id': this.marketId (symbol),
             'side': side,
             'quantity': this.amountToPrecision (symbol, amount),
         };
-        if (type === 'limit') {
+        if (clientOrderId !== undefined) {
+            request['client_order_id'] = clientOrderId;
+        }
+        if ((type === 'limit') || (type === 'limit_post_only') || (type === 'market_with_range') || (type === 'stop')) {
             request['price'] = this.priceToPrecision (symbol, price);
         }
         const response = await this.privatePostOrders (this.extend (request, params));
@@ -78075,7 +78082,8 @@ module.exports = class liquid extends Exchange {
         //         "product_code": "CASH",
         //         "funding_currency": "USD",
         //         "currency_pair_code": "BTCUSD",
-        //         "order_fee": "0.0"
+        //         "order_fee": "0.0",
+        //         "client_order_id": null,
         //     }
         //
         return this.parseOrder (response);
@@ -78144,6 +78152,7 @@ module.exports = class liquid extends Exchange {
         //         "funding_currency": "USD",
         //         "currency_pair_code": "BTCUSD",
         //         "order_fee": "0.0"
+        //         "client_order_id": null,
         //     }
         //
         // fetchOrder, fetchOrders, fetchOpenOrders, fetchClosedOrders
@@ -78230,9 +78239,10 @@ module.exports = class liquid extends Exchange {
             remaining = amount - filled;
         }
         const side = this.safeString (order, 'side');
+        const clientOrderId = this.safeString (order, 'client_order_id');
         return {
             'id': orderId,
-            'clientOrderId': undefined,
+            'clientOrderId': clientOrderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -78445,10 +78455,12 @@ module.exports = class liquid extends Exchange {
             const nonce = this.nonce ();
             const request = {
                 'path': url,
-                'nonce': nonce,
                 'token_id': this.apiKey,
                 'iat': Math.floor (nonce / 1000), // issued at
             };
+            if (!('client_order_id' in query)) {
+                request['nonce'] = nonce;
+            }
             headers['X-Quoine-Auth'] = this.jwt (request, this.encode (this.secret));
         } else {
             if (Object.keys (query).length) {
@@ -80914,7 +80926,7 @@ module.exports = class mercado extends Exchange {
         };
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         return [
             this.safeTimestamp (ohlcv, 'timestamp'),
             this.safeFloat (ohlcv, 'open'),
@@ -83269,7 +83281,7 @@ module.exports = class okex extends Exchange {
         return this.parseTrades (response, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         // spot markets
         //
@@ -85685,7 +85697,7 @@ module.exports = class poloniex extends Exchange {
         };
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "date":1590913773,
@@ -85968,31 +85980,20 @@ module.exports = class poloniex extends Exchange {
 
     parseTrade (trade, market = undefined) {
         //
-        // fetchMyTrades (symbol defined, specific market)
+        // fetchMyTrades
         //
         //     {
-        //         globalTradeID: 394698946,
-        //         tradeID: 45210255,
-        //         date: '2018-10-23 17:28:55',
-        //         type: 'sell',
-        //         rate: '0.03114126',
-        //         amount: '0.00018753',
-        //         total: '0.00000583'
-        //     }
-        //
-        // fetchMyTrades (symbol undefined, all markets)
-        //
-        //     {
-        //         globalTradeID: 394131412,
-        //         tradeID: '5455033',
-        //         date: '2018-10-16 18:05:17',
-        //         rate: '0.06935244',
-        //         amount: '1.40308443',
-        //         total: '0.09730732',
-        //         fee: '0.00100000',
-        //         orderNumber: '104768235081',
-        //         type: 'sell',
-        //         category: 'exchange'
+        //       globalTradeID: 471030550,
+        //       tradeID: '42582',
+        //       date: '2020-06-16 09:47:50',
+        //       rate: '0.000079980000',
+        //       amount: '75215.00000000',
+        //       total: '6.01569570',
+        //       fee: '0.00095000',
+        //       feeDisplay: '0.26636100 TRX (0.07125%)',
+        //       orderNumber: '5963454848',
+        //       type: 'sell',
+        //       category: 'exchange'
         //     }
         //
         // createOrder (taker trades)
@@ -86034,25 +86035,26 @@ module.exports = class poloniex extends Exchange {
         const price = this.safeFloat (trade, 'rate');
         const cost = this.safeFloat (trade, 'total');
         const amount = this.safeFloat (trade, 'amount');
-        if ('fee' in trade) {
-            const rate = this.safeFloat (trade, 'fee');
-            let feeCost = undefined;
-            let currency = undefined;
-            if (side === 'buy') {
-                currency = base;
-                feeCost = amount * rate;
-            } else {
-                currency = quote;
-                if (cost !== undefined) {
-                    feeCost = cost * rate;
+        const feeDisplay = this.safeString (trade, 'feeDisplay');
+        if (feeDisplay !== undefined) {
+            const parts = feeDisplay.split (' ');
+            const feeCost = this.safeFloat (parts, 0);
+            if (feeCost !== undefined) {
+                const feeCurrencyId = this.safeString (parts, 1);
+                const feeCurrencyCode = this.safeCurrencyCode (feeCurrencyId);
+                let feeRate = this.safeString (parts, 2);
+                if (feeRate !== undefined) {
+                    feeRate = feeRate.replace ('(', '');
+                    feeRate = feeRate.replace (')', '');
+                    feeRate = feeRate.replace ('%', '');
+                    feeRate = parseFloat (feeRate) / 100;
                 }
+                fee = {
+                    'cost': feeCost,
+                    'currency': feeCurrencyCode,
+                    'rate': feeRate,
+                };
             }
-            fee = {
-                'type': undefined,
-                'rate': rate,
-                'cost': feeCost,
-                'currency': currency,
-            };
         }
         let takerOrMaker = undefined;
         const takerAdjustment = this.safeFloat (trade, 'takerAdjustment');
@@ -86112,49 +86114,59 @@ module.exports = class poloniex extends Exchange {
         //
         //     [
         //         {
-        //             globalTradeID: 394700861,
-        //             tradeID: 45210354,
-        //             date: '2018-10-23 18:01:58',
-        //             type: 'buy',
-        //             rate: '0.03117266',
-        //             amount: '0.00000652',
-        //             total: '0.00000020'
+        //             globalTradeID: 470912587,
+        //             tradeID: '42543',
+        //             date: '2020-06-15 17:31:22',
+        //             rate: '0.000083840000',
+        //             amount: '95237.60321429',
+        //             total: '7.98472065',
+        //             fee: '0.00095000',
+        //             feeDisplay: '0.36137761 TRX (0.07125%)',
+        //             orderNumber: '5926344995',
+        //             type: 'sell',
+        //             category: 'exchange'
         //         },
         //         {
-        //             globalTradeID: 394698946,
-        //             tradeID: 45210255,
-        //             date: '2018-10-23 17:28:55',
+        //             globalTradeID: 470974497,
+        //             tradeID: '42560',
+        //             date: '2020-06-16 00:41:23',
+        //             rate: '0.000078220000',
+        //             amount: '1000000.00000000',
+        //             total: '78.22000000',
+        //             fee: '0.00095000',
+        //             feeDisplay: '3.48189819 TRX (0.07125%)',
+        //             orderNumber: '5945490830',
         //             type: 'sell',
-        //             rate: '0.03114126',
-        //             amount: '0.00018753',
-        //             total: '0.00000583'
+        //             category: 'exchange'
         //         }
         //     ]
         //
         // all markets (symbol undefined)
         //
         //     {
-        //         BTC_BCH: [{
-        //             globalTradeID: 394131412,
-        //             tradeID: '5455033',
-        //             date: '2018-10-16 18:05:17',
-        //             rate: '0.06935244',
-        //             amount: '1.40308443',
-        //             total: '0.09730732',
-        //             fee: '0.00100000',
-        //             orderNumber: '104768235081',
-        //             type: 'sell',
+        //        BTC_GNT: [{
+        //             globalTradeID: 470839947,
+        //             tradeID: '4322347',
+        //             date: '2020-06-15 12:25:24',
+        //             rate: '0.000005810000',
+        //             amount: '1702.04429303',
+        //             total: '0.00988887',
+        //             fee: '0.00095000',
+        //             feeDisplay: '4.18235294 TRX (0.07125%)',
+        //             orderNumber: '102290272520',
+        //             type: 'buy',
         //             category: 'exchange'
-        //         }, {
-        //             globalTradeID: 394126818,
-        //             tradeID: '5455007',
-        //             date: '2018-10-16 16:55:34',
-        //             rate: '0.06935244',
-        //             amount: '0.00155709',
-        //             total: '0.00010798',
-        //             fee: '0.00200000',
-        //             orderNumber: '104768179137',
-        //             type: 'sell',
+        //     }, {
+        //             globalTradeID: 470895902,
+        //             tradeID: '4322413',
+        //             date: '2020-06-15 16:19:00',
+        //             rate: '0.000005980000',
+        //             amount: '18.66879219',
+        //             total: '0.00011163',
+        //             fee: '0.00095000',
+        //             feeDisplay: '0.04733727 TRX (0.07125%)',
+        //             orderNumber: '102298304480',
+        //             type: 'buy',
         //             category: 'exchange'
         //         }],
         //     }
@@ -87782,7 +87794,7 @@ module.exports = class probit extends Exchange {
         return this.parseOHLCVs (data, market, timeframe, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "market_id":"ETH-BTC",
@@ -88589,7 +88601,7 @@ module.exports = class qtrade extends Exchange {
         return result;
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "time":"2019-12-07T22:55:00Z",
@@ -90229,7 +90241,7 @@ module.exports = class rightbtc extends Exchange {
         return this.parseTrades (response['result'], market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         return [
             this.safeInteger (ohlcv, 0),
             parseFloat (ohlcv[2]) / 1e8,
@@ -110256,7 +110268,7 @@ module.exports = class stex extends Exchange {
         return this.parseTickers (tickers, symbols);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1d', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "time": 1566086400000,
@@ -112455,7 +112467,7 @@ module.exports = class theocean extends Exchange {
         return result;
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "market_id":"ETH-BTC",
@@ -114740,7 +114752,7 @@ module.exports = class tidebit extends Exchange {
         return this.parseTrades (response, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1498530360,
@@ -116956,7 +116968,7 @@ module.exports = class timex extends Exchange {
         };
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         "timestamp":"2019-12-04T23:00:00",
@@ -117894,7 +117906,7 @@ module.exports = class upbit extends Exchange {
         return this.parseTrades (response, market, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1d', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         market: "BTC-ETH",
@@ -119141,8 +119153,14 @@ module.exports = class wavesexchange extends Exchange {
                 },
             },
             'commonCurrencies': {
+                'BITCOIN CASH': 'BCH',
+                'LITECOIN': 'LTC',
+                'MONERO': 'XMR',
+                'TIDEX': 'TDX',
+                'USD-N': 'USDN',
                 'WBTC': 'BTC',
                 'WETH': 'ETH',
+                'ZCASH': 'ZEC',
             },
             'options': {
                 'allowedCandles': 1440,
@@ -119574,7 +119592,7 @@ module.exports = class wavesexchange extends Exchange {
         return result;
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     {
         //         __type: 'candle',
@@ -119705,6 +119723,7 @@ module.exports = class wavesexchange extends Exchange {
 
     async createOrder (symbol, type, side, amount, price = undefined, params = {}) {
         this.checkRequiredDependencies ();
+        this.checkRequiredCredentials ();
         await this.loadMarkets ();
         const market = this.market (symbol);
         const matcherPublicKey = await this.getMatcherPublicKey ();
@@ -119777,6 +119796,7 @@ module.exports = class wavesexchange extends Exchange {
 
     async cancelOrder (id, symbol = undefined, params = {}) {
         this.checkRequiredDependencies ();
+        this.checkRequiredCredentials ();
         await this.loadMarkets ();
         if (symbol === undefined) {
             throw new ArgumentsRequired (this.id + ' symbol is required for cancelOrder');
@@ -119825,6 +119845,7 @@ module.exports = class wavesexchange extends Exchange {
 
     async fetchOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         this.checkRequiredDependencies ();
+        this.checkRequiredCredentials ();
         if (symbol === undefined) {
             throw new ArgumentsRequired (this.id + ' fetchOrders requires symbol argument');
         }
@@ -120011,6 +120032,7 @@ module.exports = class wavesexchange extends Exchange {
         // getReservedBalance (includes WAVES)
         // I couldn't find another way to get all the data
         this.checkRequiredDependencies ();
+        this.checkRequiredCredentials ();
         await this.loadMarkets ();
         const wavesAddress = await this.getWavesAddress ();
         const request = {
@@ -120828,7 +120850,7 @@ module.exports = class whitebit extends Exchange {
         return this.parseOHLCVs (result, market, timeframe, since, limit);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         //
         //     [
         //         1591488000,
@@ -121159,7 +121181,7 @@ module.exports = class xbtce extends Exchange {
         return await this.privateGetTrade (params);
     }
 
-    parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+    parseOHLCV (ohlcv, market = undefined) {
         return [
             this.safeInteger (ohlcv, 'Timestamp'),
             this.safeFloat (ohlcv, 'Open'),
