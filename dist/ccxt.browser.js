@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.24'
+const version = '1.31.25'
 
 Exchange.ccxtVersion = version
 
@@ -22684,7 +22684,7 @@ module.exports = class bitpanda extends Exchange {
         const baseVolume = this.safeFloat (ticker, 'base_volume');
         const quoteVolume = this.safeFloat (ticker, 'quote_volume');
         let vwap = undefined;
-        if (quoteVolume !== undefined && baseVolume !== undefined) {
+        if ((quoteVolume !== undefined) && (baseVolume !== undefined) && (baseVolume !== 0)) {
             vwap = quoteVolume / baseVolume;
         }
         return {
