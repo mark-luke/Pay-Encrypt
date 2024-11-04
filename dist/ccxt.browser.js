@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.60'
+const version = '1.27.61'
 
 Exchange.ccxtVersion = version
 
@@ -42585,6 +42585,7 @@ module.exports = class coinmarketcap extends Exchange {
             'Blocktrade Token': 'Blocktrade Token',
             'Catcoin': 'Catcoin',
             'CanYaCoin': 'CanYaCoin', // conflict with CAN (Content and AD Network)
+            'CryptoBossCoin': 'CryptoBossCoin', // conflict with CBC (CashBet Coin)
             'Comet': 'Comet', // conflict with CMT (CyberMiles)
             'CPChain': 'CPChain',
             'CrowdCoin': 'CrowdCoin', // conflict with CRC CryCash
@@ -74139,6 +74140,7 @@ module.exports = class livecoin extends Exchange {
             'commonCurrencies': {
                 'BTCH': 'Bithash',
                 'CPC': 'Capricoin',
+                'CBC': 'CryptoBossCoin', // conflict with CBC (CashBet Coin)
                 'CPT': 'Cryptos', // conflict with CPT = Contents Protocol https://github.com/ccxt/ccxt/issues/4920 and https://github.com/ccxt/ccxt/issues/6081
                 'EDR': 'E-Dinar Coin', // conflicts with EDR for Endor Protocol and EDRCoin
                 'eETT': 'EETT',
@@ -113337,6 +113339,7 @@ module.exports = class yobit extends Exchange {
                 'BPC': 'BitcoinPremium',
                 'BTS': 'Bitshares2',
                 'CAT': 'BitClave',
+                'CBC': 'CryptoBossCoin',
                 'CMT': 'CometCoin',
                 'COV': 'Coven Coin',
                 'COVX': 'COV',
