@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.32'
+const version = '1.20.33'
 
 Exchange.ccxtVersion = version
 
@@ -2316,10 +2316,7 @@ module.exports = class allcoin extends okcoinusd {
                             'min': this.safeFloat (market, 'MinOrderPrice'),
                             'max': this.safeFloat (market, 'MaxOrderPrice'),
                         },
-                        'cost': {
-                            'min': undefined,
-                            'max': undefined,
-                        },
+                        'cost': { 'min': undefined, 'max': undefined },
                     },
                     'info': market,
                 });
@@ -3761,18 +3758,9 @@ module.exports = class Exchange {
             },
             'precisionMode': DECIMAL_PLACES,
             'limits': {
-                'amount': {
-                    'min': undefined,
-                    'max': undefined,
-                },
-                'price': {
-                    'min': undefined,
-                    'max': undefined,
-                },
-                'cost': {
-                    'min': undefined,
-                    'max': undefined,
-                },
+                'amount': { 'min': undefined, 'max': undefined },
+                'price': { 'min': undefined, 'max': undefined },
+                'cost': { 'min': undefined, 'max': undefined },
             },
         } // return
     } // describe ()
@@ -6845,18 +6833,9 @@ module.exports = class bcex extends Exchange {
                     },
                     // overrided by defaults from this.options['limits']
                     'limits': {
-                        'amount': {
-                            'min': undefined,
-                            'max': undefined,
-                        },
-                        'price': {
-                            'min': undefined,
-                            'max': undefined,
-                        },
-                        'cost': {
-                            'min': undefined,
-                            'max': undefined,
-                        },
+                        'amount': { 'min': undefined, 'max': undefined },
+                        'price': { 'min': undefined, 'max': undefined },
+                        'cost': { 'min': undefined, 'max': undefined },
                     },
                     'info': market,
                 }, defaults));
@@ -18550,7 +18529,7 @@ module.exports = class bitmax extends Exchange {
         if (since !== undefined) {
             request['from'] = since;
             if (limit !== undefined) {
-                request['to'] = this.sum (request['from'], limit * duration * 1000, 1);
+                request['to'] = this.sum (since, limit * duration * 1000, 1);
             }
         } else if (limit !== undefined) {
             request['to'] = this.milliseconds ();
@@ -51415,22 +51394,10 @@ module.exports = class ftx extends Exchange {
                 'fee': undefined,
                 'precision': undefined,
                 'limits': {
-                    'amount': {
-                        'min': undefined,
-                        'max': undefined,
-                    },
-                    'price': {
-                        'min': undefined,
-                        'max': undefined,
-                    },
-                    'cost': {
-                        'min': undefined,
-                        'max': undefined,
-                    },
-                    'withdraw': {
-                        'min': undefined,
-                        'max': undefined,
-                    },
+                    'withdraw': { 'min': undefined, 'max': undefined },
+                    'amount': { 'min': undefined, 'max': undefined },
+                    'price': { 'min': undefined, 'max': undefined },
+                    'cost': { 'min': undefined, 'max': undefined },
                 },
             };
         }
