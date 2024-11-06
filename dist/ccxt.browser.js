@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.65'
+const version = '1.28.66'
 
 Exchange.ccxtVersion = version
 
@@ -18313,7 +18313,7 @@ module.exports = class bitmart extends Exchange {
         //     }
         //
         const timestamp = this.safeInteger (ticker, 'closeTime', this.milliseconds ());
-        const marketId = this.safeString (ticker, 'pair');
+        const marketId = this.safeString2 (ticker, 'pair', 'symbol_id');
         let symbol = undefined;
         if (marketId !== undefined) {
             if (marketId in this.markets_by_id) {
