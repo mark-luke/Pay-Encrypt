@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.54'
+const version = '1.26.55'
 
 Exchange.ccxtVersion = version
 
@@ -55071,6 +55071,7 @@ module.exports = class ftx extends Exchange {
         //     {
         //         "fee": 20.1374935,
         //         "feeRate": 0.0005,
+        //         "feeCurrency": "USD",
         //         "future": "EOS-0329",
         //         "id": 11215,
         //         "liquidity": "taker",
@@ -55117,8 +55118,11 @@ module.exports = class ftx extends Exchange {
         let fee = undefined;
         const feeCost = this.safeFloat (trade, 'fee');
         if (feeCost !== undefined) {
+            const feeCurrencyId = this.safeString (trade, 'feeCurrency');
+            const feeCurrencyCode = this.safeCurrencyCode (feeCurrencyId);
             fee = {
                 'cost': feeCost,
+                'currency': feeCurrencyCode,
                 'rate': this.safeFloat (trade, 'feeRate'),
             };
         }
