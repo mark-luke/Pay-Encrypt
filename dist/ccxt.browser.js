@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.11'
+const version = '1.33.12'
 
 Exchange.ccxtVersion = version
 
@@ -2260,7 +2260,7 @@ module.exports = class Exchange {
                     const camelcaseSuffix  = splitPath.map (this.capitalize).join ('')
                     const underscoreSuffix = splitPath.map ((x) => x.trim ().toLowerCase ()).filter ((x) => x.length > 0).join ('_')
                     const camelcasePrefix = [ paths[0] ].concat (paths.slice (1).map (this.capitalize)).join ('')
-                    const underscorePrefix = [ paths[0] ].concat (paths.slice (1).map ((x) => x.trim ().toLowerCase ()).filter ((x) => x.length > 0)).join ('_')
+                    const underscorePrefix = [ paths[0] ].concat (paths.slice (1).map ((x) => x.trim ()).filter ((x) => x.length > 0)).join ('_')
                     const camelcase  = camelcasePrefix + camelcaseMethod + this.capitalize (camelcaseSuffix)
                     const underscore = underscorePrefix + '_' + lowercaseMethod + '_' + underscoreSuffix
                     const typeArgument = (paths.length > 1) ? paths : paths[0]
