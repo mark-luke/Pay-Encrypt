@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.55'
+const version = '1.33.56'
 
 Exchange.ccxtVersion = version
 
@@ -48478,7 +48478,7 @@ module.exports = class coinfalcon extends Exchange {
             request['market'] = market['id'];
         }
         if (since !== undefined) {
-            request['since_time'] = this.iso8601 (this.milliseconds ());
+            request['since_time'] = this.iso8601 (since);
         }
         // TODO: test status=all if it works for closed orders too
         const response = await this.privateGetUserOrders (this.extend (request, params));
