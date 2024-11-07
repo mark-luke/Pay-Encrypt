@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.45'
+const version = '1.29.46'
 
 Exchange.ccxtVersion = version
 
@@ -40825,6 +40825,16 @@ module.exports = class coinbasepro extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         1591514160,
+        //         0.02507,
+        //         0.02507,
+        //         0.02507,
+        //         0.02507,
+        //         0.02816506
+        //     ]
+        //
         return [
             this.safeTimestamp (ohlcv, 0),
             this.safeFloat (ohlcv, 3),
@@ -40852,7 +40862,14 @@ module.exports = class coinbasepro extends Exchange {
             request['end'] = this.iso8601 (this.sum ((limit - 1) * granularity * 1000, since));
         }
         const response = await this.publicGetProductsIdCandles (this.extend (request, params));
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        //
+        //     [
+        //         [1591514160,0.02507,0.02507,0.02507,0.02507,0.02816506],
+        //         [1591514100,0.02507,0.02507,0.02507,0.02507,1.63830323],
+        //         [1591514040,0.02505,0.02507,0.02505,0.02507,0.19918178]
+        //     ]
+        //
+        return this.parseOHLCVs (response, market);
     }
 
     async fetchTime (params = {}) {
@@ -42598,6 +42615,18 @@ module.exports = class coinex extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '5m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         1591484400,
+        //         "0.02505349",
+        //         "0.02506988",
+        //         "0.02507000",
+        //         "0.02505304",
+        //         "343.19716223",
+        //         "8.6021323866383196",
+        //         "ETHBTC"
+        //     ]
+        //
         return [
             this.safeTimestamp (ohlcv, 0),
             this.safeFloat (ohlcv, 1),
@@ -42616,7 +42645,19 @@ module.exports = class coinex extends Exchange {
             'type': this.timeframes[timeframe],
         };
         const response = await this.publicGetMarketKline (this.extend (request, params));
-        return this.parseOHLCVs (response['data'], market, timeframe, since, limit);
+        //
+        //     {
+        //         "code": 0,
+        //         "data": [
+        //             [1591484400, "0.02505349", "0.02506988", "0.02507000", "0.02505304", "343.19716223", "8.6021323866383196", "ETHBTC"],
+        //             [1591484700, "0.02506990", "0.02508109", "0.02508109", "0.02506979", "91.59841581", "2.2972047780447000", "ETHBTC"],
+        //             [1591485000, "0.02508106", "0.02507996", "0.02508106", "0.02507500", "65.15307697", "1.6340597822306000", "ETHBTC"],
+        //         ],
+        //         "message": "OK"
+        //     }
+        //
+        const data = this.safeValue (response, 'data', []);
+        return this.parseOHLCVs (data, market);
     }
 
     async fetchBalance (params = {}) {
@@ -46742,6 +46783,16 @@ module.exports = class coss extends Exchange {
     }
 
     parseOHLCV (ohlcv, market = undefined, timeframe = '1m', since = undefined, limit = undefined) {
+        //
+        //     [
+        //         1545138960000,
+        //         "0.02705000",
+        //         "0.02705000",
+        //         "0.02705000",
+        //         "0.02705000",
+        //         "0.00000000"
+        //     ]
+        //
         return [
             this.safeInteger (ohlcv, 0),   // timestamp
             this.safeFloat (ohlcv, 1), // Open
@@ -46761,25 +46812,25 @@ module.exports = class coss extends Exchange {
         };
         const response = await this.engineGetCs (this.extend (request, params));
         //
-        //     {       tt:   "1m",
-        //         symbol:   "ETH_BTC",
-        //       nextTime:    1545138960000,
-        //         series: [ [  1545138960000,
-        //                     "0.02705000",
-        //                     "0.02705000",
-        //                     "0.02705000",
-        //                     "0.02705000",
-        //                     "0.00000000"    ],
-        //                   ...
-        //                   [  1545168900000,
-        //                     "0.02684000",
-        //                     "0.02684000",
-        //                     "0.02684000",
-        //                     "0.02684000",
-        //                     "0.00000000"    ]  ],
-        //          limit:    500                    }
+        //     {
+        //         tt: "1m",
+        //         symbol: "ETH_BTC",
+        //         nextTime: 1545138960000,
+        //         series: [
+        //             [
+        //                 1545138960000,
+        //                 "0.02705000",
+        //                 "0.02705000",
+        //                 "0.02705000",
+        //                 "0.02705000",
+        //                 "0.00000000"
+        //             ],
+        //         ],
+        //         limit: 500
+        //     }
         //
-        return this.parseOHLCVs (response['series'], market, timeframe, since, limit);
+        const series = this.safeValue (response, 'series', []);
+        return this.parseOHLCVs (series, market);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
@@ -47963,7 +48014,19 @@ module.exports = class crex24 extends Exchange {
             request['limit'] = limit; // Accepted values: 1 - 1000. If the parameter is not specified, the number of results is limited to 100
         }
         const response = await this.publicGetOhlcv (this.extend (request, params));
-        return this.parseOHLCVs (response, market, timeframe, since, limit);
+        //
+        //     [
+        //         {
+        //             "timestamp": "2020-06-06T17:36:00Z",
+        //             "open": 0.025,
+        //             "high": 0.025,
+        //             "low": 0.02499,
+        //             "close": 0.02499,
+        //             "volume": 0.00643127
+        //         }
+        //     ]
+        //
+        return this.parseOHLCVs (response, market);
     }
 
     parseOrderStatus (status) {
