@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.45'
+const version = '1.35.46'
 
 Exchange.ccxtVersion = version
 
@@ -29908,7 +29908,7 @@ module.exports = class bittrex extends Exchange {
         //         ]
         //     }
         //
-        const sequence = this.safeInteger (this.last_response_headers, 'Sequence');
+        const sequence = this.safeInteger2 (this.last_response_headers, 'sequence', 'Sequence');
         const orderbook = this.parseOrderBook (response, undefined, 'bid', 'ask', 'rate', 'quantity');
         orderbook['nonce'] = sequence;
         return orderbook;
