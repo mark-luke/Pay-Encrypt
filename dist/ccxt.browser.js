@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.68'
+const version = '1.35.69'
 
 Exchange.ccxtVersion = version
 
@@ -1155,23 +1155,10 @@ module.exports = class aofex extends Exchange {
         const result = {};
         for (let i = 0; i < tickers.length; i++) {
             const marketId = this.safeString (tickers[i], 'symbol');
-            let market = undefined;
-            let symbol = marketId;
-            if (marketId !== undefined) {
-                if (marketId in this.markets_by_id) {
-                    market = this.markets_by_id[marketId];
-                    symbol = market['symbol'];
-                } else {
-                    const [ baseId, quoteId ] = marketId.split ('-');
-                    const base = this.safeCurrencyCode (baseId);
-                    const quote = this.safeCurrencyCode (quoteId);
-                    symbol = base + '/' + quote;
-                }
-            }
+            const market = this.safeMarket (marketId, undefined, '-');
+            const symbol = market['symbol'];
             const data = this.safeValue (tickers[i], 'data', {});
-            const ticker = this.parseTicker (data, market);
-            ticker['symbol'] = symbol;
-            result[symbol] = ticker;
+            result[symbol] = this.parseTicker (data, market);
         }
         return this.filterByArray (result, 'symbol', symbols);
     }
@@ -1375,25 +1362,8 @@ module.exports = class aofex extends Exchange {
         const id = this.safeString (order, 'order_sn');
         const orderStatus = this.safeString (order, 'status');
         const status = this.parseOrderStatus (orderStatus);
-        let symbol = undefined;
         const marketId = this.safeString (order, 'symbol');
-        let base = undefined;
-        let quote = undefined;
-        if (marketId !== undefined) {
-            if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[marketId];
-            } else {
-                const [ baseId, quoteId ] = marketId.split ('-');
-                base = this.safeCurrencyCode (baseId);
-                quote = this.safeCurrencyCode (quoteId);
-                symbol = base + '/' + quote;
-            }
-        }
-        if ((symbol === undefined) && (market !== undefined)) {
-            symbol = market['symbol'];
-            base = market['base'];
-            quote = market['quote'];
-        }
+        market = this.safeMarket (marketId, market, '-');
         let timestamp = this.parse8601 (this.safeString (order, 'ctime'));
         if (timestamp !== undefined) {
             timestamp -= 28800000; // 8 hours, adjust to UTC
@@ -1461,7 +1431,7 @@ module.exports = class aofex extends Exchange {
                     }
                 }
                 if (feeCost !== undefined) {
-                    const feeCurrencyCode = (side === 'buy') ? base : quote;
+                    const feeCurrencyCode = (side === 'buy') ? market['base'] : market['quote'];
                     fee = {
                         'cost': feeCost,
                         'currency': feeCurrencyCode,
@@ -1497,7 +1467,7 @@ module.exports = class aofex extends Exchange {
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
             'status': status,
-            'symbol': symbol,
+            'symbol': market['symbol'],
             'type': type,
             'side': side,
             'price': price,
