@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.59'
+const version = '1.29.60'
 
 Exchange.ccxtVersion = version
 
@@ -85416,6 +85416,10 @@ module.exports = class okex extends Exchange {
         //         },
         //     ]
         //
+        const responseLength = response.length;
+        if (responseLength < 1) {
+            return [];
+        }
         const isArray = Array.isArray (response[0]);
         const isMargin = (type === 'margin');
         const entries = (isMargin && isArray) ? response[0] : response;
