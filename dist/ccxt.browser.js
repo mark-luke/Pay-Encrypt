@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1180'
+const version = '1.18.1181'
 
 Exchange.ccxtVersion = version
 
@@ -66868,7 +66868,7 @@ module.exports = class mandala extends Exchange {
     }
 
     async generateDepositAddress (code, params = {}) {
-        // a common implmenetation of fetchDepositAddress and createDepositAddress
+        // a common implementation of fetchDepositAddress and createDepositAddress
         await this.loadMarkets ();
         const currency = this.currency (code);
         const request = {
