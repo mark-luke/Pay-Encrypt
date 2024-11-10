@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.93'
+const version = '1.33.94'
 
 Exchange.ccxtVersion = version
 
@@ -40144,7 +40144,7 @@ module.exports = class bybit extends Exchange {
                 }
             }
         }
-        const status = this.parseOrderStatus (this.safeString (order, 'order_status'));
+        const status = this.parseOrderStatus (this.safeString2 (order, 'order_status', 'stop_order_status'));
         const side = this.safeStringLower (order, 'side');
         let feeCost = this.safeFloat (order, 'cum_exec_fee');
         let fee = undefined;
