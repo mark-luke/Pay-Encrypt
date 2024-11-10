@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1154'
+const version = '1.18.1155'
 
 Exchange.ccxtVersion = version
 
@@ -17157,6 +17157,7 @@ module.exports = class bitmex extends Exchange {
             'exceptions': {
                 'exact': {
                     'Invalid API Key.': AuthenticationError,
+                    'This key is disabled.': PermissionDenied,
                     'Access Denied': PermissionDenied,
                     'Duplicate clOrdID': InvalidOrder,
                     'orderQty is invalid': InvalidOrder,
