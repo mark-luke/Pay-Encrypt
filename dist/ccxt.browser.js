@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.62'
+const version = '1.35.63'
 
 Exchange.ccxtVersion = version
 
@@ -38663,16 +38663,8 @@ module.exports = class buda extends Exchange {
     parseOrder (order, market = undefined) {
         const id = this.safeString (order, 'id');
         const timestamp = this.parse8601 (this.safeString (order, 'created_at'));
-        let symbol = undefined;
-        if (market === undefined) {
-            const marketId = order['market_id'];
-            if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[marketId];
-            }
-        }
-        if (market !== undefined) {
-            symbol = market['symbol'];
-        }
+        const marketId = this.safeString (order, 'market_id');
+        const symbol = this.safeSymbol (marketId, market);
         const type = this.safeString (order, 'price_type');
         const side = this.safeStringLower (order, 'type');
         const status = this.parseOrderStatus (this.safeString (order, 'state'));
