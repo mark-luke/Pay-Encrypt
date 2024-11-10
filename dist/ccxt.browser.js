@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1281'
+const version = '1.18.1282'
 
 Exchange.ccxtVersion = version
 
@@ -75214,7 +75214,7 @@ module.exports = class rightbtc extends Exchange {
                     // 0.01 ETP
                     // 0.001 ETH
                     // 0.1 BITCNY
-                    'maker': 0.2 / 100,
+                    'maker': 0.1 / 100,
                     'taker': 0.2 / 100,
                 },
                 'funding': {
@@ -75237,11 +75237,11 @@ module.exports = class rightbtc extends Exchange {
                         // 'BitCNY': n => 0.1 + n * (1 / 100),
                         // 'MTX': n => 1 + n * (1 / 100),
                         'ETP': 0.01,
-                        'BTC': 0.001,
-                        'ETH': 0.01,
+                        'BTC': 0.0005,
+                        'ETH': 0.005,
                         'ETC': 0.01,
                         'STORJ': 3,
-                        'LTC': 0.001,
+                        'LTC': 0.01,
                         'ZEC': 0.001,
                         'BCC': 0.001,
                         'XRB': 0,
