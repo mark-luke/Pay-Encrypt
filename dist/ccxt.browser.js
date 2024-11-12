@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.4'
+const version = '1.28.5'
 
 Exchange.ccxtVersion = version
 
@@ -76680,6 +76680,7 @@ module.exports = class lykke extends Exchange {
                 'fetchClosedOrders': true,
                 'fetchOrder': true,
                 'fetchOrders': true,
+                'fetchMyTrades': true,
             },
             'timeframes': {
                 '1m': 'Minute',
