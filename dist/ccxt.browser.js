@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.28'
+const version = '1.25.29'
 
 Exchange.ccxtVersion = version
 
@@ -76854,7 +76854,6 @@ module.exports = class okex extends Exchange {
                 marketType = 'swap';
                 spot = false;
                 swap = true;
-                baseId = this.safeString (market, 'coin');
                 const futuresAlias = this.safeString (market, 'alias');
                 if (futuresAlias !== undefined) {
                     swap = false;
