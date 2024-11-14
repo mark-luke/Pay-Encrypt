@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1051'
+const version = '1.18.1057'
 
 Exchange.ccxtVersion = version
 
@@ -4032,7 +4032,7 @@ module.exports = subclass (
     // Root class
     Error,
     // Derived class hierarchy
-    errorHierarchy,
+    errorHierarchy
 )
 
 },{"./errorHierarchy.js":8}],10:[function(require,module,exports){
@@ -4074,7 +4074,7 @@ const CryptoJS = require ('../../static_dependencies/crypto-js/crypto-js')
 const { capitalize } = require ('./string')
 const { stringToBase64, utf16ToBase64, urlencodeBase64 } = require ('./encode')
 const NodeRSA = require ('./../../static_dependencies/node-rsa/NodeRSA')
-const EC = require ('./../../static_dependencies/elliptic').ec
+const EC = require ('./../../static_dependencies/elliptic/lib/elliptic').ec
 const { ArgumentsRequired } = require ('./../errors')
 
 
@@ -4199,7 +4199,7 @@ module.exports = {
 
 /*  ------------------------------------------------------------------------ */
 
-},{"../../static_dependencies/crypto-js/crypto-js":127,"./../../static_dependencies/elliptic":129,"./../../static_dependencies/node-rsa/NodeRSA":144,"./../errors":9,"./encode":12,"./string":17}],12:[function(require,module,exports){
+},{"../../static_dependencies/crypto-js/crypto-js":127,"./../../static_dependencies/elliptic/lib/elliptic":129,"./../../static_dependencies/node-rsa/NodeRSA":144,"./../errors":9,"./encode":12,"./string":17}],12:[function(require,module,exports){
 "use strict";
 
 /*  ------------------------------------------------------------------------ */
@@ -6714,10 +6714,10 @@ module.exports = class bibox extends Exchange {
     }
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
+        await this.loadMarkets ();
         let market = undefined;
         let pair = undefined;
         if (symbol !== undefined) {
-            await this.loadMarkets ();
             market = this.market (symbol);
             pair = market['id'];
         }
@@ -22451,7 +22451,7 @@ module.exports = class bleutrade extends bittrex {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, InvalidOrder, AuthenticationError } = require ('./base/errors');
+const { ExchangeError, InvalidOrder, AuthenticationError, ArgumentsRequired } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -22468,6 +22468,7 @@ module.exports = class braziliex extends Exchange {
                 'fetchOpenOrders': true,
                 'fetchMyTrades': true,
                 'fetchDepositAddress': true,
+                'fetchOrder': true,
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/34703593-c4498674-f504-11e7-8d14-ff8e44fb78c1.jpg',
@@ -22497,6 +22498,7 @@ module.exports = class braziliex extends Exchange {
                         'sell',
                         'buy',
                         'cancel_order',
+                        'order_status',
                     ],
                 },
             },
@@ -22857,6 +22859,18 @@ module.exports = class braziliex extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "order_number":"58ee441d05f8233fadabfb07",
+        //         "type":"buy",
+        //         "market":"ltc_btc",
+        //         "price":"0.01000000",
+        //         "amount":"0.00200000",
+        //         "total":"0.00002000",
+        //         "progress":"1.0000",
+        //         "date":"2017-03-12 15:13:33"
+        //     }
+        //
         let symbol = undefined;
         if (market === undefined) {
             const marketId = this.safeString (order, 'market');
@@ -22883,12 +22897,13 @@ module.exports = class braziliex extends Exchange {
         }
         const id = this.safeString (order, 'order_number');
         const fee = this.safeValue (order, 'fee'); // propagated from createOrder
+        const status = (filledPercentage === 1.0) ? 'closed' : 'open';
         return {
             'id': id,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
-            'status': 'open',
+            'status': status,
             'symbol': symbol,
             'type': 'limit',
             'side': order['type'],
@@ -22950,6 +22965,20 @@ module.exports = class braziliex extends Exchange {
             'market': market['id'],
         };
         return await this.privatePostCancelOrder (this.extend (request, params));
+    }
+
+    async fetchOrder (id, symbol = undefined, params = {}) {
+        if (symbol === undefined) {
+            throw new ArgumentsRequired (this.id + ' fetchOrder() requires a symbol argument');
+        }
+        await this.loadMarkets ();
+        const market = this.market (symbol);
+        const request = {
+            'order_number': id,
+            'market': market['id'],
+        };
+        const response = await this.privatePostOrderStatus (this.extend (request, params));
+        return this.parseOrder (response, market);
     }
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
@@ -31218,7 +31247,7 @@ module.exports = class coinex extends Exchange {
             'done': 'closed',
             'cancel': 'canceled',
         };
-        return this.safeFloat (statuses, status, status);
+        return this.safeString (statuses, status, status);
     }
 
     parseOrder (order, market = undefined) {
