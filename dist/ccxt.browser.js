@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1177'
+const version = '1.18.1184'
 
 Exchange.ccxtVersion = version
 
@@ -1404,7 +1404,7 @@ module.exports = class adara extends Exchange {
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const market = this.market (symbol);
-        const filters = 'filters[' + 'symbol' + ']';
+        const filters = 'filters[symbol]';
         const request = {};
         request[filters] = market['id'];
         const response = await this.publicGetOrderBook (this.extend (request, params));
@@ -1955,7 +1955,7 @@ module.exports = class adara extends Exchange {
         let market = undefined;
         if (symbol !== undefined) {
             market = this.market (symbol);
-            const filters = 'filters[' + 'symbol' + ']';
+            const filters = 'filters[symbol]';
             request[filters] = market['id'];
         }
         const response = await this.privateGetOrder (this.extend (request, params));
@@ -2020,14 +2020,14 @@ module.exports = class adara extends Exchange {
     }
 
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
-        const filters = 'filters[status]' + '[' + ']';
+        const filters = 'filters[status][]';
         const request = {};
         request[filters] = 'open';
         return await this.fetchOrders (symbol, since, limit, this.extend (request, params));
     }
 
     async fetchClosedOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
-        const filters = 'filters[status]' + '[' + ']';
+        const filters = 'filters[status][]';
         const request = {};
         request[filters] = 'closed';
         return await this.fetchOrders (symbol, since, limit, this.extend (request, params));
@@ -15502,11 +15502,11 @@ module.exports = class bithumb extends Exchange {
             }
             average = this.sum (open, close) / 2;
         }
-        const vwap = this.safeFloat (ticker, 'average_price');
-        const baseVolume = this.safeFloat (ticker, 'volume_1day');
-        let quoteVolume = undefined;
-        if (vwap !== undefined && baseVolume !== undefined) {
-            quoteVolume = baseVolume * vwap;
+        const baseVolume = this.safeFloat (ticker, 'units_traded_24H');
+        const quoteVolume = this.safeFloat (ticker, 'acc_trade_value_24H');
+        let vwap = undefined;
+        if (quoteVolume !== undefined && baseVolume !== undefined) {
+            vwap = quoteVolume / baseVolume;
         }
         return {
             'symbol': symbol,
@@ -24628,6 +24628,9 @@ module.exports = class btcalpha extends Exchange {
                         'QBIC': 0.5,
                     },
                 },
+            },
+            'commonCurrencies': {
+                'CBC': 'Cashbery',
             },
         });
     }
@@ -38978,7 +38981,7 @@ module.exports = class coss extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, BadRequest, InvalidNonce, RequestTimeout, ExchangeNotAvailable, InsufficientFunds, OrderNotFound, InvalidOrder, DDoSProtection, AuthenticationError } = require ('./base/errors');
+const { ExchangeError, BadRequest, InvalidNonce, RequestTimeout, ExchangeNotAvailable, InsufficientFunds, OrderNotFound, InvalidOrder, DDoSProtection, AuthenticationError, BadSymbol } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -39118,6 +39121,7 @@ module.exports = class crex24 extends Exchange {
                 'broad': {
                     'API Key': AuthenticationError, // "API Key '9edc48de-d5b0-4248-8e7e-f59ffcd1c7f1' doesn't exist."
                     'Insufficient funds': InsufficientFunds, // "Insufficient funds: new order requires 10 ETH which is more than the available balance."
+                    'has been delisted.': BadSymbol, // {"errorDescription":"Instrument '$PAC-BTC' has been delisted."}
                 },
             },
         });
@@ -59065,6 +59069,9 @@ module.exports = class kucoin extends Exchange {
                 'version': 'v1',
                 'symbolSeparator': '-',
                 'fetchMyTradesMethod': 'private_get_fills',
+                'fetchBalance': {
+                    'type': 'trade', // or 'main'
+                },
             },
         });
     }
@@ -60244,7 +60251,8 @@ module.exports = class kucoin extends Exchange {
             }
             params = this.omit (params, 'type');
         } else {
-            type = 'trade';
+            const options = this.safeValue (this.options, 'fetchBalance', {});
+            type = this.safeString (options, 'type', 'trade');
         }
         const response = await this.privateGetAccounts (this.extend (request, params));
         //
@@ -60256,7 +60264,7 @@ module.exports = class kucoin extends Exchange {
         //             {"balance":"0.01562641","available":"0.01562641","holds":"0","currency":"NEO","id":"5c6a4f1199a1d8165a99edb1","type":"trade"},
         //         ]
         //     }
-        // /
+        //
         const data = this.safeValue (response, 'data', []);
         const result = { 'info': response };
         for (let i = 0; i < data.length; i++) {
@@ -66861,7 +66869,7 @@ module.exports = class mandala extends Exchange {
     }
 
     async generateDepositAddress (code, params = {}) {
-        // a common implmenetation of fetchDepositAddress and createDepositAddress
+        // a common implementation of fetchDepositAddress and createDepositAddress
         await this.loadMarkets ();
         const currency = this.currency (code);
         const request = {
@@ -70763,6 +70771,7 @@ module.exports = class okex3 extends Exchange {
                         'accounts/{currency}',
                         'accounts/{currency}/leverage',
                         'accounts/{currency}/ledger',
+                        'order_algo/{instrument_id}',
                         'orders/{instrument_id}',
                         'orders/{instrument_id}/{order_id}',
                         'orders/{instrument_id}/{client_oid}',
@@ -70788,6 +70797,8 @@ module.exports = class okex3 extends Exchange {
                         'accounts/margin_mode',
                         'order',
                         'orders',
+                        'order_algo',
+                        'cancel_algos',
                         'cancel_order/{instrument_id}/{order_id}',
                         'cancel_order/{instrument_id}/{client_oid}',
                         'cancel_batch_orders/{instrument_id}',
