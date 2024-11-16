@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.81'
+const version = '1.19.82'
 
 Exchange.ccxtVersion = version
 
@@ -2200,19 +2200,10 @@ module.exports = class adara extends Exchange {
             const title = this.safeString (error, 'title');
             const detail = this.safeString (error, 'detail');
             const feedback = this.id + ' ' + this.json (response);
-            const exact = this.exceptions['exact'];
-            if (code in exact) {
-                throw new exact[code] (feedback);
-            }
-            if (status in exact) {
-                throw new exact[status] (feedback);
-            }
-            if (title in exact) {
-                throw new exact[title] (feedback);
-            }
-            if (detail in exact) {
-                throw new exact[detail] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions['exact'], code, feedback);
+            this.throwExactlyMatchedException (this.exceptions['exact'], status, feedback);
+            this.throwExactlyMatchedException (this.exceptions['exact'], title, feedback);
+            this.throwExactlyMatchedException (this.exceptions['exact'], detail, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], body, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
@@ -3563,12 +3554,8 @@ module.exports = class anxpro extends Exchange {
         if (((result !== undefined) && (result !== 'success')) || ((code !== undefined) && (code !== 'OK'))) {
             const message = this.safeString (response, 'error');
             const feedback = this.id + ' ' + body;
-            const exact = this.exceptions['exact'];
-            if (code in exact) {
-                throw new exact[code] (feedback);
-            } else if (message in exact) {
-                throw new exact[message] (feedback);
-            }
+            this.throwExactlyMatchedException (this.exceptions['exact'], code, feedback);
+            this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
@@ -4115,6 +4102,12 @@ module.exports = class Exchange {
         } catch (e) {
             // SyntaxError
             return undefined
+        }
+    }
+
+    throwExactlyMatchedException (exact, string, message) {
+        if (string in exact) {
+            throw new exact[string] (message)
         }
     }
 
@@ -14319,19 +14312,9 @@ module.exports = class bitfinex extends Exchange {
         }
         if (code >= 400) {
             if (body[0] === '{') {
-                const feedback = this.id + ' ' + this.json (response);
-                let message = undefined;
-                if ('message' in response) {
-                    message = response['message'];
-                } else if ('error' in response) {
-                    message = response['error'];
-                } else {
-                    throw new ExchangeError (feedback); // malformed (to our knowledge) response
-                }
-                const exact = this.exceptions['exact'];
-                if (message in exact) {
-                    throw new exact[message] (feedback);
-                }
+                const feedback = this.id + ' ' + body;
+                const message = this.safeString2 (response, 'message', 'error');
+                this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
                 this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
                 throw new ExchangeError (feedback); // unknown message
             }
@@ -72523,11 +72506,8 @@ module.exports = class mandala extends Exchange {
         if ((status !== undefined) && (status !== 'Success')) {
             let message = this.safeString2 (response, 'errorMessage', 'Message');
             message = this.safeString (response, 'message', message);
-            const feedback = this.id + ' ' + this.json (response);
-            const exact = this.exceptions['exact'];
-            if (message in exact) {
-                throw new exact[message] (feedback);
-            }
+            const feedback = this.id + ' ' + body;
+            this.throwExactlyMatchedException (this.exceptions['exact'], message, feedback);
             this.throwBroadlyMatchedException (this.exceptions['broad'], message, feedback);
             throw new ExchangeError (feedback); // unknown message
         }
