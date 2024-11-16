@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.82'
+const version = '1.32.83'
 
 Exchange.ccxtVersion = version
 
@@ -35690,7 +35690,7 @@ module.exports = class btcmarkets extends Exchange {
         const market = this.market (symbol);
         const request = this.ordered ({
             'marketId': market['id'],
-            'amount': this.priceToPrecision (symbol, amount),
+            'amount': this.amountToPrecision (symbol, amount),
             'side': (side === 'buy') ? 'Bid' : 'Ask',
             'clientOrderId': this.safeValue (params, 'clientOrderId'),
         });
