@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.66'
+const version = '1.26.67'
 
 Exchange.ccxtVersion = version
 
@@ -33870,7 +33870,10 @@ module.exports = class bybit extends Exchange {
         if (limit !== undefined) {
             request['count'] = limit; // default 500, max 1000
         }
-        const response = await this.publicGetTradingRecords (this.extend (request, params));
+        const options = this.safeValue (this.options, 'marketTypes');
+        const marketType = this.safeString (options, symbol);
+        const method = (marketType === 'linear') ? 'publicLinearGetRecentTradingRecords' : 'publicGetTradingRecords';
+        const response = await this[method] (this.extend (request, params));
         //
         //     {
         //         ret_code: 0,
