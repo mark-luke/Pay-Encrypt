@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.35'
+const version = '1.28.36'
 
 Exchange.ccxtVersion = version
 
@@ -70680,7 +70680,7 @@ module.exports = class kucoin extends Exchange {
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
         const level = this.safeInteger (params, 'level', 2);
         let levelLimit = level.toString ();
-        if (level === '2') {
+        if (levelLimit === '2') {
             if (limit !== undefined) {
                 if ((limit !== 20) && (limit !== 100)) {
                     throw new ExchangeError (this.id + ' fetchOrderBook limit argument must be undefined, 20 or 100');
