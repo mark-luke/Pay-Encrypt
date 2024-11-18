@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.22'
+const version = '1.23.23'
 
 Exchange.ccxtVersion = version
 
@@ -3508,6 +3508,7 @@ module.exports = class Exchange {
             'enableRateLimit': false,
             'rateLimit': 2000, // milliseconds = seconds * 1000
             'certified': false,
+            'pro': false,
             'has': {
                 'cancelAllOrders': false,
                 'cancelOrder': true,
@@ -9256,6 +9257,7 @@ module.exports = class binance extends Exchange {
             'countries': [ 'JP', 'MT' ], // Japan, Malta
             'rateLimit': 500,
             'certified': true,
+            'pro': true,
             // new metainfo interface
             'has': {
                 'fetchDepositAddress': true,
@@ -11146,6 +11148,7 @@ module.exports = class binanceje extends binance {
             'name': 'Binance Jersey',
             'countries': [ 'JE' ], // Jersey
             'certified': false,
+            'pro': true,
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/54874009-d526eb00-4df3-11e9-928c-ce6a2b914cd1.jpg',
                 'api': {
@@ -11200,6 +11203,7 @@ module.exports = class binanceus extends binance {
             'name': 'Binance US',
             'countries': [ 'US' ], // US
             'certified': false,
+            'pro': true,
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/65177307-217b7c80-da5f-11e9-876e-0b748ba0a358.jpg',
                 'api': {
@@ -13448,6 +13452,7 @@ module.exports = class bitfinex extends Exchange {
             'version': 'v1',
             'rateLimit': 1500,
             'certified': true,
+            'pro': true,
             // new metainfo interface
             'has': {
                 'CORS': false,
@@ -14627,6 +14632,7 @@ module.exports = class bitfinex2 extends bitfinex {
             'countries': [ 'VG' ],
             'version': 'v2',
             'certified': false,
+            'pro': false,
             // new metainfo interface
             'has': {
                 'CORS': false,
@@ -19843,6 +19849,7 @@ module.exports = class bitmex extends Exchange {
             'version': 'v1',
             'userAgent': undefined,
             'rateLimit': 2000,
+            'pro': true,
             'has': {
                 'CORS': false,
                 'fetchOHLCV': true,
@@ -23177,6 +23184,7 @@ module.exports = class bittrex extends Exchange {
             'version': 'v1.1',
             'rateLimit': 1500,
             'certified': true,
+            'pro': true,
             // new metainfo interface
             'has': {
                 'CORS': false,
@@ -36915,6 +36923,7 @@ module.exports = class coinbaseprime extends coinbasepro {
         return this.deepExtend (super.describe (), {
             'id': 'coinbaseprime',
             'name': 'Coinbase Prime',
+            'pro': true,
             'urls': {
                 'test': {
                     'public': 'https://api-public.sandbox.prime.coinbase.com',
@@ -36951,6 +36960,7 @@ module.exports = class coinbasepro extends Exchange {
             'countries': [ 'US' ],
             'rateLimit': 1000,
             'userAgent': this.userAgents['chrome'],
+            'pro': true,
             'has': {
                 'cancelAllOrders': true,
                 'CORS': true,
@@ -52855,6 +52865,7 @@ module.exports = class gateio extends Exchange {
             'countries': [ 'CN' ],
             'version': '2',
             'rateLimit': 1000,
+            'pro': true,
             'has': {
                 'CORS': false,
                 'createMarketOrder': false,
@@ -61865,6 +61876,7 @@ module.exports = class kraken extends Exchange {
             'version': '0',
             'rateLimit': 3000,
             'certified': true,
+            'pro': true,
             'has': {
                 'createDepositAddress': true,
                 'fetchDepositAddress': true,
@@ -63297,6 +63309,7 @@ module.exports = class kucoin extends Exchange {
             'rateLimit': 334,
             'version': 'v2',
             'certified': false,
+            'pro': true,
             'comment': 'Platform 2.0',
             'has': {
                 'CORS': false,
@@ -75409,6 +75422,7 @@ module.exports = class poloniex extends Exchange {
             'countries': [ 'US' ],
             'rateLimit': 1000, // up to 6 calls per second
             'certified': true, // 2019-06-07
+            'pro': true,
             'has': {
                 'CORS': false,
                 'createDepositAddress': true,
