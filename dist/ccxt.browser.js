@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.16'
+const version = '1.22.17'
 
 Exchange.ccxtVersion = version
 
@@ -9373,6 +9373,7 @@ module.exports = class binance extends Exchange {
                 // the API structure below will need 3-layer apidefs
                 'sapi': {
                     'get': [
+                        'accountSnapshot',
                         // these endpoints require this.apiKey
                         'margin/asset',
                         'margin/pair',
@@ -9396,13 +9397,30 @@ module.exports = class binance extends Exchange {
                         'futures/transfer',
                         // https://binance-docs.github.io/apidocs/spot/en/#withdraw-sapi
                         'capital/config/getall', // get networks for withdrawing USDT ERC20 vs USDT Omni
+                        'capital/deposit/address',
+                        'capital/deposit/hisrec',
+                        'capital/deposit/subAddress',
+                        'capital/deposit/subHisrec',
+                        'capital/withdraw/history',
+                        'sub-account/futures/account',
+                        'sub-account/futures/accountSummary',
+                        'sub-account/futures/positionRisk',
+                        'sub-account/margin/account',
+                        'sub-account/margin/accountSummary',
+                        'sub-account/status',
                     ],
                     'post': [
                         'asset/dust',
+                        'account/disableFastWithdrawSwitch',
+                        'account/enableFastWithdrawSwitch',
+                        'capital/withdraw/apply',
                         'margin/transfer',
                         'margin/loan',
                         'margin/repay',
                         'margin/order',
+                        'sub-account/margin/enable',
+                        'sub-account/margin/enable',
+                        'sub-account/futures/enable',
                         'userDataStream',
                         'futures/transfer',
                     ],
