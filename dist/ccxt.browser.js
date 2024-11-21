@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1167'
+const version = '1.18.1168'
 
 Exchange.ccxtVersion = version
 
@@ -3308,7 +3308,7 @@ module.exports = class anxpro extends Exchange {
         const settlementCurrency = this.safeString (order, 'settlementCurrency');
         const symbol = this.findSymbol (tradedCurrency + '/' + settlementCurrency);
         const buyTradedCurrency = this.safeString (order, 'buyTradedCurrency');
-        const side = buyTradedCurrency === 'true' ? 'buy' : 'sell';
+        const side = (buyTradedCurrency === 'true') ? 'buy' : 'sell';
         const timestamp = this.safeInteger (order, 'timestamp');
         let lastTradeTimestamp = undefined;
         const trades = [];
@@ -7914,7 +7914,7 @@ module.exports = class bibox extends Exchange {
                 'currency': undefined,
             };
         }
-        cost = cost ? cost : parseFloat (price) * filled;
+        cost = cost ? cost : (parseFloat (price) * filled);
         return {
             'info': order,
             'id': id,
@@ -7956,7 +7956,7 @@ module.exports = class bibox extends Exchange {
             market = this.market (symbol);
             pair = market['id'];
         }
-        const size = (limit) ? limit : 200;
+        const size = limit ? limit : 200;
         const request = {
             'cmd': 'orderpending/orderPendingList',
             'body': this.extend ({
@@ -7997,7 +7997,7 @@ module.exports = class bibox extends Exchange {
         }
         await this.loadMarkets ();
         const market = this.market (symbol);
-        const size = (limit) ? limit : 200;
+        const size = limit ? limit : 200;
         const request = {
             'cmd': 'orderpending/orderHistoryList',
             'body': this.extend ({
@@ -9376,7 +9376,7 @@ module.exports = class binance extends Exchange {
             side = trade['isBuyerMaker'] ? 'sell' : 'buy';
         } else {
             if ('isBuyer' in trade) {
-                side = (trade['isBuyer']) ? 'buy' : 'sell'; // this is a true side
+                side = trade['isBuyer'] ? 'buy' : 'sell'; // this is a true side
             }
         }
         let fee = undefined;
@@ -18070,7 +18070,7 @@ module.exports = class bitmex extends Exchange {
         }
         let takerOrMaker = undefined;
         if (fee !== undefined) {
-            takerOrMaker = fee['cost'] < 0 ? 'maker' : 'taker';
+            takerOrMaker = (fee['cost'] < 0) ? 'maker' : 'taker';
         }
         let symbol = undefined;
         const marketId = this.safeString (trade, 'symbol');
@@ -54973,7 +54973,7 @@ module.exports = class idex extends Exchange {
             const buy = this.safeCurrencyCode (this.safeString (params, 'tokenBuy'));
             const sell = this.safeCurrencyCode (this.safeString (params, 'tokenSell'));
             if (buy !== undefined && sell !== undefined) {
-                symbol = side === 'buy' ? buy + '/' + sell : sell + '/' + buy;
+                symbol = (side === 'buy') ? (buy + '/' + sell) : (sell + '/' + buy);
             }
         }
         if (symbol === undefined && market !== undefined) {
