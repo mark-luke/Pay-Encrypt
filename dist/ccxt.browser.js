@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.26.8'
+const version = '1.26.9'
 
 Exchange.ccxtVersion = version
 
@@ -34902,7 +34902,7 @@ module.exports = class bybit extends Exchange {
                 request = '/' + this.version + '/' + api + '/' + request;
             } else {
                 // position, user
-                request += '/' + api + '/' + request;
+                request = '/' + api + '/' + request;
             }
             const timestamp = this.nonce ();
             const query = this.extend (params, {
