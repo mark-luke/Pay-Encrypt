@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.6'
+const version = '1.23.7'
 
 Exchange.ccxtVersion = version
 
@@ -101658,11 +101658,11 @@ module.exports = class tidex extends Exchange {
                         'max': undefined,
                     },
                     'withdraw': {
-                        'min': currency['withdrawMinAmout'],
+                        'min': this.safeFloat (currency, 'withdrawMinAmount'),
                         'max': undefined,
                     },
                     'deposit': {
-                        'min': currency['depositMinAmount'],
+                        'min': this.safeFloat (currency, 'depositMinAmount'),
                         'max': undefined,
                     },
                 },
