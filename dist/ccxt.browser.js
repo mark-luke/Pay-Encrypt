@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.5'
+const version = '1.20.6'
 
 Exchange.ccxtVersion = version
 
@@ -99001,8 +99001,8 @@ module.exports = class stex extends Exchange {
             const minBuyPrice = this.safeFloat (market, 'min_buy_price');
             const minSellPrice = this.safeFloat (market, 'min_sell_price');
             const minPrice = Math.max (minBuyPrice, minSellPrice);
-            const buyFee = this.safeFloat (market, 'buy_fee_percent');
-            const sellFee = this.safeFloat (market, 'sell_fee_percent');
+            const buyFee = this.safeFloat (market, 'buy_fee_percent') / 100;
+            const sellFee = this.safeFloat (market, 'sell_fee_percent') / 100;
             const fee = Math.max (buyFee, sellFee);
             result.push ({
                 'id': id,
