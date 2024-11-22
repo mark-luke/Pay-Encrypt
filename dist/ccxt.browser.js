@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.42'
+const version = '1.25.43'
 
 Exchange.ccxtVersion = version
 
@@ -77038,7 +77038,7 @@ module.exports = class okex extends Exchange {
                         'ledger',
                         'deposit/address',
                         'deposit/history',
-                        'deposit/history{<currency}',
+                        'deposit/history/{currency}',
                         'currencies',
                         'withdrawal/fee',
                     ],
