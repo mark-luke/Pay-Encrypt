@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.36'
+const version = '1.28.37'
 
 Exchange.ccxtVersion = version
 
@@ -10483,7 +10483,14 @@ module.exports = class binance extends Exchange {
         }
         await this.loadMarkets ();
         const market = this.market (symbol);
-        const method = market['spot'] ? 'privateGetOrder' : 'fapiPrivateGetOrder';
+        const defaultType = this.safeString2 (this.options, 'fetchOrder', 'defaultType', market['type']);
+        const type = this.safeString (params, 'type', defaultType);
+        let method = 'privateGetOrder';
+        if (type === 'future') {
+            method = 'fapiPrivateGetOrder';
+        } else if (type === 'margin') {
+            method = 'sapiGetMarginOrder';
+        }
         const request = {
             'symbol': market['id'],
         };
@@ -10493,7 +10500,8 @@ module.exports = class binance extends Exchange {
         } else {
             request['orderId'] = parseInt (id);
         }
-        const response = await this[method] (this.extend (request, params));
+        const query = this.omit (params, 'type');
+        const response = await this[method] (this.extend (request, query));
         return this.parseOrder (response, market);
     }
 
