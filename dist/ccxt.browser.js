@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.58'
+const version = '1.20.59'
 
 Exchange.ccxtVersion = version
 
@@ -58945,10 +58945,18 @@ module.exports = class independentreserve extends Exchange {
 
     parseOrder (order, market = undefined) {
         let symbol = undefined;
-        if (market === undefined) {
+        const baseId = this.safeString (order, 'PrimaryCurrencyCode');
+        const quoteId = this.safeString (order, 'PrimaryCurrencyCode');
+        let base = undefined;
+        let quote = undefined;
+        if ((baseId !== undefined) && (quoteId !== undefined)) {
+            base = this.safeCurrencyCode (baseId);
+            quote = this.safeCurrencyCode (quoteId);
+            symbol = base + '/' + quote;
+        } else if (market !== undefined) {
             symbol = market['symbol'];
-        } else {
-            market = this.findMarket (order['PrimaryCurrencyCode'] + '/' + order['SecondaryCurrencyCode']);
+            base = market['base'];
+            quote = market['quote'];
         }
         let orderType = this.safeValue (order, 'Type');
         if (orderType.indexOf ('Market') >= 0) {
@@ -58962,7 +58970,7 @@ module.exports = class independentreserve extends Exchange {
         } else if (orderType.indexOf ('Offer') >= 0) {
             side = 'sell';
         }
-        const timestamp = this.parse8601 (order['CreatedTimestampUtc']);
+        const timestamp = this.parse8601 (this.safeString (order, 'CreatedTimestampUtc'));
         let amount = this.safeFloat (order, 'VolumeOrdered');
         if (amount === undefined) {
             amount = this.safeFloat (order, 'Volume');
@@ -58979,15 +58987,10 @@ module.exports = class independentreserve extends Exchange {
                 }
             }
         }
-        let feeCurrency = undefined;
-        if (market !== undefined) {
-            symbol = market['symbol'];
-            feeCurrency = market['base'];
-        }
         const fee = {
             'rate': feeRate,
             'cost': feeCost,
-            'currency': feeCurrency,
+            'currency': base,
         };
         const id = this.safeString (order, 'OrderGuid');
         const status = this.parseOrderStatus (this.safeString (order, 'Status'));
