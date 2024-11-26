@@ -21,9 +21,14 @@ binance = ccxt.binance()
 
 symbol = 'BTC/USDT'
 
+timeframe = '1h'
+
 # each ohlcv candle is a list of [ timestamp, open, high, low, close, volume ]
 index = 4  # use close price from each ohlcv candle
 
+height = 15
+
+length = 80
 
 def print_chart(exchange, symbol, timeframe):
 
@@ -36,11 +41,11 @@ def print_chart(exchange, symbol, timeframe):
     series = [x[index] for x in ohlcv]
 
     # print the chart
-    print("\n" + asciichart.plot(series[-80:], {'height': 15}))  # print the chart
+    print("\n" + asciichart.plot(series[-length:], {'height': height}))  # print the chart
 
     last = ohlcv[len(ohlcv) - 1][index]  # last closing price
     return last
 
 
-last = print_chart(binance, 'BTC/USDT', '1h')
+last = print_chart(binance, symbol, timeframe)
 print("\n" + binance.name + " ₿ = $" + str(last) + "\n")  # print last closing price
