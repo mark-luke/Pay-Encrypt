@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.28.90'
+const version = '1.28.91'
 
 Exchange.ccxtVersion = version
 
@@ -34077,7 +34077,7 @@ module.exports = class bybit extends Exchange {
                 'test': 'https://api-testnet.bybit.com',
                 'logo': 'https://user-images.githubusercontent.com/51840849/76547799-daff5b80-649e-11ea-87fb-3be9bac08954.jpg',
                 'api': 'https://api.bybit.com',
-                'www': 'https://www.bybit.com/',
+                'www': 'https://www.bybit.com',
                 'doc': [
                     'https://bybit-exchange.github.io/docs/inverse/',
                     'https://bybit-exchange.github.io/docs/linear/',
@@ -34377,7 +34377,11 @@ module.exports = class bybit extends Exchange {
             const quote = this.safeCurrencyCode (quoteId);
             const linear = (quote in linearQuoteCurrencies);
             const inverse = !linear;
-            const symbol = base + '/' + quote;
+            let symbol = base + '/' + quote;
+            const baseQuote = base + quote;
+            if (baseQuote !== id) {
+                symbol = id;
+            }
             const lotSizeFilter = this.safeValue (market, 'lot_size_filter', {});
             const priceFilter = this.safeValue (market, 'price_filter', {});
             const precision = {
