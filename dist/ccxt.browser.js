@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.14'
+const version = '1.29.15'
 
 Exchange.ccxtVersion = version
 
@@ -58199,10 +58199,9 @@ module.exports = class ftx extends Exchange {
     async fetchOpenOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const request = {};
-        let market = undefined;
-        if (symbol !== undefined) {
-            market = this.market (symbol);
-            request['market'] = market['id'];
+        const [ market, marketId ] = this.getMarketParams (symbol, 'market', params);
+        if (marketId !== undefined) {
+            request['market'] = marketId;
         }
         // support for canceling conditional orders
         // https://github.com/ccxt/ccxt/issues/6669
@@ -58247,10 +58246,9 @@ module.exports = class ftx extends Exchange {
     async fetchOrders (symbol = undefined, since = undefined, limit = undefined, params = {}) {
         await this.loadMarkets ();
         const request = {};
-        let market = undefined;
-        if (symbol !== undefined) {
-            market = this.market (symbol);
-            request['market'] = market['id'];
+        const [ market, marketId ] = this.getMarketParams (symbol, 'market', params);
+        if (marketId !== undefined) {
+            request['market'] = marketId;
         }
         if (limit !== undefined) {
             request['limit'] = limit; // default 100, max 100
