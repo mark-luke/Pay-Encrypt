@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.64'
+const version = '1.31.65'
 
 Exchange.ccxtVersion = version
 
@@ -91436,6 +91436,10 @@ module.exports = class probit extends Exchange {
                     'limit': 'gtc',
                     'market': 'ioc',
                 },
+            },
+            'commonCurrencies': {
+                'BTCBEAR': 'BEAR',
+                'BTCBULL': 'BULL',
             },
         });
     }
