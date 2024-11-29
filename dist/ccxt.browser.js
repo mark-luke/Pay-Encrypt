@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.29.1'
+const version = '1.29.2'
 
 Exchange.ccxtVersion = version
 
@@ -72013,8 +72013,8 @@ module.exports = class kucoin extends Exchange {
         return this.milliseconds ();
     }
 
-    async loadTimeDifference () {
-        const response = await this.publicGetTimestamp ();
+    async loadTimeDifference (params = {}) {
+        const response = await this.publicGetTimestamp (params);
         const after = this.milliseconds ();
         const kucoinTime = this.safeInteger (response, 'data');
         this.options['timeDifference'] = parseInt (after - kucoinTime);
