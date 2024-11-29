@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.76'
+const version = '1.35.77'
 
 Exchange.ccxtVersion = version
 
@@ -29876,8 +29876,7 @@ module.exports = class bittrex extends Exchange {
         //         ]
         //     }
         //
-        let sequence = this.safeValue2 (this.last_response_headers, 'sequence', 'Sequence');
-        sequence = Array.isArray (sequence) ? parseInt (sequence[0]) : parseInt (sequence);
+        const sequence = this.safeInteger (this.last_response_headers, 'Sequence');
         const orderbook = this.parseOrderBook (response, undefined, 'bid', 'ask', 'rate', 'quantity');
         orderbook['nonce'] = sequence;
         return orderbook;
@@ -72346,6 +72345,7 @@ module.exports = class huobijp extends huobipro {
 
 const Exchange = require ('./base/Exchange');
 const { AuthenticationError, ExchangeError, PermissionDenied, ExchangeNotAvailable, OnMaintenance, InvalidOrder, OrderNotFound, InsufficientFunds, ArgumentsRequired, BadSymbol, BadRequest, RequestTimeout, NetworkError } = require ('./base/errors');
+const { TRUNCATE } = require ('./base/functions/number');
 
 //  ---------------------------------------------------------------------------
 
@@ -72654,6 +72654,10 @@ module.exports = class huobipro extends Exchange {
         };
     }
 
+    costToPrecision (symbol, cost) {
+        return this.decimalToPrecision (cost, TRUNCATE, this.markets[symbol]['precision']['cost'], this.precisionMode);
+    }
+
     async fetchMarkets (params = {}) {
         const method = this.options['fetchMarketsMethod'];
         const response = await this[method] (params);
@@ -72672,8 +72676,9 @@ module.exports = class huobipro extends Exchange {
             const quote = this.safeCurrencyCode (quoteId);
             const symbol = base + '/' + quote;
             const precision = {
-                'amount': market['amount-precision'],
-                'price': market['price-precision'],
+                'amount': this.safeInteger (market, 'amount-precision'),
+                'price': this.safeInteger (market, 'price-precision'),
+                'cost': this.safeInteger (market, 'value-precision'),
             };
             const maker = (base === 'OMG') ? 0 : 0.2 / 100;
             const taker = (base === 'OMG') ? 0 : 0.2 / 100;
@@ -73493,10 +73498,10 @@ module.exports = class huobipro extends Exchange {
                     // https://github.com/ccxt/ccxt/pull/4395
                     // https://github.com/ccxt/ccxt/issues/7611
                     // we use amountToPrecision here because the exchange requires cost in base precision
-                    request['amount'] = this.amountToPrecision (symbol, parseFloat (amount) * parseFloat (price));
+                    request['amount'] = this.costtToPrecision (symbol, parseFloat (amount) * parseFloat (price));
                 }
             } else {
-                request['amount'] = this.amountToPrecision (symbol, amount);
+                request['amount'] = this.costToPrecision (symbol, amount);
             }
         } else {
             request['amount'] = this.amountToPrecision (symbol, amount);
@@ -73847,7 +73852,7 @@ module.exports = class huobipro extends Exchange {
     }
 };
 
-},{"./base/Exchange":5,"./base/errors":7}],94:[function(require,module,exports){
+},{"./base/Exchange":5,"./base/errors":7,"./base/functions/number":13}],94:[function(require,module,exports){
 'use strict';
 
 // ---------------------------------------------------------------------------
