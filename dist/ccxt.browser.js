@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.27.25'
+const version = '1.27.26'
 
 Exchange.ccxtVersion = version
 
@@ -10449,7 +10449,7 @@ module.exports = class bigone extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, ArgumentsRequired, ExchangeNotAvailable, InsufficientFunds, OrderNotFound, InvalidOrder, DDoSProtection, InvalidNonce, AuthenticationError, InvalidAddress, RateLimitExceeded, PermissionDenied, NotSupported, BadRequest } = require ('./base/errors');
+const { ExchangeError, ArgumentsRequired, ExchangeNotAvailable, InsufficientFunds, OrderNotFound, InvalidOrder, DDoSProtection, InvalidNonce, AuthenticationError, InvalidAddress, RateLimitExceeded, PermissionDenied, NotSupported } = require ('./base/errors');
 const { ROUND, TRUNCATE } = require ('./base/functions/number');
 
 //  ---------------------------------------------------------------------------
@@ -10773,8 +10773,7 @@ module.exports = class binance extends Exchange {
                 '-1022': AuthenticationError, // {"code":-1022,"msg":"Signature for this request is not valid."}
                 '-1100': InvalidOrder, // createOrder(symbol, 1, asdf) -> 'Illegal characters found in parameter 'price'
                 '-1104': ExchangeError, // Not all sent parameters were read, read 8 parameters but was sent 9
-                '-1116': InvalidOrder, // {"code":-1116,"msg":"Invalid orderType."}
-                '-1128': BadRequest, // {"code":-1128,"msg":"Combination of optional parameters invalid."}
+                '-1128': ExchangeError, // {"code":-1128,"msg":"Combination of optional parameters invalid."}
                 '-2010': ExchangeError, // generic error code for createOrder -> 'Account has insufficient balance for requested action.', {"code":-2010,"msg":"Rest API trading is not enabled."}, etc...
                 '-2011': OrderNotFound, // cancelOrder(1, 'BTC/USDT') -> 'UNKNOWN_ORDER'
                 '-2013': OrderNotFound, // fetchOrder (1, 'BTC/USDT') -> 'Order does not exist'
@@ -10785,11 +10784,29 @@ module.exports = class binance extends Exchange {
     }
 
     setSandboxMode (enabled) {
-        const type = this.safeString (this.options, 'defaultType', 'spot');
-        if (type !== 'future') {
-            throw new NotSupported (this.id + ' does not have a sandbox URL for ' + type + " markets, set exchange.options['defaultType'] = 'future' or don't use the sandbox for " + this.id);
+        if (enabled) { // eslint-disable-line no-extra-boolean-cast
+            if ('test' in this.urls) {
+                const type = this.safeString (this.options, 'defaultType', 'spot');
+                if (type !== 'future') {
+                    throw new NotSupported (this.id + ' does not have a sandbox URL for ' + type + " markets, set exchange.options['defaultType'] = 'future' or don't use the sandbox for " + this.id);
+                }
+                if (typeof this.urls['api'] === 'string') {
+                    this.urls['api_backup'] = this.urls['api'];
+                    this.urls['api'] = this.urls['test'];
+                } else {
+                    this.urls['api_backup'] = this.extend ({}, this.urls['api']);
+                    this.urls['api'] = this.extend ({}, this.urls['test']);
+                }
+            } else {
+                throw new NotSupported (this.id + ' does not have a sandbox URL');
+            }
+        } else if ('api_backup' in this.urls) {
+            if (typeof this.urls['api'] === 'string') {
+                this.urls['api'] = this.urls['api_backup'];
+            } else {
+                this.urls['api'] = this.extend ({}, this.urls['api_backup']);
+            }
         }
-        return super.setSandboxMode (enabled);
     }
 
     nonce () {
@@ -11610,17 +11627,13 @@ module.exports = class binance extends Exchange {
             'side': side.toUpperCase (),
         };
         if (uppercaseType === 'MARKET') {
+            const quoteOrderQty = this.safeFloat (params, 'quoteOrderQty');
             const precision = market['precision']['price'];
-            if (market['spot']) {
-                const quoteOrderQty = this.safeFloat (params, 'quoteOrderQty');
-                if (quoteOrderQty !== undefined) {
-                    request['quoteOrderQty'] = this.decimalToPrecision (quoteOrderQty, TRUNCATE, precision, this.precisionMode);
-                    params = this.omit (params, 'quoteOrderQty');
-                } else if (price !== undefined) {
-                    request['quoteOrderQty'] = this.decimalToPrecision (amount * price, TRUNCATE, precision, this.precisionMode);
-                } else {
-                    request['quantity'] = this.amountToPrecision (symbol, amount);
-                }
+            if (quoteOrderQty !== undefined) {
+                request['quoteOrderQty'] = this.decimalToPrecision (quoteOrderQty, TRUNCATE, precision, this.precisionMode);
+                params = this.omit (params, 'quoteOrderQty');
+            } else if (price !== undefined) {
+                request['quoteOrderQty'] = this.decimalToPrecision (amount * price, TRUNCATE, precision, this.precisionMode);
             } else {
                 request['quantity'] = this.amountToPrecision (symbol, amount);
             }
