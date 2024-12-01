@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.43'
+const version = '1.35.44'
 
 Exchange.ccxtVersion = version
 
@@ -50631,6 +50631,7 @@ module.exports = class coinmarketcap extends Exchange {
             'FairCoin': 'FairCoin', // conflict with FAIR (FairGame) https://github.com/ccxt/ccxt/pull/5865
             'Fabric Token': 'Fabric Token',
             // 'GET Protocol': 'GET Protocol',
+            'GHOSTPRISM': 'GHOSTPRISM', // conflict with GHOST
             'Global Tour Coin': 'Global Tour Coin', // conflict with GTC (Game.com)
             'GuccioneCoin': 'GuccioneCoin', // conflict with GCC (Global Cryptocurrency)
             'HarmonyCoin': 'HarmonyCoin', // conflict with HMC (Hi Mutual Society)
@@ -53583,6 +53584,7 @@ module.exports = class crex24 extends Exchange {
                 'BCC': 'BCH',
                 'BULL': 'BuySell',
                 'CREDIT': 'TerraCredit',
+                'GHOST': 'GHOSTPRISM',
                 'YOYO': 'YOYOW',
             },
             // exchange-specific options
@@ -102160,9 +102162,10 @@ module.exports = class southxchange extends Exchange {
                 },
             },
             'commonCurrencies': {
-                'SMT': 'SmartNode',
-                'MTC': 'Marinecoin',
                 'BHD': 'Bithold',
+                'GHOST': 'GHOSTPRISM',
+                'MTC': 'Marinecoin',
+                'SMT': 'SmartNode',
             },
         });
     }
