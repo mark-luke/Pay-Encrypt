@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1137'
+const version = '1.18.1138'
 
 Exchange.ccxtVersion = version
 
@@ -68808,12 +68808,15 @@ module.exports = class oceanex extends Exchange {
     }
 
     async fetchOrder (id, symbol = undefined, params = {}) {
+        if (!Array.isArray (id)) {
+            id = [ id ];
+        }
         await this.loadMarkets ();
         let market = undefined;
         if (symbol !== undefined) {
             market = this.market (symbol);
         }
-        const request = { 'ids': [id] };
+        const request = { 'ids': id };
         const response = await this.privateGetOrders (this.extend (request, params));
         const data = this.safeValue (response, 'data');
         const dataLength = data.length;
