@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.32'
+const version = '1.23.33'
 
 Exchange.ccxtVersion = version
 
@@ -23584,9 +23584,6 @@ module.exports = class bittrex extends Exchange {
         for (let i = 0; i < currencies.length; i++) {
             const currency = currencies[i];
             const id = this.safeString (currency, 'Currency');
-            // todo: will need to rethink the fees
-            // to add support for multiple withdrawal/deposit methods and
-            // differentiated fees for each particular method
             const code = this.safeCurrencyCode (id);
             const precision = 8; // default precision, todo: fix "magic constants"
             const address = this.safeValue (currency, 'BaseAddress');
@@ -23596,9 +23593,9 @@ module.exports = class bittrex extends Exchange {
                 'code': code,
                 'address': address,
                 'info': currency,
-                'type': currency['CoinType'],
-                'name': currency['CurrencyLong'],
-                'active': currency['IsActive'],
+                'type': this.safeString (currency, 'CoinType'),
+                'name': this.safeString (currency, 'CurrencyLong'),
+                'active': this.safeValue (currency, 'IsActive'),
                 'fee': fee,
                 'precision': precision,
                 'limits': {
@@ -75842,9 +75839,6 @@ module.exports = class poloniex extends Exchange {
         for (let i = 0; i < ids.length; i++) {
             const id = ids[i];
             const currency = response[id];
-            // todo: will need to rethink the fees
-            // to add support for multiple withdrawal/deposit methods and
-            // differentiated fees for each particular method
             const precision = 8; // default precision, todo: fix "magic constants"
             const code = this.safeCurrencyCode (id);
             const active = (currency['delisted'] === 0) && !currency['disabled'];
