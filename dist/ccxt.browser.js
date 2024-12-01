@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.35.46'
+const version = '1.35.48'
 
 Exchange.ccxtVersion = version
 
@@ -101564,34 +101564,14 @@ module.exports = class ripio extends Exchange {
             cost = amount * price;
         }
         const marketId = this.safeString (trade, 'pair');
-        let symbol = undefined;
-        let base = undefined;
-        let quote = undefined;
-        if (marketId !== undefined) {
-            if (marketId in this.markets_by_id) {
-                market = this.markets_by_id[marketId];
-                symbol = market['symbol'];
-                base = market['base'];
-                quote = market['quote'];
-            } else {
-                const [ baseId, quoteId ] = marketId.split ('_');
-                base = this.safeCurrencyCode (baseId);
-                quote = this.safeCurrencyCode (quoteId);
-                symbol = base + '/' + quote;
-            }
-        }
-        if ((market !== undefined) && (symbol === undefined)) {
-            symbol = market['symbol'];
-            base = market['base'];
-            quote = market['quote'];
-        }
+        market = this.safeMarket (marketId, market);
         const feeCost = this.safeFloat (trade, takerOrMaker + '_fee');
         const orderId = this.safeString (trade, takerOrMaker);
         let fee = undefined;
         if (feeCost !== undefined) {
             fee = {
                 'cost': feeCost,
-                'currency': (side === 'buy') ? base : quote,
+                'currency': (side === 'buy') ? market['base'] : market['quote'],
             };
         }
         return {
@@ -101599,7 +101579,7 @@ module.exports = class ripio extends Exchange {
             'order': orderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
-            'symbol': symbol,
+            'symbol': market['symbol'],
             'type': undefined,
             'side': side,
             'price': price,
