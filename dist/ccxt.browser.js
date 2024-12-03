@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.32'
+const version = '1.25.33'
 
 Exchange.ccxtVersion = version
 
@@ -8152,7 +8152,10 @@ module.exports = class bequant extends hitbtc2 {
             'countries': [ 'MT' ], // Malta
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/55248342-a75dfe00-525a-11e9-8aa2-05e9dca943c6.jpg',
-                'api': 'https://api.bequant.io',
+                'api': {
+                    'public': 'https://api.bequant.io',
+                    'private': 'https://api.bequant.io',
+                },
                 'www': 'https://bequant.io',
                 'doc': [
                     'https://api.bequant.io/',
@@ -59818,7 +59821,10 @@ module.exports = class hitbtc2 extends hitbtc {
             },
             'urls': {
                 'logo': 'https://user-images.githubusercontent.com/1294454/27766555-8eaec20e-5edc-11e7-9c5b-6dc69fc42f5e.jpg',
-                'api': 'https://api.hitbtc.com',
+                'api': {
+                    'public': 'https://api.hitbtc.com',
+                    'private': 'https://api.hitbtc.com',
+                },
                 'www': 'https://hitbtc.com',
                 'referral': 'https://hitbtc.com/?ref_id=5a5d39a65d466',
                 'doc': [
@@ -61238,7 +61244,7 @@ module.exports = class hitbtc2 extends hitbtc {
                 'Content-Type': 'application/json',
             };
         }
-        url = this.urls['api'] + url;
+        url = this.urls['api'][api] + url;
         return { 'url': url, 'method': method, 'body': body, 'headers': headers };
     }
 
