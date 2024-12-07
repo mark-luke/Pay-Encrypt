@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.32'
+const version = '1.33.33'
 
 Exchange.ccxtVersion = version
 
@@ -29972,6 +29972,9 @@ module.exports = class bitvavo extends Exchange {
                 'fetchCurrencies': {
                     'expires': 1000, // 1 second
                 },
+            },
+            'commonCurrencies': {
+                'MIOTA': 'IOTA', // https://github.com/ccxt/ccxt/issues/7487
             },
         });
     }
