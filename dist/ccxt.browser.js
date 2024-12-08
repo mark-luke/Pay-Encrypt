@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.65'
+const version = '1.31.66'
 
 Exchange.ccxtVersion = version
 
@@ -9078,25 +9078,33 @@ module.exports = class binance extends Exchange {
             'pro': true,
             // new metainfo interface
             'has': {
-                'fetchDepositAddress': true,
+                'cancelAllOrders': true,
+                'cancelOrder': true,
                 'CORS': false,
+                'createOrder': true,
+                'fetchBalance': true,
                 'fetchBidsAsks': true,
-                'fetchTickers': true,
-                'fetchTime': true,
-                'fetchOHLCV': true,
+                'fetchClosedOrders': 'emulated',
+                'fetchDepositAddress': true,
+                'fetchDeposits': true,
+                'fetchFundingFees': true,
+                'fetchMarkets': true,
                 'fetchMyTrades': true,
+                'fetchOHLCV': true,
+                'fetchOpenOrders': true,
                 'fetchOrder': true,
                 'fetchOrders': true,
-                'fetchOpenOrders': true,
-                'fetchClosedOrders': 'emulated',
-                'withdraw': true,
-                'fetchFundingFees': true,
-                'fetchDeposits': true,
-                'fetchWithdrawals': true,
-                'fetchTransactions': false,
+                'fetchOrderBook': true,
+                'fetchStatus': true,
+                'fetchTicker': true,
+                'fetchTickers': true,
+                'fetchTime': true,
+                'fetchTrades': true,
                 'fetchTradingFee': true,
                 'fetchTradingFees': true,
-                'cancelAllOrders': true,
+                'fetchTransactions': false,
+                'fetchWithdrawals': true,
+                'withdraw': true,
             },
             'timeframes': {
                 '1m': '1m',
