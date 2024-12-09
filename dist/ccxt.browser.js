@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.14'
+const version = '1.19.15'
 
 Exchange.ccxtVersion = version
 
@@ -9694,7 +9694,7 @@ module.exports = class binance extends Exchange {
             if (filled) {
                 average = cost / filled;
                 if (this.options['parseOrderToPrecision']) {
-                    average = parseFloat (this.amountToPrecision (symbol, average));
+                    average = parseFloat (this.priceToPrecision (symbol, average));
                 }
             }
             if (this.options['parseOrderToPrecision']) {
@@ -76990,7 +76990,7 @@ module.exports = class poloniex extends Exchange {
     }
 
     async fetchMarkets (params = {}) {
-        const markets = await this.publicGetReturnTicker ();
+        const markets = await this.publicGetReturnTicker (params);
         const keys = Object.keys (markets);
         const result = [];
         for (let i = 0; i < keys.length; i++) {
@@ -77007,8 +77007,10 @@ module.exports = class poloniex extends Exchange {
             });
             const isFrozen = this.safeString (market, 'isFrozen');
             const active = (isFrozen !== '1');
-            result.push (this.extend (this.fees['trading'], {
+            const numericId = this.safeInteger (market, 'id');
+            result.push ({
                 'id': id,
+                'numericId': numericId,
                 'symbol': symbol,
                 'baseId': baseId,
                 'quoteId': quoteId,
@@ -77017,7 +77019,7 @@ module.exports = class poloniex extends Exchange {
                 'active': active,
                 'limits': limits,
                 'info': market,
-            }));
+            });
         }
         return result;
     }
