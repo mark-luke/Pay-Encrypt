@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.20.70'
+const version = '1.20.71'
 
 Exchange.ccxtVersion = version
 
@@ -36329,6 +36329,7 @@ module.exports = class coinbasepro extends Exchange {
                         'orders',
                         'position/close',
                         'profiles/margin-transfer',
+                        'fees',
                         'reports',
                         'withdrawals/coinbase',
                         'withdrawals/crypto',
@@ -52793,6 +52794,7 @@ module.exports = class gemini extends Exchange {
                         'v1/order/status',
                         'v1/orders',
                         'v1/mytrades',
+                        'v1/notionalvolume',
                         'v1/tradevolume',
                         'v1/transfers',
                         'v1/balances',
