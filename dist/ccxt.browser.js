@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.33.3'
+const version = '1.33.4'
 
 Exchange.ccxtVersion = version
 
@@ -64863,7 +64863,7 @@ module.exports = class ftx extends Exchange {
         return this.safeString (statuses, status, status);
     }
 
-    parseTransaction (transaction) {
+    parseTransaction (transaction, currency = undefined) {
         //
         // fetchDeposits
         //
