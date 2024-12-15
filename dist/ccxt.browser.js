@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1178'
+const version = '1.18.1179'
 
 Exchange.ccxtVersion = version
 
@@ -24628,6 +24628,9 @@ module.exports = class btcalpha extends Exchange {
                         'QBIC': 0.5,
                     },
                 },
+            },
+            'commonCurrencies': {
+                'CBC': 'Cashbery',
             },
         });
     }
