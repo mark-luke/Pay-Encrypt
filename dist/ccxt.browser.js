@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.6'
+const version = '1.25.23'
 
 Exchange.ccxtVersion = version
 
@@ -816,6 +816,7 @@ module.exports = class acx extends Exchange {
         const id = this.safeString (order, 'id');
         return {
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -1931,6 +1932,7 @@ module.exports = class adara extends Exchange {
         const result = {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -3191,6 +3193,7 @@ module.exports = class anxpro extends Exchange {
         const cost = executedAverageRate * filled;
         return {
             'id': this.safeString (order, 'orderId'),
+            'clientOrderId': undefined,
             'symbol': symbol,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -3283,6 +3286,7 @@ module.exports = class anxpro extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'symbol': symbol,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -6873,6 +6877,7 @@ module.exports = class bcex extends Exchange {
         const result = {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -7749,6 +7754,7 @@ module.exports = class bibox extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -8739,6 +8745,7 @@ module.exports = class bigone extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -11603,6 +11610,7 @@ module.exports = class bit2c extends Exchange {
         const status = this.safeString (order, 'status');
         return {
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -12057,6 +12065,7 @@ module.exports = class bitbank extends Exchange {
         const side = this.safeStringLower (order, 'side');
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -12602,6 +12611,7 @@ module.exports = class bitbay extends Exchange {
         }
         return {
             'id': this.safeString (order, 'id'),
+            'clientOrderId': undefined,
             'info': order,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -14371,6 +14381,7 @@ module.exports = class bitfinex extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -15442,9 +15453,11 @@ module.exports = class bitfinex2 extends bitfinex {
         const price = this.safeFloat (order, 16);
         const average = this.safeFloat (order, 17);
         const cost = price * filled;
+        const clientOrderId = this.safeString (order, 2);
         return {
             'info': order,
             'id': id,
+            'clientOrderId': clientOrderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -16253,6 +16266,7 @@ module.exports = class bitflyer extends Exchange {
         const id = this.safeString (order, 'child_order_acceptance_id');
         return {
             'id': id,
+            'clientOrderId': undefined,
             'info': order,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -16851,6 +16865,7 @@ module.exports = class bitforex extends Exchange {
         const result = {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -18526,6 +18541,7 @@ module.exports = class bitmart extends Exchange {
         const type = undefined;
         return {
             'id': id,
+            'clientOrderId': undefined,
             'info': order,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -19496,7 +19512,7 @@ module.exports = class bitmax extends Exchange {
             'currency': this.safeString (order, 'feeAsset'),
         };
         const average = this.safeFloat (order, 'avgPrice');
-        const clientOrderId = this.safeString (order, 'coid');
+        const clientOrderId = id;
         return {
             'info': order,
             'id': id,
@@ -21070,9 +21086,11 @@ module.exports = class bitmex extends Exchange {
         const id = this.safeString (order, 'orderID');
         const type = this.safeStringLower (order, 'ordType');
         const side = this.safeStringLower (order, 'side');
+        const clientOrderId = this.safeString (order, 'clOrdID');
         return {
             'info': order,
             'id': id,
+            'clientOrderId': clientOrderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -21656,9 +21674,11 @@ module.exports = class bitso extends Exchange {
                 filled = amount - remaining;
             }
         }
+        const clientOrderId = this.safeString (order, 'client_id');
         return {
             'info': order,
             'id': id,
+            'clientOrderId': clientOrderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -22818,6 +22838,7 @@ module.exports = class bitstamp extends Exchange {
         }
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -23607,7 +23628,6 @@ module.exports = class bittrex extends Exchange {
             },
             'commonCurrencies': {
                 'BITS': 'SWIFT',
-                'CPC': 'Capricoin',
             },
         });
     }
@@ -24389,6 +24409,7 @@ module.exports = class bittrex extends Exchange {
         }
         return {
             'id': this.safeString (order, 'id'),
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -24531,6 +24552,7 @@ module.exports = class bittrex extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -25630,6 +25652,7 @@ module.exports = class bitz extends Exchange {
         const status = this.parseOrderStatus (this.safeString (order, 'status'));
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -27004,6 +27027,7 @@ module.exports = class bleutrade extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -27611,6 +27635,7 @@ module.exports = class braziliex extends Exchange {
         const status = (filledPercentage === 1.0) ? 'closed' : 'open';
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -28092,6 +28117,7 @@ module.exports = class btcalpha extends Exchange {
         }
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'status': status,
@@ -28492,7 +28518,16 @@ module.exports = class btcbox extends Exchange {
 
     parseOrder (order, market = undefined) {
         //
-        // {"id":11,"datetime":"2014-10-21 10:47:20","type":"sell","price":42000,"amount_original":1.2,"amount_outstanding":1.2,"status":"closed","trades":[]}
+        //     {
+        //         "id":11,
+        //         "datetime":"2014-10-21 10:47:20",
+        //         "type":"sell",
+        //         "price":42000,
+        //         "amount_original":1.2,
+        //         "amount_outstanding":1.2,
+        //         "status":"closed",
+        //         "trades":[]
+        //     }
         //
         const id = this.safeString (order, 'id');
         const datetimeString = this.safeString (order, 'datetime');
@@ -28531,6 +28566,7 @@ module.exports = class btcbox extends Exchange {
         const side = this.safeString (order, 'type');
         return {
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -28662,6 +28698,7 @@ module.exports = class btcbox extends Exchange {
 
 const Exchange = require ('./base/Exchange');
 const { ExchangeError, OrderNotFound, ArgumentsRequired, InvalidOrder, DDoSProtection } = require ('./base/errors');
+const { ROUND } = require ('./base/functions/number');
 
 //  ---------------------------------------------------------------------------
 
@@ -29125,8 +29162,8 @@ module.exports = class btcmarkets extends Exchange {
         });
         request['currency'] = market['quote'];
         request['instrument'] = market['base'];
-        request['price'] = parseInt (price * multiplier);
-        request['volume'] = parseInt (amount * multiplier);
+        request['price'] = parseInt (this.decimalToPrecision (price * multiplier, ROUND, 0));
+        request['volume'] = parseInt (this.decimalToPrecision (amount * multiplier, ROUND, 0));
         request['orderSide'] = orderSide;
         request['ordertype'] = this.capitalize (type);
         request['clientRequestId'] = this.nonce ().toString ();
@@ -29269,9 +29306,11 @@ module.exports = class btcmarkets extends Exchange {
             lastTradeTimestamp = trades[numTrades - 1]['timestamp'];
         }
         const id = this.safeString (order, 'id');
+        const clientOrderId = this.safeString (order, 'clientRequestId');
         return {
             'info': order,
             'id': id,
+            'clientOrderId': clientOrderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -29411,7 +29450,7 @@ module.exports = class btcmarkets extends Exchange {
     }
 };
 
-},{"./base/Exchange":7,"./base/errors":9}],52:[function(require,module,exports){
+},{"./base/Exchange":7,"./base/errors":9,"./base/functions/number":15}],52:[function(require,module,exports){
 'use strict';
 
 //  ---------------------------------------------------------------------------
@@ -29807,6 +29846,7 @@ module.exports = class btctradeua extends Exchange {
         }
         return {
             'id': this.safeString (order, 'id'),
+            'clientOrderId': undefined,
             'timestamp': timestamp, // until they fix their timestamp
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -30755,6 +30795,7 @@ module.exports = class buda extends Exchange {
         };
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -31715,6 +31756,7 @@ module.exports = class bw extends Exchange {
         return {
             'info': order,
             'id': this.safeString (order, 'entrustId'),
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -33023,9 +33065,9 @@ module.exports = class bybit extends Exchange {
             'Cancelled': 'canceled',
             'PendingCancel': 'canceling', // the engine has received the cancellation but there is no guarantee that it will be successful
             // conditional orders
-            'Active': 'open', // order is triggered and placed successfully
+            'Active': 'closed', // order is triggered and placed successfully
             'Untriggered': 'open', // order waits to be triggered
-            'Triggered': 'open', // order is triggered
+            'Triggered': 'closed', // order is triggered
             // 'Cancelled': 'canceled', // order is cancelled
             // 'Rejected': 'rejected', // order is triggered but fail to be placed
             'Deactivated': 'canceled', // conditional order was cancelled before triggering
@@ -33112,9 +33154,14 @@ module.exports = class bybit extends Exchange {
             };
         }
         const type = this.safeStringLower (order, 'order_type');
+        let clientOrderId = this.safeString (order, 'order_link_id');
+        if ((clientOrderId !== undefined) && (clientOrderId.length < 1)) {
+            clientOrderId = undefined;
+        }
         return {
             'info': order,
             'id': id,
+            'clientOrderId': clientOrderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -33498,11 +33545,20 @@ module.exports = class bybit extends Exchange {
         }
         const options = this.safeValue (this.options, 'fetchOrders', {});
         let defaultMethod = 'openapiGetOrderList';
+        let query = params;
         if (('stop_order_id' in params) || ('stop_order_status' in params)) {
+            let stopOrderStatus = this.safeValue (params, 'stopOrderStatus');
+            if (stopOrderStatus !== undefined) {
+                if (Array.isArray (stopOrderStatus)) {
+                    stopOrderStatus = stopOrderStatus.join (',');
+                }
+                request['stop_order_status'] = stopOrderStatus;
+                query = this.omit (params, 'stop_order_status');
+            }
             defaultMethod = 'openapiGetStopOrderList';
         }
         const method = this.safeString (options, 'method', defaultMethod);
-        const response = await this[method] (this.extend (request, params));
+        const response = await this[method] (this.extend (request, query));
         //
         //     {
         //         "ret_code": 0,
@@ -33599,16 +33655,25 @@ module.exports = class bybit extends Exchange {
             'Rejected',
             'Filled',
             'Cancelled',
-            'Deactivated',
+            // conditional orders
+            // 'Active',
+            // 'Triggered',
+            // 'Cancelled',
+            // 'Rejected',
+            // 'Deactivated',
         ];
         const options = this.safeValue (this.options, 'fetchClosedOrders', {});
         let status = this.safeValue (options, 'order_status', defaultStatuses);
         if (Array.isArray (status)) {
             status = status.join (',');
         }
-        const request = {
-            'order_status': status,
-        };
+        const request = {};
+        const stopOrderStatus = this.safeValue (params, 'stop_order_status');
+        if (stopOrderStatus === undefined) {
+            request['order_status'] = status;
+        } else {
+            request['stop_order_status'] = stopOrderStatus;
+        }
         return await this.fetchOrders (symbol, since, limit, this.extend (request, params));
     }
 
@@ -33618,18 +33683,21 @@ module.exports = class bybit extends Exchange {
             'New',
             'PartiallyFilled',
             'PendingCancel',
-            'Active',
-            'Untriggered',
-            'Triggered',
+            // conditional orders
+            // 'Untriggered',
         ];
         const options = this.safeValue (this.options, 'fetchOpenOrders', {});
         let status = this.safeValue (options, 'order_status', defaultStatuses);
         if (Array.isArray (status)) {
             status = status.join (',');
         }
-        const request = {
-            'order_status': status,
-        };
+        const request = {};
+        const stopOrderStatus = this.safeValue (params, 'stop_order_status');
+        if (stopOrderStatus === undefined) {
+            request['order_status'] = status;
+        } else {
+            request['stop_order_status'] = stopOrderStatus;
+        }
         return await this.fetchOrders (symbol, since, limit, this.extend (request, params));
     }
 
@@ -34607,6 +34675,7 @@ module.exports = class bytetrade extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': datetime,
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -36255,6 +36324,7 @@ module.exports = class cex extends Exchange {
         }
         return {
             'id': orderId,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -37193,6 +37263,7 @@ module.exports = class cobinhood extends Exchange {
         }
         return {
             'id': this.safeString (order, 'id'),
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -39324,6 +39395,7 @@ module.exports = class coinbasepro extends Exchange {
         const side = this.safeString (order, 'side');
         return {
             'id': id,
+            'clientOrderId': undefined,
             'info': order,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -39894,6 +39966,7 @@ module.exports = class coincheck extends Exchange {
         }
         return {
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -40486,6 +40559,7 @@ module.exports = class coinegg extends Exchange {
         const id = this.safeString (order, 'id');
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -41103,6 +41177,7 @@ module.exports = class coinex extends Exchange {
         const side = this.safeString (order, 'type');
         return {
             'id': this.safeString (order, 'id'),
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -41828,6 +41903,23 @@ module.exports = class coinfalcon extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "id":"8bdd79f4-8414-40a2-90c3-e9f4d6d1eef4"
+        //         "market":"IOT-BTC"
+        //         "price":"0.0000003"
+        //         "size":"4.0"
+        //         "size_filled":"3.0"
+        //         "fee":"0.0075"
+        //         "fee_currency_code":"iot"
+        //         "funds":"0.0"
+        //         "status":"canceled"
+        //         "order_type":"buy"
+        //         "post_only":false
+        //         "operation_type":"market_order"
+        //         "created_at":"2018-01-12T21:14:06.747828Z"
+        //     }
+        //
         if (market === undefined) {
             const marketId = this.safeString (order, 'market');
             if (marketId in this.markets_by_id) {
@@ -41861,6 +41953,7 @@ module.exports = class coinfalcon extends Exchange {
         const side = this.safeString (order, 'order_type');
         return {
             'id': this.safeString (order, 'id'),
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'status': status,
@@ -42429,6 +42522,7 @@ module.exports = class coinfloor extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -43283,8 +43377,32 @@ module.exports = class coinmate extends Exchange {
             },
             'fees': {
                 'trading': {
-                    'maker': 0.05 / 100,
-                    'taker': 0.15 / 100,
+                    'tierBased': true,
+                    'percentage': true,
+                    'maker': 0.12 / 100,
+                    'taker': 0.25 / 100,
+                    'tiers': {
+                        'taker': [
+                            [0, 0.25 / 100],
+                            [10000, 0.23 / 100],
+                            [100000, 0.21 / 100],
+                            [250000, 0.20 / 100],
+                            [500000, 0.15 / 100],
+                            [1000000, 0.13 / 100],
+                            [3000000, 0.10 / 100],
+                            [15000000, 0.05 / 100],
+                        ],
+                        'maker': [
+                            [0, 0.12 / 100],
+                            [10000, 0.11 / 100],
+                            [1000000, 0.10 / 100],
+                            [250000, 0.08 / 100],
+                            [500000, 0.05 / 100],
+                            [1000000, 0.03 / 100],
+                            [3000000, 0.02 / 100],
+                            [15000000, 0],
+                        ],
+                    },
                 },
             },
             'exceptions': {
@@ -44252,6 +44370,17 @@ module.exports = class coinone extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "index": "0",
+        //         "orderId": "68665943-1eb5-4e4b-9d76-845fc54f5489",
+        //         "timestamp": "1449037367",
+        //         "price": "444000.0",
+        //         "qty": "0.3456",
+        //         "type": "ask",
+        //         "feeRate": "-0.0015"
+        //     }
+        //
         const info = this.safeValue (order, 'info');
         const id = this.safeStringUpper (info, 'orderId');
         const timestamp = this.safeTimestamp (info, 'timestamp');
@@ -44294,6 +44423,7 @@ module.exports = class coinone extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -45485,6 +45615,7 @@ module.exports = class coss extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -46302,6 +46433,7 @@ module.exports = class crex24 extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -47313,8 +47445,8 @@ module.exports = class deribit extends Exchange {
             //     }
             //
             const instrumentsResult = this.safeValue (instrumentsResponse, 'result', []);
-            for (let i = 0; i < instrumentsResult.length; i++) {
-                const market = instrumentsResult[i];
+            for (let k = 0; k < instrumentsResult.length; k++) {
+                const market = instrumentsResult[k];
                 const id = this.safeString (market, 'instrument_name');
                 const baseId = this.safeString (market, 'base_currency');
                 const quoteId = this.safeString (market, 'quote_currency');
@@ -48007,6 +48139,7 @@ module.exports = class deribit extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -48578,7 +48711,7 @@ module.exports = class deribit extends Exchange {
             const auth = timestamp + "\n" + nonce + "\n" + requestData; // eslint-disable-line quotes
             const signature = this.hmac (this.encode (auth), this.encode (this.secret), 'sha256');
             headers = {
-                'Authorization': 'deri-hmac-sha256 id=' + this.apiKey + ',ts=' + timestamp + ',sig=' + signature + ',nonce=' + nonce,
+                'Authorization': 'deri-hmac-sha256 id=' + this.apiKey + ',ts=' + timestamp + ',sig=' + signature + ',' + 'nonce=' + nonce,
             };
         }
         const url = this.urls['api'] + request;
@@ -49465,6 +49598,7 @@ module.exports = class digifinex extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -50618,6 +50752,7 @@ module.exports = class dsx extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'symbol': symbol,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -52226,6 +52361,7 @@ module.exports = class exmo extends Exchange {
         };
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -52777,6 +52913,20 @@ module.exports = class exx extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "fees": 0,
+        //         "total_amount": 1,
+        //         "trade_amount": 0,
+        //         "price": 30,
+        //         "currency": “eth_hsr",
+        //         "id": "13878",
+        //         "trade_money": 0,
+        //         "type": "buy",
+        //         "trade_date": 1509728897772,
+        //         "status": 0
+        //     }
+        //
         const symbol = market['symbol'];
         const timestamp = parseInt (order['trade_date']);
         const price = this.safeFloat (order, 'price');
@@ -52801,6 +52951,7 @@ module.exports = class exx extends Exchange {
         }
         return {
             'id': this.safeString (order, 'id'),
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -53456,6 +53607,22 @@ module.exports = class fcoin extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "id": "string",
+        //         "symbol": "string",
+        //         "type": "limit",
+        //         "side": "buy",
+        //         "price": "string",
+        //         "amount": "string",
+        //         "state": "submitted",
+        //         "executed_value": "string",
+        //         "fill_fees": "string",
+        //         "filled_amount": "string",
+        //         "created_at": 0,
+        //         "source": "web"
+        //     }
+        //
         const id = this.safeString (order, 'id');
         const side = this.safeString (order, 'side');
         const status = this.parseOrderStatus (this.safeString (order, 'state'));
@@ -53504,6 +53671,7 @@ module.exports = class fcoin extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -55081,9 +55249,11 @@ module.exports = class ftx extends Exchange {
             cost = filled * price;
         }
         const lastTradeTimestamp = this.parse8601 (this.safeString (order, 'triggeredAt'));
+        const clientOrderId = this.safeString (order, 'clientId');
         return {
             'info': order,
             'id': id,
+            'clientOrderId': clientOrderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -56383,6 +56553,7 @@ module.exports = class gateio extends Exchange {
         }
         return {
             'id': id,
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -57135,8 +57306,10 @@ module.exports = class gemini extends Exchange {
         }
         const id = this.safeString (order, 'order_id');
         const side = this.safeStringLower (order, 'side');
+        const clientOrderId = this.safeString (order, 'client_order_id');
         return {
             'id': id,
+            'clientOrderId': clientOrderId,
             'info': order,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -58247,8 +58420,10 @@ module.exports = class hitbtc extends Exchange {
         const id = this.safeString (order, 'clientOrderId');
         const type = this.safeString (order, 'type');
         const side = this.safeString (order, 'side');
+        const clientOrderId = id;
         return {
             'id': id,
+            'clientOrderId': clientOrderId,
             'info': order,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -60686,6 +60861,7 @@ module.exports = class hollaex extends Exchange {
         const status = (type === 'market') ? 'closed' : 'open';
         const result = {
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -62169,6 +62345,7 @@ module.exports = class huobipro extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -62924,6 +63101,7 @@ module.exports = class ice3x extends Exchange {
         }
         return {
             'id': this.safeString (order, 'order_id'),
+            'clientOrderId': undefined,
             'datetime': this.iso8601 (timestamp),
             'timestamp': timestamp,
             'lastTradeTimestamp': undefined,
@@ -63833,6 +64011,7 @@ module.exports = class idex extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'symbol': symbol,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -64334,6 +64513,21 @@ module.exports = class independentreserve extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "OrderGuid": "c7347e4c-b865-4c94-8f74-d934d4b0b177",
+        //         "CreatedTimestampUtc": "2014-09-23T12:39:34.3817763Z",
+        //         "Type": "MarketBid",
+        //         "VolumeOrdered": 5.0,
+        //         "VolumeFilled": 5.0,
+        //         "Price": null,
+        //         "AvgPrice": 100.0,
+        //         "ReservedAmount": 0.0,
+        //         "Status": "Filled",
+        //         "PrimaryCurrencyCode": "Xbt",
+        //         "SecondaryCurrencyCode": "Usd"
+        //     }
+        //
         let symbol = undefined;
         const baseId = this.safeString (order, 'PrimaryCurrencyCode');
         const quoteId = this.safeString (order, 'PrimaryCurrencyCode');
@@ -64390,6 +64584,7 @@ module.exports = class independentreserve extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -64854,6 +65049,16 @@ module.exports = class indodax extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
+        //
+        //     {
+        //         "order_id": "12345",
+        //         "submit_time": "1392228122",
+        //         "price": "8000000",
+        //         "type": "sell",
+        //         "order_ltc": "100000000",
+        //         "remain_ltc": "100000000"
+        //     }
+        //
         let side = undefined;
         if ('type' in order) {
             side = order['type'];
@@ -64905,6 +65110,7 @@ module.exports = class indodax extends Exchange {
         return {
             'info': order,
             'id': id,
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -65601,19 +65807,51 @@ module.exports = class itbit extends Exchange {
     }
 
     parseOrder (order, market = undefined) {
-        const side = order['side'];
-        const type = order['type'];
+        //
+        //     {
+        //         "id": "13d6af57-8b0b-41e5-af30-becf0bcc574d",
+        //         "walletId": "7e037345-1288-4c39-12fe-d0f99a475a98",
+        //         "side": "buy",
+        //         "instrument": "XBTUSD",
+        //         "type": "limit",
+        //         "currency": "XBT",
+        //         "amount": "2.50000000",
+        //         "displayAmount": "2.50000000",
+        //         "price": "650.00000000",
+        //         "volumeWeightedAveragePrice": "0.00000000",
+        //         "amountFilled": "0.00000000",
+        //         "createdTime": "2014-02-11T17:05:15Z",
+        //         "status": "submitted",
+        //         "funds": null,
+        //         "metadata": {},
+        //         "clientOrderIdentifier": null,
+        //         "postOnly": "False"
+        //     }
+        //
+        const side = this.safeString (order, 'side');
+        const type = this.safeString (order, 'type');
         const symbol = this.markets_by_id[order['instrument']]['symbol'];
         const timestamp = this.parse8601 (order['createdTime']);
         const amount = this.safeFloat (order, 'amount');
         const filled = this.safeFloat (order, 'amountFilled');
-        const remaining = amount - filled;
+        let remaining = undefined;
+        let cost = undefined;
         const fee = undefined;
         const price = this.safeFloat (order, 'price');
         const average = this.safeFloat (order, 'volumeWeightedAveragePrice');
-        const cost = filled * average;
+        if (filled !== undefined) {
+            if (amount !== undefined) {
+                remaining = amount - filled;
+            }
+            if (average !== undefined) {
+                cost = filled * average;
+            }
+        }
+        const clientOrderId = this.safeString (order, 'clientOrderIdentifier');
+        const id = this.safeString (order, 'id');
         return {
-            'id': order['id'],
+            'id': id,
+            'clientOrderId': clientOrderId,
             'info': order,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -67154,8 +67392,10 @@ module.exports = class kraken extends Exchange {
                 id = (length > 1) ? id : id[0];
             }
         }
+        const clientOrderId = this.safeString (params, 'userref');
         return {
             'id': id,
+            'clientOrderId': clientOrderId,
             'info': response,
             'timestamp': undefined,
             'datetime': undefined,
@@ -67277,8 +67517,10 @@ module.exports = class kraken extends Exchange {
         }
         const status = this.parseOrderStatus (this.safeString (order, 'status'));
         const id = this.safeString (order, 'id');
+        const clientOrderId = this.safeString (order, 'userref');
         return {
             'id': id,
+            'clientOrderId': clientOrderId,
             'info': order,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
@@ -72998,6 +73240,7 @@ module.exports = class livecoin extends Exchange {
         return {
             'info': order,
             'id': order['id'],
+            'clientOrderId': undefined,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -77777,9 +78020,11 @@ module.exports = class okex extends Exchange {
                 'currency': feeCurrency,
             };
         }
+        const clientOrderId = this.safeString (order, 'client_oid');
         return {
             'info': order,
             'id': id,
+            'clientOrderId': clientOrderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': undefined,
@@ -79748,6 +79993,7 @@ module.exports = class poloniex extends Exchange {
         //             },
         //         ],
         //         'fee': '0.00000000',
+        //         'clientOrderId': '12345',
         //         'currencyPair': 'BTC_MANA',
         //         // ---------------------------------------------------------
         //         // the following fields are injected by createOrder
@@ -79834,9 +80080,11 @@ module.exports = class poloniex extends Exchange {
                 'currency': feeCurrencyCode,
             };
         }
+        const clientOrderId = this.safeString (order, 'clientOrderId');
         return {
             'info': order,
             'id': id,
+            'clientOrderId': clientOrderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
@@ -107137,9 +107385,11 @@ module.exports = class timex extends Exchange {
                 lastTradeTimestamp = trades[numTrades - 1]['timestamp'];
             }
         }
+        const clientOrderId = this.safeString (order, 'clientOrderId');
         return {
             'info': order,
             'id': id,
+            'clientOrderId': clientOrderId,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'lastTradeTimestamp': lastTradeTimestamp,
