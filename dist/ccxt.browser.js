@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.23.27'
+const version = '1.23.28'
 
 Exchange.ccxtVersion = version
 
@@ -59372,8 +59372,11 @@ module.exports = class idex extends Exchange {
             amount = this.safeFloat (order, 'amount');
         }
         const filled = this.safeFloat (order, 'filled');
-        const cost = this.safeFloat (order, 'total');
         const price = this.safeFloat (order, 'price');
+        let cost = this.safeFloat (order, 'total');
+        if ((cost !== undefined) && (filled !== undefined) && !cost) {
+            cost = filled * price;
+        }
         if ('market' in order) {
             const marketId = order['market'];
             symbol = this.markets_by_id[marketId]['symbol'];
