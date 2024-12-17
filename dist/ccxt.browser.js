@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.95'
+const version = '1.30.96'
 
 Exchange.ccxtVersion = version
 
@@ -27443,6 +27443,7 @@ module.exports = class bitz extends Exchange {
                 'fetchOrder': true,
                 'createMarketOrder': false,
                 'fetchDeposits': true,
+                'fetchTime': true,
                 'fetchWithdrawals': true,
                 'fetchTransactions': false,
             },
@@ -27480,6 +27481,7 @@ module.exports = class bitz extends Exchange {
                         'tickerall',
                         'kline',
                         'symbolList',
+                        'getServerTime',
                         'currencyRate',
                         'currencyCoinRate',
                         'coinRate',
@@ -27931,6 +27933,21 @@ module.exports = class bitz extends Exchange {
             }
         }
         return result;
+    }
+
+    async fetchTime (params = {}) {
+        const response = await this.marketGetGetServerTime (params);
+        //
+        //     {
+        //         "status":200,
+        //         "msg":"",
+        //         "data":[],
+        //         "time":1555490875,
+        //         "microtime":"0.35994200 1555490875",
+        //         "source":"api"
+        //     }
+        //
+        return this.safeTimestamp (response, 'time');
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
