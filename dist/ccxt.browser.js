@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.30.37'
+const version = '1.30.38'
 
 Exchange.ccxtVersion = version
 
@@ -85525,7 +85525,7 @@ module.exports = class phemex extends Exchange {
                 'fetchDepositAddress': true,
                 'fetchOrder': true,
                 'fetchOrders': true,
-                'fetchOpenOrdrs': true,
+                'fetchOpenOrders': true,
                 'fetchClosedOrders': true,
                 'fetchMyTrades': true,
             },
