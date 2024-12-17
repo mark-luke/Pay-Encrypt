@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1057'
+const version = '1.18.1061'
 
 Exchange.ccxtVersion = version
 
@@ -3745,12 +3745,6 @@ module.exports = class Exchange {
         return '0x' +  ethAbi.soliditySHA3 (types, values).toString ('hex')
     }
 
-    soliditySha256 (array) {
-        const values = this.solidityValues (array);
-        const types = this.solidityTypes (values);
-        return '0x' +  ethAbi.soliditySHA256 (types, values).toString ('hex')
-    }
-
     solidityTypes (array) {
         return array.map (value => (this.web3.utils.isAddress (value) ? 'address' : 'uint256'))
     }
@@ -3879,13 +3873,12 @@ module.exports = class Exchange {
         return this.web3.eth.accounts.hashMessage (message)
     }
 
-    // works with Node only
     signHash (hash, privateKey) {
-        const signature = ethUtil.ecsign (Buffer.from (hash.slice (-64), 'hex'), Buffer.from (privateKey.slice (-64), 'hex'))
+        const signature = this.ecdsa (hash.slice (-64), privateKey.slice (-64), 'secp256k1', undefined)
         return {
-            v: signature.v, // integer
-            r: '0x' + signature.r.toString ('hex'), // '0x'-prefixed hex string
-            s: '0x' + signature.s.toString ('hex'), // '0x'-prefixed hex string
+            'r': '0x' + signature['r'],
+            's': '0x' + signature['s'],
+            'v': 27 + signature['v'],
         }
     }
 
@@ -4081,7 +4074,12 @@ const { ArgumentsRequired } = require ('./../errors')
 /*  ------------------------------------------------------------------------ */
 
 const hash = (request, hash = 'md5', digest = 'hex') => {
-    const result = CryptoJS[hash.toUpperCase ()] (request)
+    const options = {}
+    if (hash === 'keccak') {
+        hash = 'SHA3'
+        options['outputLength'] = 256
+    }
+    const result = CryptoJS[hash.toUpperCase ()] (request, options)
     return (digest === 'binary') ? result : result.toString (CryptoJS.enc[capitalize (digest)])
 }
 
@@ -4138,14 +4136,17 @@ function jwt (request, secret, alg = 'HS256') {
     return [ token, signature ].join ('.')
 }
 
-function ecdsa (request, secret, algorithm = 'p256', hash = 'sha256') {
-    const digest = this.hash (request, hash, 'hex')
+function ecdsa (request, secret, algorithm = 'p256', hash = undefined) {
+    let digest = request
+    if (hash !== undefined) {
+        digest = this.hash (request, hash, 'hex')
+    }
     const curve = new EC (algorithm)
     const signature = curve.sign (digest, secret, 'hex',  { 'canonical': true })
     return {
         'r': signature.r.toString (16).padStart (64, '0'),
         's': signature.s.toString (16).padStart (64, '0'),
-        'v': signature.recoveryParam.toString (16),
+        'v': signature.recoveryParam,
     }
 }
 
