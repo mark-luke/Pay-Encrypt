@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.18.1151'
+const version = '1.18.1152'
 
 Exchange.ccxtVersion = version
 
@@ -60823,6 +60823,9 @@ module.exports = class latoken extends Exchange {
                     'maker': 0.1 / 100,
                     'taker': 0.1 / 100,
                 },
+            },
+            'commonCurrencies': {
+                'TSL': 'Treasure SL',
             },
             'options': {
                 'createOrderMethod': 'private_post_order_new', // private_post_order_test_order
