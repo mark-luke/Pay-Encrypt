@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.3'
+const version = '1.31.4'
 
 Exchange.ccxtVersion = version
 
@@ -22167,7 +22167,7 @@ module.exports = class bitmex extends Exchange {
 //  ---------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { AuthenticationError, ExchangeError, PermissionDenied, BadRequest, ArgumentsRequired, OrderNotFound, InsufficientFunds, ExchangeNotAvailable, DDoSProtection } = require ('./base/errors');
+const { AuthenticationError, ExchangeError, PermissionDenied, BadRequest, ArgumentsRequired, OrderNotFound, InsufficientFunds, ExchangeNotAvailable, DDoSProtection, InvalidAddress } = require ('./base/errors');
 
 //  ---------------------------------------------------------------------------
 
@@ -22184,6 +22184,7 @@ module.exports = class bitpanda extends Exchange {
                 'createDepositAddress': true,
                 'fetchBalance': true,
                 'fetchCurrencies': true,
+                'fetchDepositAddress': true,
                 'fetchMarkets': true,
                 'fetchOHLCV': true,
                 'fetchOrderBook': true,
@@ -22301,6 +22302,8 @@ module.exports = class bitpanda extends Exchange {
             },
             'exceptions': {
                 'exact': {
+                    'ONLY_ONE_ERC20_ADDRESS_ALLOWED': InvalidAddress,
+                    'DEPOSIT_ADDRESS_NOT_USED': InvalidAddress,
                     'INVALID_CREDENTIALS': AuthenticationError,
                     'MISSING_CREDENTIALS': AuthenticationError,
                     'INVALID_APIKEY': AuthenticationError,
@@ -22979,6 +22982,22 @@ module.exports = class bitpanda extends Exchange {
         return this.parseBalance (result);
     }
 
+    parseDepositAddress (depositAddress, currency = undefined) {
+        let code = undefined;
+        if (currency !== undefined) {
+            code = currency['code'];
+        }
+        const address = this.safeString (depositAddress, 'address');
+        const tag = this.safeString (depositAddress, 'destination_tag');
+        this.checkAddress (address);
+        return {
+            'currency': code,
+            'address': address,
+            'tag': tag,
+            'info': depositAddress,
+        };
+    }
+
     async createDepositAddress (code, params = {}) {
         await this.loadMarkets ();
         const currency = this.currency (code);
@@ -22994,15 +23013,26 @@ module.exports = class bitpanda extends Exchange {
         //         "is_smart_contract":false
         //     }
         //
-        const address = this.safeString (response, 'address');
-        const tag = this.safeString (response, 'destination_tag');
-        this.checkAddress (address);
-        return {
-            'currency': code,
-            'address': address,
-            'tag': tag,
-            'info': response,
+        return this.parseDepositAddress (response, currency);
+    }
+
+    async fetchDepositAddress (code, params = {}) {
+        await this.loadMarkets ();
+        const currency = this.currency (code);
+        const request = {
+            'currency_code': currency['id'],
         };
+        const response = await this.privateGetAccountDepositCryptoCurrencyCode (this.extend (request, params));
+        //
+        //     {
+        //         "address":"rBnNhk95FrdNisZtXcStzriFS8vEzz53DM",
+        //         "destination_tag":"865690307",
+        //         "enabled":true,
+        //         "is_smart_contract":false,
+        //         "can_create_more":false
+        //     }
+        //
+        return this.parseDepositAddress (response, currency);
     }
 
     handleErrors (code, reason, url, method, headers, body, response, requestHeaders, requestBody) {
