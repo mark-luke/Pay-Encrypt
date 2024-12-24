@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.6'
+const version = '1.19.9'
 
 Exchange.ccxtVersion = version
 
@@ -7384,6 +7384,7 @@ module.exports = class bibox extends Exchange {
             },
             'commonCurrencies': {
                 'KEY': 'Bihu',
+                'MTC': 'MTC Mesh Network', // conflict with MTC Docademic doc.com Token https://github.com/ccxt/ccxt/issues/6081 https://github.com/ccxt/ccxt/issues/3025
                 'PAI': 'PCHAIN',
             },
         });
@@ -39022,6 +39023,7 @@ module.exports = class coinmarketcap extends Exchange {
             'KingN Coin': 'KingN Coin', // conflict with KNC (Kyber Network)
             'LiteBitcoin': 'LiteBitcoin', // conflict with LBTC (LightningBitcoin)
             'Maggie': 'Maggie',
+            'MTC Mesh Network': 'MTC Mesh Network', // conflict with MTC Docademic doc.com Token https://github.com/ccxt/ccxt/issues/6081 https://github.com/ccxt/ccxt/issues/3025
             'IOTA': 'IOTA', // a special case, most exchanges list it as IOTA, therefore we change just the Coinmarketcap instead of changing them all
             'NetCoin': 'NetCoin',
             'PCHAIN': 'PCHAIN', // conflict with PAI (Project Pai)
@@ -74062,7 +74064,7 @@ module.exports = class okex3 extends Exchange {
                     '30029': AccountSuspended, // { "code": 30029, "message": "account suspended" }
                     '30030': ExchangeError, // { "code": 30030, "message": "endpoint request failed. Please try again" }
                     '30031': BadRequest, // { "code": 30031, "message": "token does not exist" }
-                    '30032': ExchangeError, // { "code": 30032, "message": "pair does not exist" }
+                    '30032': BadSymbol, // { "code": 30032, "message": "pair does not exist" }
                     '30033': BadRequest, // { "code": 30033, "message": "exchange domain does not exist" }
                     '30034': ExchangeError, // { "code": 30034, "message": "exchange ID does not exist" }
                     '30035': ExchangeError, // { "code": 30035, "message": "trading is not supported in this website" }
