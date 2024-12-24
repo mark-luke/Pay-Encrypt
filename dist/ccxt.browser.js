@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.34.21'
+const version = '1.34.22'
 
 Exchange.ccxtVersion = version
 
@@ -8612,7 +8612,7 @@ module.exports = class binance extends Exchange {
                 'amount': this.safeInteger (market, 'baseAssetPrecision'),
                 'price': this.safeInteger (market, 'quotePrecision'),
             };
-            const status = this.safeString (market, delivery ? 'contractStatus' : 'status');
+            const status = this.safeString2 (market, 'status', 'contractStatus');
             const active = (status === 'TRADING');
             const margin = this.safeValue (market, 'isMarginTradingAllowed', future || delivery);
             const entry = {
