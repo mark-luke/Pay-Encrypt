@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.25.50'
+const version = '1.25.51'
 
 Exchange.ccxtVersion = version
 
@@ -79523,14 +79523,6 @@ module.exports = class okex extends Exchange {
     }
 
     parseMyTrade (pair, market = undefined) {
-        if (!Array.isArray (pair)) {
-            throw new NotSupported (this.id + ' parseMyTrade() received unrecognized response format, the exchange API might have changed, paste your verbose output: https://github.com/ccxt/ccxt/wiki/FAQ#what-is-required-to-get-help');
-        }
-        // make sure it has exactly 2 trades, no more, no less
-        const numTradesInPair = pair.length;
-        if (numTradesInPair !== 2) {
-            throw new NotSupported (this.id + ' parseMyTrade() received unrecognized response format, more than two trades in one fill, the exchange API might have changed, paste your verbose output: https://github.com/ccxt/ccxt/wiki/FAQ#what-is-required-to-get-help');
-        }
         // check that trading symbols match in both entries
         const first = pair[0];
         const second = pair[1];
@@ -79653,8 +79645,12 @@ module.exports = class okex extends Exchange {
         for (let i = 0; i < tradeIds.length; i++) {
             const tradeId = tradeIds[i];
             const pair = grouped[tradeId];
-            const trade = this.parseMyTrade (pair);
-            result.push (trade);
+            // make sure it has exactly 2 trades, no more, no less
+            const numTradesInPair = pair.length;
+            if (numTradesInPair === 2) {
+                const trade = this.parseMyTrade (pair);
+                result.push (trade);
+            }
         }
         let symbol = undefined;
         if (market !== undefined) {
