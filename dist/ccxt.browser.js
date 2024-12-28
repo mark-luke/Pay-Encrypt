@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.31.88'
+const version = '1.31.89'
 
 Exchange.ccxtVersion = version
 
@@ -26248,21 +26248,28 @@ module.exports = class bittrex extends Exchange {
             'pro': true,
             // new metainfo interface
             'has': {
+                'cancelOrder': true,
                 'CORS': false,
                 'createMarketOrder': true,
+                'createOrder': true,
+                'fetchBalance': true,
+                'fetchDeposits': true,
                 'fetchDepositAddress': true,
                 'fetchClosedOrders': true,
                 'fetchCurrencies': true,
+                'fetchMarkets': true,
                 'fetchMyTrades': 'emulated',
                 'fetchOHLCV': true,
                 'fetchOrder': true,
+                'fetchOrderBook': true,
                 'fetchOpenOrders': true,
+                'fetchTicker': true,
                 'fetchTickers': true,
                 'fetchTime': true,
-                'withdraw': true,
-                'fetchDeposits': true,
-                'fetchWithdrawals': true,
+                'fetchTrades': true,
                 'fetchTransactions': false,
+                'fetchWithdrawals': true,
+                'withdraw': true,
             },
             'timeframes': {
                 '1m': 'MINUTE_1',
