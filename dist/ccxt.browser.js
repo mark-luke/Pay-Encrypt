@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.19.23'
+const version = '1.19.25'
 
 Exchange.ccxtVersion = version
 
@@ -4175,12 +4175,6 @@ module.exports = class Exchange {
         }
     }
 
-    isJsonEncodedObject (object) {
-        return ((typeof object === 'string') &&
-                (object.length >= 2) &&
-                ((object[0] === '{') || (object[0] === '[')))
-    }
-
     getResponseHeaders (response) {
         const result = {}
         response.headers.forEach ((value, key) => {
@@ -5429,6 +5423,12 @@ module.exports =
 
     { json:   (data, params = undefined) => JSON.stringify (data)
     , unjson: JSON.parse
+
+    , isJsonEncodedObject: object => (
+        (typeof object === 'string') &&
+        (object.length >= 2) &&
+        ((object[0] === '{') || (object[0] === '['))
+    )
 
     , stringToBinary (str) {
         const arr = new Uint8Array (str.length)
@@ -58062,8 +58062,8 @@ module.exports = class idex extends Exchange {
             'change': undefined,
             'percentage': percentage,
             'average': undefined,
-            'baseVolume': baseVolume,
-            'quoteVolume': quoteVolume,
+            'baseVolume': quoteVolume,
+            'quoteVolume': baseVolume,
             'info': ticker,
         };
     }
