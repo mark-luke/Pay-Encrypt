@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.32.57'
+const version = '1.32.58'
 
 Exchange.ccxtVersion = version
 
@@ -53705,9 +53705,7 @@ module.exports = class currencycom extends Exchange {
         };
     }
 
-    async fetchBalance (params = {}) {
-        await this.loadMarkets ();
-        const response = await this.privateGetAccount (params);
+    parseBalanceResponse (response) {
         //
         //     {
         //         "makerCommission":0.20,
@@ -53742,6 +53740,34 @@ module.exports = class currencycom extends Exchange {
             result[code] = account;
         }
         return this.parseBalance (result);
+    }
+
+    async fetchBalance (params = {}) {
+        await this.loadMarkets ();
+        const response = await this.privateGetAccount (params);
+        //
+        //     {
+        //         "makerCommission":0.20,
+        //         "takerCommission":0.20,
+        //         "buyerCommission":0.20,
+        //         "sellerCommission":0.20,
+        //         "canTrade":true,
+        //         "canWithdraw":true,
+        //         "canDeposit":true,
+        //         "updateTime":1591056268,
+        //         "balances":[
+        //             {
+        //                 "accountId":5470306579272968,
+        //                 "collateralCurrency":true,
+        //                 "asset":"ETH",
+        //                 "free":0.0,
+        //                 "locked":0.0,
+        //                 "default":false,
+        //             },
+        //         ]
+        //     }
+        //
+        return this.parseBalanceResponse (response);
     }
 
     async fetchOrderBook (symbol, limit = undefined, params = {}) {
