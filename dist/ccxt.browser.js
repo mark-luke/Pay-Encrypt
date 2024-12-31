@@ -43,7 +43,7 @@ const Exchange  = require ('./js/base/Exchange')
 //-----------------------------------------------------------------------------
 // this is updated by vss.js when building
 
-const version = '1.22.8'
+const version = '1.22.9'
 
 Exchange.ccxtVersion = version
 
@@ -43194,9 +43194,6 @@ module.exports = class crex24 extends Exchange {
         //         }
         //     ]
         //
-        // const log = require ('ololog').unlimited.green;
-        // log (response);
-        // process.exit ();
         const result = { 'info': response };
         for (let i = 0; i < response.length; i++) {
             const balance = response[i];
